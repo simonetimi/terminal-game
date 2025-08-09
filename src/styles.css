@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+html,
+body {
+  @apply bg-black text-green-400 h-screen text-base;
+  font-family: "Courier New", monospace;
+}
+
+.ascii-art {
+  font-family: monospace;
+  white-space: pre;
+}

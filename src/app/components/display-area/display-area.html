@@ -1,0 +1,8 @@
+<ul
+  #scrollContainer
+  class="list-none h-full overflow-y-auto flex flex-col-reverse"
+>
+  @for (item of displayItems(); track item) {
+    <li [innerHTML]="item"></li>
+  }
+</ul>

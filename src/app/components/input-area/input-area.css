@@ -1,0 +1,7 @@
+input.terminal-input {
+  caret-color: #22ff22;
+}
+input.terminal-input::selection {
+  background: #22ff22;
+  color: #000;
+}
