@@ -39,16 +39,20 @@ export class GameService {
     const savedDisplay = this.#persistenceService.loadDisplayState();
     const savedPlayerData = this.#persistenceService.loadPlayerData();
 
-    if (savedNode) {
-      this.currentNode.set(savedNode);
-      if (savedDisplay) this.displayItems.set(savedDisplay);
-      if (savedPlayerData) this.playerName.set(savedPlayerData.name);
+    if (savedNode && savedDisplay && savedPlayerData) {
+      this.displayItems.set(savedDisplay);
+      this.playerName.set(savedPlayerData.name);
+      this.setCurrentNode(savedNode);
     } else {
       this.setCurrentNode(gameData.nodes[0]);
     }
   }
 
   setCurrentNode(node: GameNode) {
+    // save before the node change
+    this.#persistenceService.saveCurrentNode(node);
+    this.#persistenceService.saveDisplayState(this.displayItems());
+
     this.currentNode.set(node);
     this.writeOnScreen(node.text, () => {
       const choices = node.choices
@@ -57,9 +61,7 @@ export class GameService {
         )
         .reverse();
       this.displayItems.update((items) => [...choices, ...items]);
-      this.#persistenceService.saveDisplayState(this.displayItems());
     });
-    this.#persistenceService.saveCurrentNode(node);
   }
 
   writeOnScreen(text: string, callback?: () => void) {
