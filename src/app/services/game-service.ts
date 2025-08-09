@@ -41,8 +41,8 @@ export class GameService {
 
     if (savedNode) {
       this.currentNode.set(savedNode);
-      this.displayItems.set(savedDisplay);
-      this.playerName.set(savedPlayerData.name);
+      if (savedDisplay) this.displayItems.set(savedDisplay);
+      if (savedPlayerData) this.playerName.set(savedPlayerData.name);
     } else {
       this.setCurrentNode(gameData.nodes[0]);
     }
