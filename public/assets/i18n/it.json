@@ -1,0 +1,60 @@
+{
+  "nodes": [
+    {
+      "id": "welcome",
+      "text": "Ciao. Hai un'aria familiare, ma... no, non ci siamo mai incontrati. Come ti chiami?",
+      "choices": [
+        {
+          "id": "answer",
+          "text": "Inserisci il tuo nome",
+          "nextNodeId": "start"
+        }
+      ],
+      "freeInput": true
+    },
+    {
+      "id": "start",
+      "text": "Ti trovi a un crocevia.",
+      "choices": [
+        {
+          "id": "go_left",
+          "text": "Vai a sinistra",
+          "nextNodeId": "forest",
+          "conditions": [
+            {
+              "type": "hasItem",
+              "item": "map"
+            }
+          ],
+          "effects": [
+            {
+              "type": "addItem",
+              "item": "torch"
+            }
+          ]
+        },
+        {
+          "id": "go_right",
+          "text": "Vai a destra",
+          "nextNodeId": "river"
+        }
+      ]
+    },
+    {
+      "id": "forest",
+      "text": "Arrivi in una foresta",
+      "choices": [
+        {
+          "id": "go_left_2",
+          "text": "Vai a sinistra 2",
+          "nextNodeId": "forest"
+        },
+        {
+          "id": "go_right_2",
+          "text": "Vai a destra 2",
+          "nextNodeId": "river"
+        }
+      ]
+    }
+  ]
+}

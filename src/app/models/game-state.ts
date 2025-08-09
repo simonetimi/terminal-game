@@ -1,3 +1,10 @@
+export interface GameNode {
+  id: string;
+  text: string;
+  choices: Choice[];
+  freeInput?: boolean;
+}
+
 export interface Choice {
   id: string;
   text: string;
@@ -6,32 +13,16 @@ export interface Choice {
   effects?: Effect[];
 }
 
-export interface Node {
-  id: string;
-  text: string;
-  choices: Choice[];
-  conditions?: Condition[];
-}
-
 export interface Condition {
-  type: 'hasItem' | 'healthAbove' | 'flagSet' | 'custom';
-  key: string;
-  value?: any;
+  type: string;
+  item: string;
 }
 
 export interface Effect {
-  type: 'addItem' | 'removeItem' | 'changeHealth' | 'setFlag';
-  key: string;
-  value?: any;
+  type: string;
+  item: string;
 }
 
-export interface PlayerState {
-  health: number;
-  inventory: string[];
-  flags: Record<string, boolean>;
-}
-
-export interface GameHistoryEntry {
-  nodeId: string;
-  choiceId: string | null;
+export interface GameData {
+  nodes: GameNode[];
 }

@@ -4,5 +4,5 @@ import { firstValueFrom } from 'rxjs';
 
 export function initializeTranslations(translate = inject(TranslateService)) {
   translate.setFallbackLang('en');
-  return firstValueFrom(translate.use('en'));
+  return firstValueFrom(translate.use('it'));
 }

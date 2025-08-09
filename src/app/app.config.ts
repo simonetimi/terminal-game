@@ -22,14 +22,11 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(),
-
     provideTranslateService({
       loader: provideTranslateHttpLoader({
         prefix: 'assets/i18n/',
         suffix: '.json',
       }),
-      fallbackLang: 'en',
-      lang: 'en',
     }),
     provideAppInitializer(initializeTranslations),
   ],
