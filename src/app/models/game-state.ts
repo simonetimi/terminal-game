@@ -26,3 +26,7 @@ export interface Effect {
 export interface GameData {
   nodes: GameNode[];
 }
+
+export interface PlayerData {
+  name: string;
+}

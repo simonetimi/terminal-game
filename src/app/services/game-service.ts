@@ -1,22 +1,25 @@
-import { effect, inject, Injectable, signal } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { typewriter } from '../utils/typewriter';
 
 // TODO this will be inside, not in the assets
-import gameData from '../../../public/assets/i18n/it.json';
+import gameData from '../game-data/data.json';
 import { GameNode } from '../models/game-state';
 import { strip } from '../utils/strings';
+import { PersistenceService } from './persistence-service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GameService {
   #translateService = inject(TranslateService);
+  #persistenceService = inject(PersistenceService);
 
   playerName = signal('anonymous');
   displayItems = signal<string[]>([]);
 
   isSystemWriting = signal(false);
+  isExiting = signal(false);
 
   skipAnimation = () => {};
 
@@ -31,7 +34,18 @@ export class GameService {
         this.skipAnimation();
       }
     });
-    this.setCurrentNode(gameData.nodes[0]);
+
+    const savedNode = this.#persistenceService.loadCurrentNode();
+    const savedDisplay = this.#persistenceService.loadDisplayState();
+    const savedPlayerData = this.#persistenceService.loadPlayerData();
+
+    if (savedNode) {
+      this.currentNode.set(savedNode);
+      this.displayItems.set(savedDisplay);
+      this.playerName.set(savedPlayerData.name);
+    } else {
+      this.setCurrentNode(gameData.nodes[0]);
+    }
   }
 
   setCurrentNode(node: GameNode) {
@@ -43,7 +57,9 @@ export class GameService {
         )
         .reverse();
       this.displayItems.update((items) => [...choices, ...items]);
+      this.#persistenceService.saveDisplayState(this.displayItems());
     });
+    this.#persistenceService.saveCurrentNode(node);
   }
 
   writeOnScreen(text: string, callback?: () => void) {
@@ -68,7 +84,24 @@ export class GameService {
       const name = cleanInput.slice(0, 20);
       const nextNodeId = this.currentNode().choices[0].nextNodeId;
       this.setCurrentNode(this.findNode(nextNodeId));
+      this.#persistenceService.savePlayerData({ name });
       return this.playerName.set(name);
+    }
+
+    if (this.isExiting()) {
+      const confirm = this.#translateService.instant('commands.yes');
+      if (confirm.keys.includes(cleanInput.toLowerCase())) {
+        return this.#persistenceService.clearAllDataAndRefresh();
+      } else {
+        this.displayItems.update((items) => items.slice(1));
+        return this.isExiting.set(false);
+      }
+    }
+
+    const exit = this.#translateService.instant('commands.exit');
+    if (exit.keys.includes(cleanInput.toLowerCase())) {
+      this.isExiting.set(true);
+      return this.displayItems.update((items) => [exit.text, ...items]);
     }
 
     // parse number for the choice. if input is not a number, return
