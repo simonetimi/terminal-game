@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   effect,
   ElementRef,
@@ -13,6 +14,7 @@ import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
   imports: [ReactiveFormsModule, FormsModule],
   templateUrl: './input-area.html',
   styleUrl: './input-area.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputArea {
   #gameService = inject(GameService);
@@ -30,7 +32,7 @@ export class InputArea {
 
   protected inputCommand = new FormControl('');
   protected isSystemWriting = this.#gameService.isSystemWriting;
-  protected playerName = this.#gameService.playerName;
+  protected playerState = this.#gameService.playerState;
 
   onSubmit() {
     this.#gameService.sendUserInput(this.inputCommand.value ?? '');

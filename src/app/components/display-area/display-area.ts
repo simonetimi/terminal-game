@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   effect,
   ElementRef,
@@ -12,6 +13,7 @@ import { GameService } from '../../services/game-service';
   imports: [],
   templateUrl: './display-area.html',
   styleUrl: './display-area.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DisplayArea {
   #gameService = inject(GameService);

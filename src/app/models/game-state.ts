@@ -29,4 +29,5 @@ export interface GameData {
 
 export interface PlayerData {
   name: string;
+  health: number;
 }

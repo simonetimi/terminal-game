@@ -1,4 +1,9 @@
 {
+  "splashScreen": {
+    "welcome1": "Connessione stabilita.",
+    "welcome2": "In attesa di autorizzazione utente...",
+    "button": "Premi INVIO"
+  },
   "commands": {
     "exit": {
       "keys": [

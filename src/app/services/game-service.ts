@@ -2,10 +2,11 @@ import { inject, Injectable, signal } from '@angular/core';
 import { typewriter } from '../utils/typewriter';
 
 import gameData from '../game-data/data.json';
-import { GameNode } from '../models/game-state';
+import { GameNode, PlayerData } from '../models/game-state';
 import { strip } from '../utils/strings';
 import { PersistenceService } from './persistence-service';
 import { TranslateService } from '@ngx-translate/core';
+import { AudioService } from './audio-service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,9 +14,12 @@ import { TranslateService } from '@ngx-translate/core';
 export class GameService {
   #translateService = inject(TranslateService);
   #persistenceService = inject(PersistenceService);
+  #audioService = inject(AudioService);
 
-  playerName = signal('anonymous');
-  playerHealth = signal(3);
+  playerState = signal<PlayerData>({
+    name: 'anonymous',
+    health: 3,
+  });
   displayItems = signal<string[]>([]);
 
   isSystemWriting = signal(false);
@@ -35,13 +39,14 @@ export class GameService {
       }
     });
 
-    const savedNode = this.#persistenceService.loadCurrentNode();
+    const savedNodeId = this.#persistenceService.loadCurrentNodeId();
     const savedDisplay = this.#persistenceService.loadDisplayState();
     const savedPlayerData = this.#persistenceService.loadPlayerData();
 
-    if (savedNode && savedDisplay && savedPlayerData) {
+    if (savedNodeId && savedDisplay && savedPlayerData) {
+      const savedNode = this.findNode(savedNodeId);
       this.displayItems.set(savedDisplay);
-      this.playerName.set(savedPlayerData.name);
+      this.playerState.set(savedPlayerData);
       this.setCurrentNode(savedNode);
     } else {
       this.setCurrentNode(gameData.nodes[0]);
@@ -50,7 +55,7 @@ export class GameService {
 
   setCurrentNode(node: GameNode) {
     // save the current state
-    this.#persistenceService.saveCurrentNode(node);
+    this.#persistenceService.saveCurrentNodeId(node.id);
     this.#persistenceService.saveDisplayState(this.displayItems());
 
     this.currentNode.set(node);
@@ -62,6 +67,7 @@ export class GameService {
 
   writeOnScreen(text: string, callback?: () => void) {
     this.isSystemWriting.set(true);
+    this.#audioService.playAudio('blip');
     this.skipAnimation = typewriter(
       this.displayItems,
       text,
@@ -82,8 +88,9 @@ export class GameService {
       const name = cleanInput.slice(0, 20);
       const nextNodeId = this.currentNode().choices[0].nextNodeId;
       this.setCurrentNode(this.findNode(nextNodeId));
-      this.#persistenceService.savePlayerData({ name });
-      return this.playerName.set(name);
+
+      this.playerState.update((playerState) => ({ ...playerState, name }));
+      return this.#persistenceService.savePlayerData(this.playerState());
     }
 
     if (this.isUserQuitting()) {

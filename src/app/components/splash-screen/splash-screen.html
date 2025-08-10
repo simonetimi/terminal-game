@@ -1,0 +1,20 @@
+<form
+  class="w-[80vw] flex flex-col gap-6 justify-center items-center"
+  (ngSubmit)="onSubmit()"
+>
+  <ul class="flex flex-col-reverse list-none">
+    @for (message of displayMessages(); track $index) {
+      <li>
+        {{ message }}
+      </li>
+    }
+  </ul>
+  @if (showButton()) {
+    <button
+      autofocus
+      class="bg-transparent p-2 text-green-400 border border-green-400 shadow-none outline-none rounded-lg cursor-pointer"
+    >
+      {{ "splashScreen.button" | translate }}
+    </button>
+  }
+</form>

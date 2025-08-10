@@ -14,7 +14,6 @@ export class PersistenceService {
     if (result) return JSON.parse(result);
   }
 
-  // TODO to expand with more player data (inventory, health, name, etc).
   savePlayerData(data: PlayerData) {
     this.save('player', data);
   }
@@ -31,11 +30,11 @@ export class PersistenceService {
     return this.load('terminalDisplay');
   }
 
-  saveCurrentNode(node: GameNode) {
-    this.save('currentNode', node);
+  saveCurrentNodeId(nodeId: string) {
+    this.save('currentNode', nodeId);
   }
 
-  loadCurrentNode(): GameNode {
+  loadCurrentNodeId(): string {
     return this.load('currentNode');
   }
 
