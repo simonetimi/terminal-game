@@ -7,4 +7,17 @@
     autocomplete="off"
     [formControl]="inputCommand"
   />
+  <img
+    [alt]="
+      isSoundOn()
+        ? 'alt.inputArea.soundOn'
+        : ('alt.inputArea.soundOff' | translate)
+    "
+    [src]="`/assets/icons/sound-${isSoundOn() ? 'on' : 'off'}.svg`"
+    height="20px"
+    width="20px"
+    class="self-center cursor-pointer"
+    role="button"
+    (click)="onToggleSound()"
+  />
 </form>

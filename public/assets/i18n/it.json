@@ -20,5 +20,14 @@
         "s"
       ]
     }
+  },
+  "alt": {
+    "playerStatus": {
+      "heartIcon": "Vita"
+    },
+    "inputArea": {
+      "soundOff": "Suoni disattivati",
+      "soundOn": "Suoni attivati"
+    }
   }
 }

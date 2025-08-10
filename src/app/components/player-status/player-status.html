@@ -1,7 +1,7 @@
 <div class="flex gap-2 justify-end w-full">
   @for (heart of playerHearts(); track $index) {
     <img
-      [alt]="'player heart ' + heart"
+      [alt]="('alt.playerStatus.heartIcon' | translate) + heart"
       src="/assets/icons/heart.svg"
       height="15px"
       width="15px"

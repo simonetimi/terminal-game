@@ -5,12 +5,14 @@ import {
   inject,
 } from '@angular/core';
 import { GameService } from '../../services/game-service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-player-status',
   templateUrl: './player-status.html',
   styleUrl: './player-status.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [TranslatePipe],
 })
 export class PlayerStatus {
   #gameService = inject(GameService);

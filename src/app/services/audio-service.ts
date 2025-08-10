@@ -1,10 +1,12 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable, OnInit, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AudioService implements OnInit {
   #blipAudio = new Audio('assets/sounds/blip.wav');
+
+  isSoundOn = signal(true);
 
   public AUDIO_MAP: Record<string, HTMLAudioElement> = {
     blip: this.#blipAudio,
@@ -19,6 +21,7 @@ export class AudioService implements OnInit {
   }
 
   playAudio(key: string) {
+    if (!this.isSoundOn()) return;
     const audio = this.AUDIO_MAP[key];
     audio.currentTime = 0;
     audio.play();
