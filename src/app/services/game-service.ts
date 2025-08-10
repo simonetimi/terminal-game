@@ -1,7 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { typewriter } from '../utils/typewriter';
 
-// TODO this will be inside, not in the assets
 import gameData from '../game-data/data.json';
 import { GameNode } from '../models/game-state';
 import { strip } from '../utils/strings';
@@ -16,10 +15,11 @@ export class GameService {
   #persistenceService = inject(PersistenceService);
 
   playerName = signal('anonymous');
+  playerHealth = signal(3);
   displayItems = signal<string[]>([]);
 
   isSystemWriting = signal(false);
-  isExiting = signal(false);
+  isUserQuitting = signal(false);
 
   skipAnimation = () => {};
 
@@ -49,17 +49,13 @@ export class GameService {
   }
 
   setCurrentNode(node: GameNode) {
-    // save before the node change
+    // save the current state
     this.#persistenceService.saveCurrentNode(node);
     this.#persistenceService.saveDisplayState(this.displayItems());
 
     this.currentNode.set(node);
     this.writeOnScreen(node.text, () => {
-      const choices = node.choices
-        .map((choice, idx) =>
-          node.freeInput ? '> ' + choice.text : `${idx + 1}. ${choice.text}`,
-        )
-        .reverse();
+      const choices = this.renderChoices(node);
       this.displayItems.update((items) => [...choices, ...items]);
     });
   }
@@ -90,23 +86,22 @@ export class GameService {
       return this.playerName.set(name);
     }
 
-    if (this.isExiting()) {
+    if (this.isUserQuitting()) {
       const confirm = this.#translateService.instant('commands.yes');
       if (confirm.keys.includes(cleanInput.toLowerCase())) {
         return this.#persistenceService.clearAllDataAndRefresh();
       } else {
         this.displayItems.update((items) => items.slice(1));
-        return this.isExiting.set(false);
+        return this.isUserQuitting.set(false);
       }
     }
-
     const exit = this.#translateService.instant('commands.exit');
     if (exit.keys.includes(cleanInput.toLowerCase())) {
-      this.isExiting.set(true);
+      this.isUserQuitting.set(true);
       return this.displayItems.update((items) => [exit.text, ...items]);
     }
 
-    // parse number for the choice. if input is not a number, return
+    // parse number for the choice
     const choice = parseInt(cleanInput);
     if (isNaN(choice)) return;
 
@@ -118,5 +113,13 @@ export class GameService {
 
   findNode(nodeId: string) {
     return gameData.nodes.find((node) => node.id === nodeId)!;
+  }
+
+  renderChoices(node: GameNode) {
+    return node.choices
+      .map((choice, idx) =>
+        node.freeInput ? '> ' + choice.text : `${idx + 1}. ${choice.text}`,
+      )
+      .reverse();
   }
 }
