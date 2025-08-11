@@ -1,9 +1,18 @@
 # Terminal Game
 
-### In progress
-
 Simulated terminal rpg text-based game
 
-- Choices-based story
-- Basic inventory
-- Player health
+## Features
+
+- Choice-based game
+- Save on local storage
+- Autofocus the input when user input is required
+- Toggle to disable sounds
+- Autoscroll when the computer replies to the player
+- Support for gameplay features like health, items and effects
+
+## In progress
+
+### TODO
+- [ ] Better 8-bit icons
+

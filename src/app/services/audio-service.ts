@@ -1,9 +1,9 @@
-import { Injectable, OnInit, signal } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AudioService implements OnInit {
+export class AudioService {
   #blipAudio = new Audio('assets/sounds/blip.wav');
 
   isSoundOn = signal(true);
@@ -12,11 +12,11 @@ export class AudioService implements OnInit {
     blip: this.#blipAudio,
   };
 
-  ngOnInit() {
+  constructor() {
     for (const audio in this.AUDIO_MAP) {
       const audioElement = this.AUDIO_MAP[audio];
       audioElement.load();
-      audioElement.volume = 0.5;
+      audioElement.volume = 0.6;
     }
   }
 

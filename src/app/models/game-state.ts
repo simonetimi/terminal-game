@@ -14,13 +14,22 @@ export interface Choice {
 }
 
 export interface Condition {
-  type: string;
-  item: string;
+  type: 'hasItem' | 'hasKnowledge' | 'hasHealth' | 'hasMoralPoints';
+  item?: string;
 }
 
 export interface Effect {
-  type: string;
-  item: string;
+  type:
+    | 'addItem'
+    | 'addKnowledge'
+    | 'addHealth'
+    | 'addMoralPoint'
+    | 'removeItem'
+    | 'removeKnowledge'
+    | 'removeHealth'
+    | 'removeMoralPoint';
+  item?: string;
+  knowledge?: string;
 }
 
 export interface GameData {
