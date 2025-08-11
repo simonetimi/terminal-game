@@ -16,6 +16,8 @@ export class GameService {
   #persistenceService = inject(PersistenceService);
   #audioService = inject(AudioService);
 
+  nodes = gameData.nodes as GameNode[];
+
   playerState = signal<PlayerData>({
     name: 'anonymous',
     health: 3,
@@ -49,7 +51,7 @@ export class GameService {
       this.playerState.set(savedPlayerData);
       this.setCurrentNode(savedNode);
     } else {
-      this.setCurrentNode(gameData.nodes[0]);
+      this.setCurrentNode(this.nodes[0]);
     }
   }
 
@@ -119,7 +121,7 @@ export class GameService {
   }
 
   findNode(nodeId: string) {
-    return gameData.nodes.find((node) => node.id === nodeId)!;
+    return this.nodes.find((node) => node.id === nodeId)!;
   }
 
   renderChoices(node: GameNode) {
