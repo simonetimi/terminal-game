@@ -15,4 +15,6 @@ Simulated terminal rpg text-based game
 
 ### TODO
 - [ ] Better 8-bit icons
+- [ ] Better save saving nodes
+- [ ] Multi lines with a break
 
