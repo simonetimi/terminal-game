@@ -14,20 +14,12 @@ export interface Choice {
 }
 
 export interface Condition {
-  type: 'hasItem' | 'hasKnowledge' | 'hasHealth' | 'hasMoralPoints';
+  type: string;
   item?: string;
 }
 
 export interface Effect {
-  type:
-    | 'addItem'
-    | 'addKnowledge'
-    | 'addHealth'
-    | 'addMoralPoint'
-    | 'removeItem'
-    | 'removeKnowledge'
-    | 'removeHealth'
-    | 'removeMoralPoint';
+  type: string;
   item?: string;
   knowledge?: string;
 }
