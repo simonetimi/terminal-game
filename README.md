@@ -17,6 +17,8 @@ Simulated terminal rpg text-based game
 - [ ] Better 8-bit icons
 - [ ] Better save saving nodes
 - [ ] Multi lines with a break
-- [ ] Support for conditions and effects
-- [ ] Add inventory, knowledge and moral points
+- [x] Support for conditions
+- [x] Support for effects
+- [x] Add inventory, knowledge and moral points
+- [ ] Add sounds for effects
 

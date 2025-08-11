@@ -16,6 +16,9 @@ export interface Choice {
 export interface Condition {
   type: 'hasItem' | 'hasKnowledge' | 'hasHealth' | 'hasMoralPoints';
   item?: string;
+  knowledge?: string;
+  health?: number;
+  moralPoints?: number;
 }
 
 export interface Effect {
@@ -23,13 +26,15 @@ export interface Effect {
     | 'addItem'
     | 'addKnowledge'
     | 'addHealth'
-    | 'addMoralPoint'
+    | 'addMoralPoints'
     | 'removeItem'
     | 'removeKnowledge'
     | 'removeHealth'
-    | 'removeMoralPoint';
+    | 'removeMoralPoints';
   item?: string;
   knowledge?: string;
+  health?: number;
+  moralPoints?: number;
 }
 
 export interface GameData {
@@ -39,4 +44,7 @@ export interface GameData {
 export interface PlayerData {
   name: string;
   health: number;
+  inventory: string[];
+  knowledge: string[];
+  moralPoints: number;
 }

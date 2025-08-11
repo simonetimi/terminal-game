@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { typewriter } from '../utils/typewriter';
 
 import gameData from '../game-data/data.json';
-import { GameNode, PlayerData } from '../models/game-state';
+import { Choice, Effect, GameNode, PlayerData } from '../models/game-state';
 import { strip } from '../utils/strings';
 import { PersistenceService } from './persistence-service';
 import { TranslateService } from '@ngx-translate/core';
@@ -21,6 +21,9 @@ export class GameService {
   playerState = signal<PlayerData>({
     name: 'anonymous',
     health: 3,
+    inventory: [],
+    knowledge: [],
+    moralPoints: 0,
   });
   displayItems = signal<string[]>([]);
 
@@ -111,24 +114,126 @@ export class GameService {
     }
 
     // parse number for the choice
-    const choice = parseInt(cleanInput);
-    if (isNaN(choice)) return;
+    const choiceNumber = parseInt(cleanInput);
+    if (isNaN(choiceNumber)) return;
 
-    const availableChoices = this.currentNode().choices;
-    if (choice > availableChoices.length || choice < 1) return;
+    const availableChoices = this.filterChoices(this.currentNode().choices);
+    if (choiceNumber > availableChoices.length || choiceNumber < 1) return;
 
-    this.setCurrentNode(this.findNode(availableChoices[choice - 1].nextNodeId));
+    const choice = availableChoices[choiceNumber - 1];
+
+    // effects run
+    if (choice.effects) this.checkEffects(choice.effects);
+
+    // node is set
+    this.setCurrentNode(this.findNode(choice.nextNodeId));
   }
 
-  findNode(nodeId: string) {
-    return this.nodes.find((node) => node.id === nodeId)!;
+  checkEffects(effects: Effect[]) {
+    effects.forEach((effect) => {
+      switch (effect.type) {
+        case 'addHealth':
+          this.playerState.update((player) => ({
+            ...player,
+            health: player.health + (effect.health ?? 0),
+          }));
+          break;
+        case 'removeHealth':
+          this.playerState.update((player) => ({
+            ...player,
+            health: Math.max(0, player.health - (effect.health ?? 0)),
+          }));
+          break;
+        case 'addMoralPoints':
+          this.playerState.update((player) => ({
+            ...player,
+            moralPoints: player.moralPoints + (effect.moralPoints ?? 0),
+          }));
+          break;
+        case 'removeMoralPoints':
+          this.playerState.update((player) => ({
+            ...player,
+            moralPoints: player.moralPoints - (effect.moralPoints ?? 0),
+          }));
+          break;
+        case 'addItem':
+          if (effect.item) {
+            this.playerState.update((player) => ({
+              ...player,
+              inventory: player.inventory.includes(effect.item!)
+                ? player.inventory
+                : [...player.inventory, effect.item!],
+            }));
+          }
+          break;
+        case 'removeItem':
+          if (effect.item) {
+            this.playerState.update((player) => ({
+              ...player,
+              inventory: player.inventory.filter((i) => i !== effect.item),
+            }));
+          }
+          break;
+        case 'addKnowledge':
+          if (effect.knowledge) {
+            this.playerState.update((player) => ({
+              ...player,
+              knowledge: player.knowledge.includes(effect.knowledge!)
+                ? player.knowledge
+                : [...player.knowledge, effect.knowledge!],
+            }));
+          }
+          break;
+        case 'removeKnowledge':
+          if (effect.knowledge) {
+            this.playerState.update((player) => ({
+              ...player,
+              knowledge: player.knowledge.filter((k) => k !== effect.knowledge),
+            }));
+          }
+          break;
+      }
+    });
+  }
+
+  filterChoices(choices: Choice[]): Choice[] {
+    const player = this.playerState();
+
+    return choices.filter((choice) => {
+      if (!choice.conditions || choice.conditions.length === 0) {
+        return true;
+      }
+      // every condition must pass
+      return choice.conditions.every((condition) => {
+        switch (condition.type) {
+          case 'hasItem':
+            return condition.item
+              ? player.inventory.includes(condition.item)
+              : false;
+          case 'hasKnowledge':
+            return condition.knowledge
+              ? player.knowledge.includes(condition.knowledge)
+              : false;
+          case 'hasHealth':
+            return player.health >= (condition.health ?? 0);
+          case 'hasMoralPoints':
+            return player.moralPoints >= (condition.moralPoints ?? 0);
+          default:
+            return true;
+        }
+      });
+    });
   }
 
   renderChoices(node: GameNode) {
-    return node.choices
+    return this.filterChoices(node.choices)
       .map((choice, idx) =>
         node.freeInput ? '> ' + choice.text : `${idx + 1}. ${choice.text}`,
       )
       .reverse();
+  }
+
+  findNode(nodeId: string) {
+    return this.nodes.find((node) => node.id === nodeId)!;
   }
 }
