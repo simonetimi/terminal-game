@@ -1,23 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { SplashScreen } from './splash-screen';
+import { SplashScreen } from "./splash-screen";
 
-describe('SplashScreen', () => {
+describe("SplashScreen", () => {
   let component: SplashScreen;
   let fixture: ComponentFixture<SplashScreen>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SplashScreen]
-    })
-    .compileComponents();
+      imports: [SplashScreen],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(SplashScreen);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

@@ -9,19 +9,11 @@
   },
   "commands": {
     "exit": {
-      "keys": [
-        "esci",
-        "ricomincia",
-        "riavvia"
-      ],
+      "keys": ["esci", "ricomincia", "riavvia"],
       "text": "Vuoi davvero uscire? Perderai tutti i progressi fatti finora!"
     },
     "yes": {
-      "keys": [
-        "si",
-        "sì",
-        "s"
-      ]
+      "keys": ["si", "sì", "s"]
     }
   },
   "alt": {

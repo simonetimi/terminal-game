@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "welcome",
-      "text": "Ciao. Hai un'aria familiare, ma... no, non ci siamo mai incontrati. Rabbia!",
+      "text": "Ciao. Hai un'aria familiare, ma... no, non ci siamo mai incontrati. Come ti chiami?",
       "choices": [
         {
           "id": "answer",
@@ -14,7 +14,7 @@
     },
     {
       "id": "start",
-      "text": "Ti trovi a un crocevia, in quel crocevia c'è un simone, quel simone è confuso.",
+      "text": "Ti trovi a un crocevia.",
       "choices": [
         {
           "id": "go_left",
@@ -52,22 +52,6 @@
         {
           "id": "go_right_2",
           "text": "Vai a destra 2",
-          "nextNodeId": "river"
-        }
-      ]
-    },
-        {
-      "id": "river",
-      "text": "Arrivi in un bel fiume, in quel fiume trovi un simone!",
-      "choices": [
-        {
-          "id": "go_left_2",
-          "text": "Vai a sinistra 2",
-          "nextNodeId": "forest"
-        },
-        {
-          "id": "go_right_2",
-          "text": "Vai di nuovo verso il fiume",
           "nextNodeId": "river"
         }
       ]

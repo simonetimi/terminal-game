@@ -14,7 +14,7 @@ export interface Choice {
 }
 
 export interface Condition {
-  type: 'hasItem' | 'hasKnowledge' | 'hasHealth' | 'hasMoralPoints';
+  type: "hasItem" | "hasKnowledge" | "hasHealth" | "hasMoralPoints";
   item?: string;
   knowledge?: string;
   health?: number;
@@ -23,14 +23,14 @@ export interface Condition {
 
 export interface Effect {
   type:
-    | 'addItem'
-    | 'addKnowledge'
-    | 'addHealth'
-    | 'addMoralPoints'
-    | 'removeItem'
-    | 'removeKnowledge'
-    | 'removeHealth'
-    | 'removeMoralPoints';
+    | "addItem"
+    | "addKnowledge"
+    | "addHealth"
+    | "addMoralPoints"
+    | "removeItem"
+    | "removeKnowledge"
+    | "removeHealth"
+    | "removeMoralPoints";
   item?: string;
   knowledge?: string;
   health?: number;

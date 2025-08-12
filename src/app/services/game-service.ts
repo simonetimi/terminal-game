@@ -1,15 +1,15 @@
-import { inject, Injectable, signal } from '@angular/core';
-import { typewriter } from '../utils/typewriter';
+import { inject, Injectable, signal } from "@angular/core";
+import { typewriter } from "../utils/typewriter";
 
-import gameData from '../game-data/data.json';
-import { Choice, Effect, GameNode, PlayerData } from '../models/game-state';
-import { strip } from '../utils/strings';
-import { PersistenceService } from './persistence-service';
-import { TranslateService } from '@ngx-translate/core';
-import { AudioService } from './audio-service';
+import gameData from "../game-data/data.json";
+import { Choice, Effect, GameNode, PlayerData } from "../models/game-state";
+import { strip } from "../utils/strings";
+import { PersistenceService } from "./persistence-service";
+import { TranslateService } from "@ngx-translate/core";
+import { AudioService } from "./audio-service";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class GameService {
   #translateService = inject(TranslateService);
@@ -19,7 +19,7 @@ export class GameService {
   nodes = gameData.nodes as GameNode[];
 
   playerState = signal<PlayerData>({
-    name: 'anonymous',
+    name: "anonymous",
     health: 3,
     inventory: [],
     knowledge: [],
@@ -36,9 +36,9 @@ export class GameService {
   currentNode = signal<GameNode>({} as GameNode);
 
   constructor() {
-    window.addEventListener('keydown', (event) => {
+    window.addEventListener("keydown", (event) => {
       if (
-        (event.key === 'Enter' || event.key === ' ') &&
+        (event.key === "Enter" || event.key === " ") &&
         this.isSystemWriting()
       ) {
         this.skipAnimation();
@@ -88,7 +88,7 @@ export class GameService {
 
   writeOnScreen(text: string, callback?: () => void) {
     this.isSystemWriting.set(true);
-    this.#audioService.playAudio('blip');
+    this.#audioService.playAudio("blip");
     this.skipAnimation = typewriter(
       this.displayItems,
       text,
@@ -105,7 +105,7 @@ export class GameService {
     if (!cleanInput) return;
 
     // setting name - game start
-    if (this.currentNode().id === 'welcome') {
+    if (this.currentNode().id === "welcome") {
       const name = cleanInput.slice(0, 20);
       const nextNodeId = this.currentNode().choices[0].nextNodeId;
       this.setCurrentNode(this.findNode(nextNodeId));
@@ -115,7 +115,7 @@ export class GameService {
     }
 
     if (this.isUserQuitting()) {
-      const confirm = this.#translateService.instant('commands.yes');
+      const confirm = this.#translateService.instant("commands.yes");
       if (confirm.keys.includes(cleanInput.toLowerCase())) {
         return this.#persistenceService.clearAllDataAndRefresh();
       } else {
@@ -123,7 +123,7 @@ export class GameService {
         return this.isUserQuitting.set(false);
       }
     }
-    const exit = this.#translateService.instant('commands.exit');
+    const exit = this.#translateService.instant("commands.exit");
     if (exit.keys.includes(cleanInput.toLowerCase())) {
       this.isUserQuitting.set(true);
       return this.displayItems.update((items) => [exit.text, ...items]);
@@ -148,31 +148,31 @@ export class GameService {
   checkEffects(effects: Effect[]) {
     effects.forEach((effect) => {
       switch (effect.type) {
-        case 'addHealth':
+        case "addHealth":
           this.playerState.update((player) => ({
             ...player,
             health: player.health + (effect.health ?? 0),
           }));
           break;
-        case 'removeHealth':
+        case "removeHealth":
           this.playerState.update((player) => ({
             ...player,
             health: Math.max(0, player.health - (effect.health ?? 0)),
           }));
           break;
-        case 'addMoralPoints':
+        case "addMoralPoints":
           this.playerState.update((player) => ({
             ...player,
             moralPoints: player.moralPoints + (effect.moralPoints ?? 0),
           }));
           break;
-        case 'removeMoralPoints':
+        case "removeMoralPoints":
           this.playerState.update((player) => ({
             ...player,
             moralPoints: player.moralPoints - (effect.moralPoints ?? 0),
           }));
           break;
-        case 'addItem':
+        case "addItem":
           if (effect.item) {
             this.playerState.update((player) => ({
               ...player,
@@ -182,7 +182,7 @@ export class GameService {
             }));
           }
           break;
-        case 'removeItem':
+        case "removeItem":
           if (effect.item) {
             this.playerState.update((player) => ({
               ...player,
@@ -190,7 +190,7 @@ export class GameService {
             }));
           }
           break;
-        case 'addKnowledge':
+        case "addKnowledge":
           if (effect.knowledge) {
             this.playerState.update((player) => ({
               ...player,
@@ -200,7 +200,7 @@ export class GameService {
             }));
           }
           break;
-        case 'removeKnowledge':
+        case "removeKnowledge":
           if (effect.knowledge) {
             this.playerState.update((player) => ({
               ...player,
@@ -222,17 +222,17 @@ export class GameService {
       // every condition must pass
       return choice.conditions.every((condition) => {
         switch (condition.type) {
-          case 'hasItem':
+          case "hasItem":
             return condition.item
               ? player.inventory.includes(condition.item)
               : false;
-          case 'hasKnowledge':
+          case "hasKnowledge":
             return condition.knowledge
               ? player.knowledge.includes(condition.knowledge)
               : false;
-          case 'hasHealth':
+          case "hasHealth":
             return player.health >= (condition.health ?? 0);
-          case 'hasMoralPoints':
+          case "hasMoralPoints":
             return player.moralPoints >= (condition.moralPoints ?? 0);
           default:
             return true;
@@ -244,7 +244,7 @@ export class GameService {
   renderChoices(node: GameNode) {
     return this.filterChoices(node.choices)
       .map((choice, idx) =>
-        node.freeInput ? '> ' + choice.text : `${idx + 1}. ${choice.text}`,
+        node.freeInput ? "> " + choice.text : `${idx + 1}. ${choice.text}`,
       )
       .reverse();
   }

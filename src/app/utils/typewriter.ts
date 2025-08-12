@@ -1,4 +1,4 @@
-import { WritableSignal } from '@angular/core';
+import { WritableSignal } from "@angular/core";
 
 export function typewriter(
   targetSignal: WritableSignal<string[]>,
@@ -7,17 +7,17 @@ export function typewriter(
   done?: () => void,
 ) {
   const { speed = 50, wordMode = false } = options;
-  const parts = wordMode ? text.split(' ') : text.split('');
+  const parts = wordMode ? text.split(" ") : text.split("");
   let i = 0;
   let finished = false;
 
-  targetSignal.update((items) => ['', ...items]);
+  targetSignal.update((items) => ["", ...items]);
   const firstIndex = 0;
 
   const updateText = () => {
     targetSignal.update((items) => {
       const arr = [...items];
-      arr[firstIndex] = parts.slice(0, i + 1).join(wordMode ? ' ' : '');
+      arr[firstIndex] = parts.slice(0, i + 1).join(wordMode ? " " : "");
       return arr;
     });
   };

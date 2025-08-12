@@ -1,8 +1,8 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from "@angular/core/testing";
 
-import { PersistenceService } from './persistence-service';
+import { PersistenceService } from "./persistence-service";
 
-describe('PersistenceService', () => {
+describe("PersistenceService", () => {
   let service: PersistenceService;
 
   beforeEach(() => {
@@ -10,7 +10,7 @@ describe('PersistenceService', () => {
     service = TestBed.inject(PersistenceService);
   });
 
-  it('should be created', () => {
+  it("should be created", () => {
     expect(service).toBeTruthy();
   });
 });

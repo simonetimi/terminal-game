@@ -4,16 +4,16 @@ import {
   inject,
   output,
   signal,
-} from '@angular/core';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { typewriter } from '../../utils/typewriter';
-import { FormsModule } from '@angular/forms';
+} from "@angular/core";
+import { TranslatePipe, TranslateService } from "@ngx-translate/core";
+import { typewriter } from "../../utils/typewriter";
+import { FormsModule } from "@angular/forms";
 
 @Component({
-  selector: 'app-splash-screen',
+  selector: "app-splash-screen",
   imports: [FormsModule, TranslatePipe],
-  templateUrl: './splash-screen.html',
-  styleUrl: './splash-screen.css',
+  templateUrl: "./splash-screen.html",
+  styleUrl: "./splash-screen.css",
 })
 export class SplashScreen implements AfterViewInit {
   #translateService = inject(TranslateService);
@@ -27,12 +27,12 @@ export class SplashScreen implements AfterViewInit {
     const speed = 40;
     typewriter(
       this.displayMessages,
-      this.#translateService.instant('splashScreen.welcome1'),
+      this.#translateService.instant("splashScreen.welcome1"),
       { speed },
       () => {
         typewriter(
           this.displayMessages,
-          this.#translateService.instant('splashScreen.welcome2'),
+          this.#translateService.instant("splashScreen.welcome2"),
           {
             speed,
           },

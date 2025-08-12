@@ -1,10 +1,10 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal } from "@angular/core";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class AudioService {
-  #blipAudio = new Audio('assets/sounds/blip.wav');
+  #blipAudio = new Audio("assets/sounds/blip.wav");
 
   isSoundOn = signal(true);
 

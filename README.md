@@ -14,6 +14,7 @@ Simulated terminal rpg text-based game
 ## In progress
 
 ### TODO
+
 - [ ] Better 8-bit icons
 - [ ] Better save saving nodes
 - [ ] Multi lines with a break
@@ -21,4 +22,3 @@ Simulated terminal rpg text-based game
 - [x] Support for effects
 - [x] Add inventory, knowledge and moral points
 - [ ] Add sounds for effects
-

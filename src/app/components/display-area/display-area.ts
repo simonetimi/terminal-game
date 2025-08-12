@@ -5,20 +5,20 @@ import {
   ElementRef,
   inject,
   viewChild,
-} from '@angular/core';
-import { GameService } from '../../services/game-service';
+} from "@angular/core";
+import { GameService } from "../../services/game-service";
 
 @Component({
-  selector: 'app-display-area',
+  selector: "app-display-area",
   imports: [],
-  templateUrl: './display-area.html',
-  styleUrl: './display-area.css',
+  templateUrl: "./display-area.html",
+  styleUrl: "./display-area.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DisplayArea {
   #gameService = inject(GameService);
 
-  protected scrollContainer = viewChild<ElementRef>('scrollContainer');
+  protected scrollContainer = viewChild<ElementRef>("scrollContainer");
 
   protected displayItems = this.#gameService.displayItems;
 
