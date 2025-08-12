@@ -22,12 +22,12 @@ export class PersistenceService {
     return this.load('player');
   }
 
-  saveDisplayState(data: string[]) {
-    this.save('terminalDisplay', data);
+  saveVisitedNodes(nodeIds: string[]) {
+    this.save('visitedNodes', nodeIds);
   }
 
-  loadDisplayState(): string[] {
-    return this.load('terminalDisplay');
+  loadVisitedNodes(): string[] {
+    return this.load('visitedNodes');
   }
 
   saveCurrentNodeId(nodeId: string) {

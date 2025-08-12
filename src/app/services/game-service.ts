@@ -26,6 +26,7 @@ export class GameService {
     moralPoints: 0,
   });
   displayItems = signal<string[]>([]);
+  visitedNodes: string[] = [];
 
   isSystemWriting = signal(false);
   isUserQuitting = signal(false);
@@ -45,24 +46,39 @@ export class GameService {
     });
 
     const savedNodeId = this.#persistenceService.loadCurrentNodeId();
-    const savedDisplay = this.#persistenceService.loadDisplayState();
+    const savedVisitedNodes = this.#persistenceService.loadVisitedNodes();
     const savedPlayerData = this.#persistenceService.loadPlayerData();
 
-    if (savedNodeId && savedDisplay && savedPlayerData) {
-      const savedNode = this.findNode(savedNodeId);
-      this.displayItems.set(savedDisplay);
+    if (savedNodeId && savedVisitedNodes && savedPlayerData) {
+      // restore player state
       this.playerState.set(savedPlayerData);
-      this.setCurrentNode(savedNode);
+
+      // restore history up to the current node (excluding the last)
+      this.visitedNodes = savedVisitedNodes;
+      this.traverseNodes(savedVisitedNodes);
+
+      // show the last visited node (current) using regular game flow
+      const lastNodeId = savedVisitedNodes[savedVisitedNodes.length - 1];
+      const lastNode = this.findNode(lastNodeId);
+      if (lastNode) {
+        this.currentNode.set(lastNode);
+        this.writeOnScreen(lastNode.text, () => {
+          const choices = this.renderChoices(lastNode);
+          this.displayItems.update((items) => [...choices, ...items]);
+        });
+      }
     } else {
       this.setCurrentNode(this.nodes[0]);
     }
   }
 
-  setCurrentNode(node: GameNode) {
-    // save the current state
-    this.#persistenceService.saveCurrentNodeId(node.id);
-    this.#persistenceService.saveDisplayState(this.displayItems());
-
+  setCurrentNode(node: GameNode, { record = true } = {}) {
+    // save current state
+    if (record) {
+      this.visitedNodes.push(node.id);
+      this.#persistenceService.saveVisitedNodes(this.visitedNodes);
+      this.#persistenceService.saveCurrentNodeId(node.id);
+    }
     this.currentNode.set(node);
     this.writeOnScreen(node.text, () => {
       const choices = this.renderChoices(node);
@@ -231,6 +247,22 @@ export class GameService {
         node.freeInput ? '> ' + choice.text : `${idx + 1}. ${choice.text}`,
       )
       .reverse();
+  }
+
+  traverseNodes(nodeIds: string[]) {
+    // rebuild all nodes but the last one, which will use the regular game flow
+    const display: string[] = [];
+    for (let i = 0; i < nodeIds.length - 1; i++) {
+      const node = this.findNode(nodeIds[i]);
+      if (!node) continue;
+      display.push(node.text);
+
+      // add the choice that was selected by the user
+      const nextId = nodeIds[i + 1];
+      const choice = node.choices?.find((c) => c.nextNodeId === nextId);
+      if (choice) display.push(`> ${choice.text}`);
+    }
+    this.displayItems.set([...display].reverse());
   }
 
   findNode(nodeId: string) {
