@@ -17,7 +17,7 @@ Simulated terminal rpg text-based game
 
 - [ ] Better 8-bit icons
 - [x] Better save saving nodes
-- [x] Multi lines with a break using `\\` in data.json
+- [x] Narration breaks using `\\` in data.json
 - [x] Remove IDs for choices
 - [x] Add alternative text if node has been visited
 - [x] Add alternative text if player has knowledge
