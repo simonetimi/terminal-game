@@ -2,10 +2,9 @@
   "nodes": [
     {
       "id": "welcome",
-      "text": "Ciao. Hai un'aria familiare, ma... no, non ci siamo mai incontrati. Come ti chiami?",
+      "text": "Ciao. Hai un'aria familiare, ma...\\ no, non ci siamo mai incontrati. Come ti chiami?",
       "choices": [
         {
-          "id": "answer",
           "text": "Inserisci il tuo nome",
           "nextNodeId": "start"
         }
@@ -17,25 +16,21 @@
       "text": "Ti trovi a un crocevia.",
       "choices": [
         {
-          "id": "go_left",
-          "text": "Vai a sinistra",
+          "text": "Vai verso la foresta",
           "nextNodeId": "forest",
           "conditions": [
             {
               "type": "hasItem",
               "item": "map"
             }
-          ],
-          "effects": [
-            {
-              "type": "addItem",
-              "item": "torch"
-            }
           ]
         },
         {
-          "id": "go_right",
-          "text": "Vai a destra",
+          "text": "Vai al negozio.",
+          "nextNodeId": "shop"
+        },
+        {
+          "text": "Vai verso il fiume",
           "nextNodeId": "river"
         }
       ]
@@ -45,15 +40,46 @@
       "text": "Arrivi in una foresta",
       "choices": [
         {
-          "id": "go_left_2",
-          "text": "Vai a sinistra 2",
-          "nextNodeId": "forest"
+          "text": "Torna all'inizio",
+          "nextNodeId": "start"
         },
         {
-          "id": "go_right_2",
-          "text": "Vai a destra 2",
+          "text": "Vai verso il fiume",
           "nextNodeId": "river"
         }
+      ]
+    },
+    {
+      "id": "shop",
+      "text": "Arrivi al negozio",
+      "altTextIfVisited": "Arrivi al negozio.\\ Ha un'aria familiare...",
+      "choices": [
+        {
+          "text": "Compra una mappa",
+          "nextNodeId": "start",
+          "conditions": [
+            {
+              "type": "hasNotItem",
+              "item": "map"
+            }
+          ],
+          "effects": [
+            {
+              "type": "addItem",
+              "item": "map"
+            }
+          ]
+        },
+        {
+          "text": "Torna all'inizio",
+          "nextNodeId": "start"
+        }
+      ]
+    },
+    {
+      "id": "river",
+      "text": "Sei morto",
+      "choices": [
       ]
     }
   ]

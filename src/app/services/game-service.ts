@@ -35,6 +35,9 @@ export class GameService {
 
   currentNode = signal<GameNode>({} as GameNode);
 
+  #typewriterSpeed = 60;
+  #lineBreakDelay = 1000;
+
   constructor() {
     window.addEventListener("keydown", (event) => {
       if (
@@ -62,7 +65,7 @@ export class GameService {
       const lastNode = this.findNode(lastNodeId);
       if (lastNode) {
         this.currentNode.set(lastNode);
-        this.writeOnScreen(lastNode.text, () => {
+        this.writeOnScreen(this.chooseTextToDisplay(lastNode), () => {
           const choices = this.renderChoices(lastNode);
           this.displayItems.update((items) => [...choices, ...items]);
         });
@@ -80,7 +83,12 @@ export class GameService {
       this.#persistenceService.saveCurrentNodeId(node.id);
     }
     this.currentNode.set(node);
-    this.writeOnScreen(node.text, () => {
+
+    // add empty space between nodes
+    this.displayItems().length > 0 &&
+      this.displayItems.update((items) => ["&nbsp;", ...items]);
+
+    this.writeOnScreen(this.chooseTextToDisplay(node), () => {
       const choices = this.renderChoices(node);
       this.displayItems.update((items) => [...choices, ...items]);
     });
@@ -92,7 +100,7 @@ export class GameService {
     this.skipAnimation = typewriter(
       this.displayItems,
       text,
-      { speed: 60 },
+      { speed: this.#typewriterSpeed, lineBreakDelay: this.#lineBreakDelay },
       () => {
         this.isSystemWriting.set(false);
         if (callback) callback();
@@ -234,11 +242,31 @@ export class GameService {
             return player.health >= (condition.health ?? 0);
           case "hasMoralPoints":
             return player.moralPoints >= (condition.moralPoints ?? 0);
+          case "hasNotItem":
+            return condition.item
+              ? !player.inventory.includes(condition.item)
+              : false;
           default:
             return true;
         }
       });
     });
+  }
+
+  chooseTextToDisplay(node: GameNode) {
+    // check if player has specific knowledge to show alt text
+    if (
+      node.altTextIfKnowledge &&
+      this.playerState().knowledge.includes(node.knowledgeForAltText ?? "")
+    )
+      return node.altTextIfKnowledge;
+    // check if player has already visited node to show alt text, excluding the last visited id
+    if (
+      node.altTextIfVisited &&
+      this.visitedNodes.toSpliced(-1, 1).includes(node.id)
+    )
+      return node.altTextIfVisited;
+    return node.text;
   }
 
   renderChoices(node: GameNode) {
@@ -255,7 +283,9 @@ export class GameService {
     for (let i = 0; i < nodeIds.length - 1; i++) {
       const node = this.findNode(nodeIds[i]);
       if (!node) continue;
-      display.push(node.text);
+      display.push("&nbsp;");
+      const text = node.text.replaceAll("\\", "");
+      display.push(text);
 
       // add the choice that was selected by the user
       const nextId = nodeIds[i + 1];

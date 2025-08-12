@@ -2,11 +2,13 @@ export interface GameNode {
   id: string;
   text: string;
   choices: Choice[];
+  altTextIfVisited?: string; // show when node has been visited
+  altTextIfKnowledge?: string; // show when player has certain knowledge
+  knowledgeForAltText?: string;
   freeInput?: boolean;
 }
 
 export interface Choice {
-  id: string;
   text: string;
   nextNodeId: string;
   conditions?: Condition[];
@@ -14,7 +16,13 @@ export interface Choice {
 }
 
 export interface Condition {
-  type: "hasItem" | "hasKnowledge" | "hasHealth" | "hasMoralPoints";
+  type:
+    | "hasItem"
+    | "hasKnowledge"
+    | "hasHealth"
+    | "hasMoralPoints"
+    | "hasNotItem"
+    | "hasNotVisited";
   item?: string;
   knowledge?: string;
   health?: number;
@@ -35,10 +43,6 @@ export interface Effect {
   knowledge?: string;
   health?: number;
   moralPoints?: number;
-}
-
-export interface GameData {
-  nodes: GameNode[];
 }
 
 export interface PlayerData {
