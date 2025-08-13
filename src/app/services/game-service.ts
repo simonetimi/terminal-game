@@ -147,6 +147,15 @@ export class GameService {
 
     const choice = availableChoices[choiceNumber - 1];
 
+    // replace the numbered choices with the selected choice
+    const choicesCount = availableChoices.length;
+    this.displayItems.update((items) => {
+      // remove the numbered choices (they are at the beginning of the array due to reverse order)
+      const itemsWithoutChoices = items.slice(choicesCount);
+      // add the selected choice in the "> text" format
+      return [`> ${choice.text}`, ...itemsWithoutChoices];
+    });
+
     // effects run
     if (choice.effects) this.checkEffects(choice.effects);
 
