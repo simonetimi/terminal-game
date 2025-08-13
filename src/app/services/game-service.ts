@@ -48,27 +48,28 @@ export class GameService {
       }
     });
 
+    const loadPlayerData = this.#persistenceService.loadPlayerData();
+    if (loadPlayerData)
+      this.playerState.update((prev) => ({
+        ...prev,
+        name: loadPlayerData.name,
+      }));
+
     const savedNodeId = this.#persistenceService.loadCurrentNodeId();
     const savedVisitedNodes = this.#persistenceService.loadVisitedNodes();
-    const savedPlayerData = this.#persistenceService.loadPlayerData();
 
-    if (savedNodeId && savedVisitedNodes && savedPlayerData) {
-      // restore player state
-      this.playerState.set(savedPlayerData);
-
-      // restore history up to the current node (excluding the last)
+    if (savedNodeId && savedVisitedNodes) {
+      // restore visited nodes
       this.visitedNodes = savedVisitedNodes;
+
+      // reconstruct player state and display by traversing nodes
       this.traverseNodes(savedVisitedNodes);
 
-      // show the last visited node (current) using regular game flow
+      // show the last visited node (current) using setCurrentNode with record=false
       const lastNodeId = savedVisitedNodes[savedVisitedNodes.length - 1];
       const lastNode = this.findNode(lastNodeId);
       if (lastNode) {
-        this.currentNode.set(lastNode);
-        this.writeOnScreen(this.chooseTextToDisplay(lastNode), () => {
-          const choices = this.renderChoices(lastNode);
-          this.displayItems.update((items) => [...choices, ...items]);
-        });
+        this.setCurrentNode(lastNode, { record: false });
       }
     } else {
       this.setCurrentNode(this.nodes[0]);
@@ -119,7 +120,7 @@ export class GameService {
       this.setCurrentNode(this.findNode(nextNodeId));
 
       this.playerState.update((playerState) => ({ ...playerState, name }));
-      return this.#persistenceService.savePlayerData(this.playerState());
+      return this.#persistenceService.savePlayerData({ name });
     }
 
     if (this.isUserQuitting()) {
@@ -253,7 +254,9 @@ export class GameService {
     });
   }
 
-  chooseTextToDisplay(node: GameNode) {
+  chooseTextToDisplay(node: GameNode, tempVisitedNodes?: string[]) {
+    const visitedNodes = tempVisitedNodes || this.visitedNodes;
+
     // check if player has specific knowledge to show alt text
     if (
       node.altTextIfKnowledge &&
@@ -263,7 +266,7 @@ export class GameService {
     // check if player has already visited node to show alt text, excluding the last visited id
     if (
       node.altTextIfVisited &&
-      this.visitedNodes.toSpliced(-1, 1).includes(node.id)
+      visitedNodes.toSpliced(-1, 1).includes(node.id)
     )
       return node.altTextIfVisited;
     return node.text;
@@ -280,11 +283,25 @@ export class GameService {
   traverseNodes(nodeIds: string[]) {
     // rebuild all nodes but the last one, which will use the regular game flow
     const display: string[] = [];
+    const tempVisitedNodes: string[] = [];
+
     for (let i = 0; i < nodeIds.length - 1; i++) {
       const node = this.findNode(nodeIds[i]);
       if (!node) continue;
-      display.push("&nbsp;");
-      const text = node.text.replaceAll("\\", "");
+
+      // add current node to temporary visited array
+      tempVisitedNodes.push(node.id);
+
+      // only add empty space if it's not the first reconstructed node
+      if (i > 0) {
+        display.push("&nbsp;");
+      }
+
+      // use chooseTextToDisplay with temporary visited nodes array
+      const text = this.chooseTextToDisplay(node, tempVisitedNodes).replaceAll(
+        "\\",
+        "",
+      );
       display.push(text);
 
       // add the choice that was selected by the user

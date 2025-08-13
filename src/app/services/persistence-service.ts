@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { GameNode, PlayerData } from "../models/game-state";
+import { GameNode, PlayerData, SavedPlayerData } from "../models/game-state";
 
 @Injectable({
   providedIn: "root",
@@ -14,11 +14,11 @@ export class PersistenceService {
     if (result) return JSON.parse(result);
   }
 
-  savePlayerData(data: PlayerData) {
+  savePlayerData(data: SavedPlayerData) {
     this.save("player", data);
   }
 
-  loadPlayerData(): PlayerData {
+  loadPlayerData(): SavedPlayerData {
     return this.load("player");
   }
 

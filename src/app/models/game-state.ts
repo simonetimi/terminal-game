@@ -52,3 +52,7 @@ export interface PlayerData {
   knowledge: string[];
   moralPoints: number;
 }
+
+export interface SavedPlayerData {
+  name: string;
+}
