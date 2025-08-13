@@ -38,6 +38,14 @@ export class PersistenceService {
     return this.load("currentNode");
   }
 
+  saveFreeInputsHistory(freeInputsHistory: string[]) {
+    this.save("freeInputsHistory", freeInputsHistory);
+  }
+
+  loadFreeInputsHistory(): string[] {
+    return this.load("freeInputsHistory");
+  }
+
   clearAllDataAndRefresh() {
     localStorage.clear();
     location.reload();

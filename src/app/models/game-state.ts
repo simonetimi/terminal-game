@@ -5,7 +5,7 @@ export interface GameNode {
   altTextIfVisited?: string; // show when node has been visited
   altTextIfKnowledge?: string; // show when player has certain knowledge
   knowledgeForAltText?: string;
-  freeInput?: boolean;
+  isFreeInput?: boolean;
 }
 
 export interface Choice {
@@ -13,6 +13,7 @@ export interface Choice {
   nextNodeId: string;
   conditions?: Condition[];
   effects?: Effect[];
+  matchKeyword?: string;
 }
 
 export interface Condition {

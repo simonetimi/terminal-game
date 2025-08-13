@@ -5,11 +5,11 @@
       "text": "Ciao. Hai un'aria familiare, ma...\\ no, non ci siamo mai incontrati. Come ti chiami?",
       "choices": [
         {
-          "text": "Inserisci il tuo nome",
+          "text": "",
           "nextNodeId": "start"
         }
       ],
-      "freeInput": true
+      "isFreeInput": true
     },
     {
       "id": "start",
@@ -78,9 +78,28 @@
     },
     {
       "id": "river",
-      "text": "Sei morto",
+      "text": "Qual è il significato della vita?",
+      "isFreeInput": true,
       "choices": [
+        {
+          "text": "",
+          "nextNodeId": "goodEnding",
+          "matchKeyword": "46"
+        },
+        {
+          "text": "",
+          "nextNodeId": "badEnding"
+        }
       ]
+    },
+    {
+      "id": "goodEnding",
+      "text": "Giusto. Sei in pace con te stesso"
+    },
+    {
+      "id": "badEnding",
+      "text": "Sei morto"
     }
   ]
 }
+

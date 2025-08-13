@@ -27,6 +27,7 @@ export class GameService {
   });
   displayItems = signal<string[]>([]);
   visitedNodes: string[] = [];
+  freeInputsHistory: string[] = [];
 
   isSystemWriting = signal(false);
   isUserQuitting = signal(false);
@@ -54,6 +55,9 @@ export class GameService {
         ...prev,
         name: loadPlayerData.name,
       }));
+
+    this.freeInputsHistory =
+      this.#persistenceService.loadFreeInputsHistory() ?? [];
 
     const savedNodeId = this.#persistenceService.loadCurrentNodeId();
     const savedVisitedNodes = this.#persistenceService.loadVisitedNodes();
@@ -116,6 +120,14 @@ export class GameService {
     // setting name - game start
     if (this.currentNode().id === "welcome") {
       const name = cleanInput.slice(0, 20);
+
+      this.displayItems.update((items) => {
+        items.shift();
+        return [`> ${name}`, ...items];
+      });
+      this.freeInputsHistory.push(name);
+      this.#persistenceService.saveFreeInputsHistory(this.freeInputsHistory);
+
       const nextNodeId = this.currentNode().choices[0].nextNodeId;
       this.setCurrentNode(this.findNode(nextNodeId));
 
@@ -136,6 +148,41 @@ export class GameService {
     if (exit.keys.includes(cleanInput.toLowerCase())) {
       this.isUserQuitting.set(true);
       return this.displayItems.update((items) => [exit.text, ...items]);
+    }
+
+    // if free input, the input will have to match the choice with the match keyword. if it doesn't, it picks the other choice
+    if (this.currentNode().isFreeInput) {
+      const slicedInput = cleanInput.slice(0, 30);
+
+      this.displayItems.update((items) => {
+        items.shift();
+        return [`> ${slicedInput}`, ...items];
+      });
+
+      this.freeInputsHistory.push(slicedInput);
+      this.#persistenceService.saveFreeInputsHistory(this.freeInputsHistory);
+
+      const availableChoices = this.filterChoices(this.currentNode().choices);
+
+      // exact match
+      const matchedKeywordChoice = availableChoices.find(
+        (choice) => choice.matchKeyword === slicedInput.toLowerCase(),
+      );
+
+      if (matchedKeywordChoice) {
+        return this.setCurrentNode(
+          this.findNode(matchedKeywordChoice.nextNodeId),
+        );
+      }
+
+      // if no exact match, find the fallback choice (one without matchKeyword or with different matchKeyword)
+      const fallbackChoice = availableChoices.find(
+        (choice) => !choice.matchKeyword,
+      );
+
+      if (fallbackChoice) {
+        return this.setCurrentNode(this.findNode(fallbackChoice.nextNodeId));
+      }
     }
 
     // parse number for the choice
@@ -284,7 +331,7 @@ export class GameService {
   renderChoices(node: GameNode) {
     return this.filterChoices(node.choices)
       .map((choice, idx) =>
-        node.freeInput ? "> " + choice.text : `${idx + 1}. ${choice.text}`,
+        node.isFreeInput ? "" + choice.text : `${idx + 1}. ${choice.text}`,
       )
       .reverse();
   }
@@ -293,6 +340,7 @@ export class GameService {
     // rebuild all nodes but the last one, which will use the regular game flow
     const display: string[] = [];
     const tempVisitedNodes: string[] = [];
+    let freeInputIndex = 0;
 
     for (let i = 0; i < nodeIds.length - 1; i++) {
       const node = this.findNode(nodeIds[i]);
@@ -314,9 +362,18 @@ export class GameService {
       display.push(text);
 
       // add the choice that was selected by the user
-      const nextId = nodeIds[i + 1];
-      const choice = node.choices?.find((c) => c.nextNodeId === nextId);
-      if (choice) display.push(`> ${choice.text}`);
+      if (node.isFreeInput) {
+        // for free input nodes, use the saved free input history
+        if (freeInputIndex < this.freeInputsHistory.length) {
+          display.push(`> ${this.freeInputsHistory[freeInputIndex]}`);
+          freeInputIndex++;
+        }
+      } else {
+        // for regular choice nodes, find the choice that was selected
+        const nextId = nodeIds[i + 1];
+        const choice = node.choices?.find((c) => c.nextNodeId === nextId);
+        if (choice) display.push(`> ${choice.text}`);
+      }
     }
     this.displayItems.set([...display].reverse());
   }
