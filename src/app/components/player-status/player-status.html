@@ -1,10 +1,23 @@
-<div class="flex gap-2 justify-end w-full">
-  @for (heart of playerHearts(); track $index) {
-    <img
-      [alt]="('alt.playerStatus.heartIcon' | translate) + heart"
-      src="/assets/icons/heart.svg"
-      height="15px"
-      width="15px"
-    />
-  }
+<div class="w-full flex items-center">
+  <section class="flex gap-2">
+    @for (item of inventory(); track $index) {
+      <img
+        [alt]="`items.${item}` | translate"
+        [src]="`/assets/icons/${item}.svg`"
+        height="25px"
+        width="25px"
+      />
+    }
+  </section>
+
+  <section class="flex gap-2 ml-auto shrink-0">
+    @for (heart of playerHearts(); track $index) {
+      <img
+        [alt]="('alt.playerStatus.heartIcon' | translate) + heart"
+        src="/assets/icons/heart.svg"
+        height="15px"
+        width="15px"
+      />
+    }
+  </section>
 </div>

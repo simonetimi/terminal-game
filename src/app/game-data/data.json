@@ -80,6 +80,7 @@
       "id": "river",
       "text": "Qual è il significato della vita?",
       "isFreeInput": true,
+      "vfx": "glitch",
       "choices": [
         {
           "text": "",
@@ -94,13 +95,14 @@
     },
     {
       "id": "goodEnding",
-      "text": "Giusto. Sei in pace con te stesso"
+      "text": "Giusto. Sei in pace con te stesso. Hai vinto!",
+      "choices": []
     },
     {
       "id": "badEnding",
-      "text": "Sei morto",
-      "vfx": "shake"
+      "text": "Sei morto.",
+      "vfx": "shake",
+      "choices": []
     }
   ]
 }
-

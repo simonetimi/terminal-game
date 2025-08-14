@@ -10,3 +10,53 @@ body {
   font-family: monospace;
   white-space: pre;
 }
+
+/* effects */
+
+.vfx-glitch-overlay {
+  filter: saturate(1.1) contrast(1.05);
+  --vfx-shake-amp: 1px;
+  --vfx-shake-rot: 0.15deg;
+}
+
+@keyframes vfx-shake {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+
+  25% {
+    transform: translate3d(var(--vfx-shake-amp), calc(var(--vfx-shake-amp) * -0.5), 0) rotate(var(--vfx-shake-rot));
+  }
+
+  50% {
+    transform: translate3d(calc(var(--vfx-shake-amp) * -1), calc(var(--vfx-shake-amp) * 0.5), 0) rotate(calc(var(--vfx-shake-rot) * -1));
+  }
+
+  75% {
+    transform: translate3d(var(--vfx-shake-amp), calc(var(--vfx-shake-amp) * 0.5), 0) rotate(calc(var(--vfx-shake-rot) * 0.6));
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+@keyframes vfx-flicker {
+  0% {
+    opacity: 0.95;
+  }
+
+  50% {
+    opacity: 0.70;
+  }
+
+  100% {
+    opacity: 0.95;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vfx-glitch-overlay {
+    animation: none !important;
+  }
+}

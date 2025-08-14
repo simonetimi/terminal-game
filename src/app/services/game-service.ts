@@ -87,6 +87,7 @@ export class GameService {
       this.#persistenceService.saveVisitedNodes(this.visitedNodes);
       this.#persistenceService.saveCurrentNodeId(node.id);
     }
+
     this.currentNode.set(node);
 
     // add empty space between nodes
@@ -94,7 +95,10 @@ export class GameService {
       this.displayItems.update((items) => ["&nbsp;", ...items]);
 
     // effects
-    this.#effectsManagerService.playNodeEffects(node);
+    this.#effectsManagerService.clearEffects();
+    requestAnimationFrame(() => {
+      this.#effectsManagerService.playNodeEffects(node);
+    });
 
     this.writeOnScreen(this.chooseTextToDisplay(node), () => {
       const choices = this.renderChoices(node);
@@ -107,7 +111,11 @@ export class GameService {
     this.skipAnimation = typewriter(
       this.displayItems,
       text,
-      { speed: this.#typewriterSpeed, lineBreakDelay: this.#lineBreakDelay },
+      {
+        speed: this.#typewriterSpeed,
+        lineBreakDelay: this.#lineBreakDelay,
+        effectsSelector: this.#effectsManagerService.defaultScreenSelector,
+      },
       () => {
         this.isSystemWriting.set(false);
         if (callback) callback();
@@ -339,6 +347,16 @@ export class GameService {
   }
 
   traverseNodes(nodeIds: string[]) {
+    // Reset player stats (keep name from persistence)
+    const { name } = this.playerState();
+    this.playerState.set({
+      name,
+      health: 3,
+      inventory: [],
+      knowledge: [],
+      moralPoints: 0,
+    });
+
     // rebuild all nodes but the last one, which will use the regular game flow
     const display: string[] = [];
     const tempVisitedNodes: string[] = [];
@@ -356,27 +374,34 @@ export class GameService {
         display.push("&nbsp;");
       }
 
-      // use chooseTextToDisplay with temporary visited nodes array
+      // render node text with current reconstructed state
       const text = this.chooseTextToDisplay(node, tempVisitedNodes).replaceAll(
         "\\",
         "",
       );
       display.push(text);
 
+      // determine which choice led to the next node
+      const nextId = nodeIds[i + 1];
+      const selectedChoice =
+        node.choices?.find((c) => c.nextNodeId === nextId) ?? undefined;
+
       // add the choice that was selected by the user
       if (node.isFreeInput) {
-        // for free input nodes, use the saved free input history
         if (freeInputIndex < this.freeInputsHistory.length) {
           display.push(`> ${this.freeInputsHistory[freeInputIndex]}`);
           freeInputIndex++;
         }
-      } else {
-        // for regular choice nodes, find the choice that was selected
-        const nextId = nodeIds[i + 1];
-        const choice = node.choices?.find((c) => c.nextNodeId === nextId);
-        if (choice) display.push(`> ${choice.text}`);
+      } else if (selectedChoice) {
+        display.push(`> ${selectedChoice.text}`);
+      }
+
+      // apply effects of the selected choice to reconstruct player state
+      if (selectedChoice?.effects) {
+        this.checkEffects(selectedChoice.effects);
       }
     }
+
     this.displayItems.set([...display].reverse());
   }
 

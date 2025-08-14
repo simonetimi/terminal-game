@@ -24,6 +24,9 @@
       ]
     }
   },
+  "items": {
+    "map": "Mappa"
+  },
   "alt": {
     "playerStatus": {
       "heartIcon": "Vita"
