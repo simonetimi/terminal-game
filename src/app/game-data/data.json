@@ -14,6 +14,7 @@
     {
       "id": "start",
       "text": "Ti trovi a un crocevia.",
+      "vfx": "dark",
       "choices": [
         {
           "text": "Vai verso la foresta",
