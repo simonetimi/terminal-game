@@ -24,4 +24,6 @@ Simulated terminal rpg text-based game
 - [x] Support for conditions
 - [x] Support for effects
 - [x] Add inventory, knowledge and moral points
+- [x] Support for free inputs instead of choices
+- [ ] Sound and visual effects
 - [ ] Add sounds for effects

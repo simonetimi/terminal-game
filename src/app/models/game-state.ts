@@ -6,6 +6,8 @@ export interface GameNode {
   altTextIfKnowledge?: string; // show when player has certain knowledge
   knowledgeForAltText?: string;
   isFreeInput?: boolean;
+  vfx?: string; // visual effect
+  sfx?: string; // sound effect
 }
 
 export interface Choice {

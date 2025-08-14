@@ -6,7 +6,7 @@ import { Choice, Effect, GameNode, PlayerData } from "../models/game-state";
 import { strip } from "../utils/strings";
 import { PersistenceService } from "./persistence-service";
 import { TranslateService } from "@ngx-translate/core";
-import { AudioService } from "./audio-service";
+import { EffectsManagerService } from "./effects-manager-service";
 
 @Injectable({
   providedIn: "root",
@@ -14,7 +14,7 @@ import { AudioService } from "./audio-service";
 export class GameService {
   #translateService = inject(TranslateService);
   #persistenceService = inject(PersistenceService);
-  #audioService = inject(AudioService);
+  #effectsManagerService = inject(EffectsManagerService);
 
   nodes = gameData.nodes as GameNode[];
 
@@ -93,6 +93,9 @@ export class GameService {
     this.displayItems().length > 0 &&
       this.displayItems.update((items) => ["&nbsp;", ...items]);
 
+    // effects
+    this.#effectsManagerService.playNodeEffects(node);
+
     this.writeOnScreen(this.chooseTextToDisplay(node), () => {
       const choices = this.renderChoices(node);
       this.displayItems.update((items) => [...choices, ...items]);
@@ -101,7 +104,6 @@ export class GameService {
 
   writeOnScreen(text: string, callback?: () => void) {
     this.isSystemWriting.set(true);
-    this.#audioService.playAudio("blip");
     this.skipAnimation = typewriter(
       this.displayItems,
       text,

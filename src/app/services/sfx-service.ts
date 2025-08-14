@@ -3,7 +3,7 @@ import { Injectable, signal } from "@angular/core";
 @Injectable({
   providedIn: "root",
 })
-export class AudioService {
+export class SfxService {
   #blipAudio = new Audio("assets/sounds/blip.wav");
 
   isSoundOn = signal(true);

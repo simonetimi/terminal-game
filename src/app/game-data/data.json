@@ -98,7 +98,8 @@
     },
     {
       "id": "badEnding",
-      "text": "Sei morto"
+      "text": "Sei morto",
+      "vfx": "shake"
     }
   ]
 }
