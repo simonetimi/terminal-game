@@ -16,6 +16,7 @@ export interface Choice {
   conditions?: Condition[];
   effects?: Effect[];
   matchKeyword?: string;
+  gameEffect?: string;
 }
 
 export interface Condition {
@@ -41,7 +42,9 @@ export interface Effect {
     | "removeItem"
     | "removeKnowledge"
     | "removeHealth"
-    | "removeMoralPoints";
+    | "removeMoralPoints"
+    | "restart"
+    | "close";
   item?: string;
   knowledge?: string;
   health?: number;

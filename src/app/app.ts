@@ -22,7 +22,7 @@ import { Title } from "@angular/platform-browser";
 export class App implements OnInit {
   #translateService = inject(TranslateService);
   #titleService = inject(Title);
-  hideSplashScreen = signal(false);
+  protected hideSplashScreen = signal(false);
 
   ngOnInit() {
     this.#titleService.setTitle(this.#translateService.instant("app.title"));

@@ -17,6 +17,7 @@ export class GameService {
   #effectsManagerService = inject(EffectsManagerService);
 
   nodes = gameData.nodes as GameNode[];
+  endingChoices = gameData.endingChoices as Choice[];
 
   playerState = signal<PlayerData>({
     name: "anonymous",
@@ -31,6 +32,7 @@ export class GameService {
 
   isSystemWriting = signal(false);
   isUserQuitting = signal(false);
+  isEndingNode = signal(false);
 
   skipAnimation = () => {};
 
@@ -160,6 +162,32 @@ export class GameService {
       return this.displayItems.update((items) => [exit.text, ...items]);
     }
 
+    if (this.isEndingNode()) {
+      const choiceNumber = parseInt(cleanInput);
+      if (isNaN(choiceNumber)) return;
+
+      if (choiceNumber > this.endingChoices.length || choiceNumber < 1) return;
+
+      const endingChoice = this.endingChoices[choiceNumber - 1];
+
+      // replace the numbered choices with the selected choice
+      this.displayItems.update((items) => {
+        const itemsWithoutChoices = items.slice(this.endingChoices.length);
+        return [`> ${endingChoice.text}`, ...itemsWithoutChoices];
+      });
+
+      // handle ending choice effects
+      switch (endingChoice.gameEffect) {
+        case "restart":
+          this.#persistenceService.clearAllDataAndRefresh();
+          break;
+        case "close":
+          location.reload();
+          break;
+      }
+      return;
+    }
+
     // if free input, the input will have to match the choice with the match keyword. if it doesn't, it picks the other choice
     if (this.currentNode().isFreeInput) {
       const slicedInput = cleanInput.slice(0, 30);
@@ -275,14 +303,6 @@ export class GameService {
             }));
           }
           break;
-        case "removeKnowledge":
-          if (effect.knowledge) {
-            this.playerState.update((player) => ({
-              ...player,
-              knowledge: player.knowledge.filter((k) => k !== effect.knowledge),
-            }));
-          }
-          break;
       }
     });
   }
@@ -339,7 +359,17 @@ export class GameService {
   }
 
   renderChoices(node: GameNode) {
-    return this.filterChoices(node.choices)
+    const filteredChoices = this.filterChoices(node.choices);
+
+    // ending node
+    if (filteredChoices.length === 0) {
+      this.isEndingNode.set(true);
+      return this.endingChoices
+        .map((choice, idx) => `${idx + 1}. ${choice.text}`)
+        .reverse();
+    }
+
+    return filteredChoices
       .map((choice, idx) =>
         node.isFreeInput ? "" + choice.text : `${idx + 1}. ${choice.text}`,
       )
