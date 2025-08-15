@@ -4,19 +4,21 @@ import { Injectable, signal } from "@angular/core";
   providedIn: "root",
 })
 export class SfxService {
-  #blipAudio = new Audio("assets/sounds/blip.wav");
+  #path = "assets/sounds/";
+  #ext = ".wav";
 
   isSoundOn = signal(true);
 
-  public AUDIO_MAP: Record<string, HTMLAudioElement> = {
-    blip: this.#blipAudio,
-  };
+  #sounds = ["blip", "win", "lose"];
+
+  public AUDIO_MAP: Record<string, HTMLAudioElement> = {};
 
   constructor() {
-    for (const audio in this.AUDIO_MAP) {
-      const audioElement = this.AUDIO_MAP[audio];
+    for (const sound of this.#sounds) {
+      const audioElement = new Audio(this.#path + sound + this.#ext);
       audioElement.load();
       audioElement.volume = 0.6;
+      this.AUDIO_MAP[sound] = audioElement;
     }
   }
 

@@ -86,7 +86,7 @@
         {
           "text": "",
           "nextNodeId": "goodEnding",
-          "matchKeyword": "46"
+          "matchKeyword": "42"
         },
         {
           "text": "",
@@ -97,11 +97,13 @@
     {
       "id": "goodEnding",
       "text": "Giusto. Sei in pace con te stesso. Hai vinto!",
+      "sfx": "win",
       "choices": []
     },
     {
       "id": "badEnding",
       "text": "Sei morto.",
+      "sfx": "lose",
       "vfx": "shake",
       "choices": []
     }

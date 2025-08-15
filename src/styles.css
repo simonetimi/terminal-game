@@ -20,6 +20,11 @@ body {
     font-size: 16px !important;
   }
 
+  .list-none li {
+    font-size: 16px !important;
+    line-height: 1.3rem;
+  }
+
   main {
     /* safe area iOS */
     padding-bottom: env(safe-area-inset-bottom);
@@ -41,15 +46,12 @@ body {
   }
 }
 
-/* desktop font settings */
-@media (min-width: 769px) {
-
-  input,
-  textarea,
-  select,
-  .input-prompt {
-    font-family: "Courier New", monospace;
-  }
+.input-prompt,
+.terminal-input,
+input,
+textarea,
+select {
+  font-family: "Courier New", monospace;
 }
 
 

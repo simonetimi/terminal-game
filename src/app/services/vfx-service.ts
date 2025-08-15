@@ -287,18 +287,15 @@ export class VfxService {
   ) {
     this.#permanentEffects.clear();
 
-    // Kill any existing timeline
     if (this.#currentTimeline) {
       this.#currentTimeline.kill();
     }
-
-    // Kill any infinite animations
     gsap.killTweensOf(selector);
 
     const element = document.querySelector(selector) as HTMLElement;
     if (!element) return;
 
-    // Remove grain overlay
+    // remove grain overlay
     const grain = element.querySelector(".vfx-grain-overlay");
     if (grain) {
       gsap.to(grain, {
@@ -308,7 +305,14 @@ export class VfxService {
       });
     }
 
-    // Smooth transition back to normal
+    if (this.#permanentEffects.size === 0 && !grain) {
+      // clear without animation
+      element.style.filter = "";
+      element.style.boxShadow = "";
+      return;
+    }
+
+    // smooth transition back to normal - only if effects were active
     this.#currentTimeline = gsap.timeline();
 
     this.#currentTimeline
@@ -318,7 +322,6 @@ export class VfxService {
         duration: duration * 0.3,
         ease: "power1.inOut",
       })
-      // Gradually restore normal appearance
       .to(
         element,
         {
@@ -328,7 +331,6 @@ export class VfxService {
         },
         "-=0.1",
       )
-      // Final clean state
       .to(element, {
         filter: "none",
         duration: duration * 0.3,
