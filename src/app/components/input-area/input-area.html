@@ -1,9 +1,15 @@
-<form class="flex gap-2 items-baseline w-full" (ngSubmit)="onSubmit()">
-  <p class="flex-shrink-0">{{ playerState().name }}&#64;terminal ~ %</p>
+<form
+  spellcheck="false"
+  class="flex gap-1 items-center w-full max-w-full text-sm"
+  (ngSubmit)="onSubmit()"
+>
+  <p class="input-prompt font-mono text-base leading-4 flex-shrink-0 pr-1">
+    {{ playerState().name }}&#64;terminal ~ %
+  </p>
   <input
     #commandInput
     type="text"
-    class="terminal-input bg-transparent border-none outline-none text-green-400 font-mono caret-green-400 text-sm flex-grow"
+    class="terminal-input bg-transparent border-none outline-none text-green-400 font-mono text-base leading-4 caret-green-400 flex-1 min-w-0"
     autocomplete="off"
     [formControl]="inputCommand"
   />
@@ -14,9 +20,9 @@
         : ('alt.inputArea.soundOff' | translate)
     "
     [src]="`/assets/icons/sound-${isSoundOn() ? 'on' : 'off'}.svg`"
-    height="20px"
-    width="20px"
-    class="self-center cursor-pointer"
+    height="18px"
+    width="18px"
+    class="flex-shrink-0 cursor-pointer"
     role="button"
     (click)="onToggleSound()"
   />

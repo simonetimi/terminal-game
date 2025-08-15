@@ -4,7 +4,54 @@ html,
 body {
   @apply bg-black text-green-400 h-screen text-base;
   font-family: "Courier New", monospace;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  -webkit-text-size-adjust: 100%;
 }
+
+/* mobile font and layout settings */
+@media (max-width: 768px) {
+
+  input,
+  textarea,
+  select {
+    /* prevents zoom on iOS */
+    font-size: 16px !important;
+  }
+
+  main {
+    /* safe area iOS */
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: env(safe-area-inset-top);
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  /* mobile keyboard */
+  @supports (height: 100dvh) {
+
+    html,
+    body {
+      height: 100dvh;
+      position: fixed;
+      width: 100%;
+    }
+  }
+}
+
+/* desktop font settings */
+@media (min-width: 769px) {
+
+  input,
+  textarea,
+  select,
+  .input-prompt {
+    font-family: "Courier New", monospace;
+  }
+}
+
 
 .ascii-art {
   font-family: monospace;
