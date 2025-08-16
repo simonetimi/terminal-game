@@ -26,7 +26,7 @@ export interface Condition {
     | "hasHealth"
     | "hasMoralPoints"
     | "hasNotItem"
-    | "hasNotVisited";
+    | "hasNotVisitedNextNode";
   item?: string;
   knowledge?: string;
   health?: number;

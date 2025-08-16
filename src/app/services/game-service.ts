@@ -342,6 +342,8 @@ export class GameService {
             return condition.item
               ? !player.inventory.includes(condition.item)
               : false;
+          case "hasNotVisitedNextNode":
+            return !this.visitedNodes.includes(choice.nextNodeId);
           default:
             return true;
         }
