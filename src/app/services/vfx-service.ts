@@ -1,23 +1,24 @@
 import { Injectable, isDevMode } from "@angular/core";
 import gsap from "gsap";
+import { CONFIG } from "../lib/config";
 
 @Injectable({ providedIn: "root" })
 export class VfxService {
   #permanentEffects: Set<string> = new Set();
   #currentTimeline: gsap.core.Timeline | null = null;
-  defaultScreenSelector = "main";
 
   play(effectName: string, options: any = {}) {
     const effects: Record<string, () => void> = {
-      shake: () => this.#shake(options.selector || this.defaultScreenSelector),
+      shake: () =>
+        this.#shake(options.selector || CONFIG.DEFAULT_SCREEN_SELECTOR),
       dark: () =>
         this.#dark(
-          options.selector || this.defaultScreenSelector,
+          options.selector || CONFIG.DEFAULT_SCREEN_SELECTOR,
           options.duration || 2,
         ),
       glitch: () =>
         this.#glitch(
-          options.selector || this.defaultScreenSelector,
+          options.selector || CONFIG.DEFAULT_SCREEN_SELECTOR,
           options.duration || 1,
         ),
     };
@@ -282,7 +283,7 @@ export class VfxService {
   }
 
   removeEffects(
-    selector: string = this.defaultScreenSelector,
+    selector: string = CONFIG.DEFAULT_SCREEN_SELECTOR,
     duration: number = 1.5,
   ) {
     this.#permanentEffects.clear();
@@ -336,9 +337,5 @@ export class VfxService {
         duration: duration * 0.3,
         ease: "power1.out",
       });
-  }
-
-  hasPermanentEffect(effectName: string): boolean {
-    return this.#permanentEffects.has(effectName);
   }
 }

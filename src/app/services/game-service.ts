@@ -13,6 +13,7 @@ import { strip } from "../utils/strings";
 import { PersistenceService } from "./persistence-service";
 import { TranslateService } from "@ngx-translate/core";
 import { EffectsManagerService } from "./effects-manager-service";
+import { CONFIG, DEFAULT_PLAYER_DATA } from "../lib/config";
 
 @Injectable({
   providedIn: "root",
@@ -25,13 +26,7 @@ export class GameService {
   nodes = gameData.nodes as GameNode[];
   endingChoices = gameData.endingChoices as Choice[];
 
-  playerState = signal<PlayerData>({
-    name: "anonymous",
-    health: 3,
-    inventory: [],
-    knowledge: [],
-    moralPoints: 0,
-  });
+  playerState = signal<PlayerData>(DEFAULT_PLAYER_DATA);
   displayItems = signal<string[]>([]);
   visitedNodes: string[] = [];
   freeInputsHistory: string[] = [];
@@ -43,9 +38,6 @@ export class GameService {
   skipAnimation = () => {};
 
   currentNode = signal<GameNode>({} as GameNode);
-
-  #typewriterSpeed = 60;
-  #lineBreakDelay = 1000;
 
   constructor() {
     window.addEventListener("keydown", (event) => {
@@ -120,9 +112,9 @@ export class GameService {
       this.displayItems,
       text,
       {
-        speed: this.#typewriterSpeed,
-        lineBreakDelay: this.#lineBreakDelay,
-        effectsSelector: this.#effectsManagerService.defaultScreenSelector,
+        speed: CONFIG.TYPEWRITER_SPEED,
+        lineBreakDelay: CONFIG.NARRATION_BREAK_DELAY,
+        effectsSelector: CONFIG.DEFAULT_SCREEN_SELECTOR,
       },
       () => {
         this.isSystemWriting.set(false);

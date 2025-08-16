@@ -8,8 +8,6 @@ export class EffectsManagerService {
   #vfxService = inject(VfxService);
   #sfxService = inject(SfxService);
 
-  defaultScreenSelector = this.#vfxService.defaultScreenSelector;
-
   playNodeEffects(node: GameNode) {
     // play audio if specified, else play blip
     if (node.sfx) {
