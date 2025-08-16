@@ -100,7 +100,7 @@ export class GameService {
 
     // add empty space between nodes
     this.displayItems().length > 0 &&
-      this.displayItems.update((items) => ["&nbsp;", ...items]);
+      this.displayItems.update((items) => [...items, "&nbsp;"]);
 
     // effects
     this.#effectsManagerService.clearEffects();
@@ -110,7 +110,7 @@ export class GameService {
 
     this.writeOnScreen(this.chooseTextToDisplay(node), () => {
       const choices = this.renderChoices(node);
-      this.displayItems.update((items) => [...choices, ...items]);
+      this.displayItems.update((items) => [...items, ...choices]);
     });
   }
 
@@ -140,8 +140,8 @@ export class GameService {
       const name = cleanInput.slice(0, 20);
 
       this.displayItems.update((items) => {
-        items.shift();
-        return [`> ${name}`, ...items];
+        const itemsWithoutPlaceholder = items.filter((item) => item !== ""); // remove empty placeholder
+        return [...itemsWithoutPlaceholder, `> ${name}`];
       });
       this.freeInputsHistory.push(name);
       this.#persistenceService.saveFreeInputsHistory(this.freeInputsHistory);
@@ -158,14 +158,15 @@ export class GameService {
       if (confirm.keys.includes(cleanInput.toLowerCase())) {
         return this.#persistenceService.clearAllDataAndRefresh();
       } else {
-        this.displayItems.update((items) => items.slice(1));
+        // remove the quit confirmation text from the end
+        this.displayItems.update((items) => items.slice(0, -1));
         return this.isUserQuitting.set(false);
       }
     }
     const exit = this.#translateService.instant("commands.exit");
     if (exit.keys.includes(cleanInput.toLowerCase())) {
       this.isUserQuitting.set(true);
-      return this.displayItems.update((items) => [exit.text, ...items]);
+      return this.displayItems.update((items) => [...items, exit.text]);
     }
 
     if (this.isEndingNode()) {
@@ -178,8 +179,8 @@ export class GameService {
 
       // replace the numbered choices with the selected choice
       this.displayItems.update((items) => {
-        const itemsWithoutChoices = items.slice(this.endingChoices.length);
-        return [`> ${endingChoice.text}`, ...itemsWithoutChoices];
+        const itemsWithoutChoices = items.slice(0, -this.endingChoices.length);
+        return [...itemsWithoutChoices, `> ${endingChoice.text}`];
       });
 
       // handle ending choice effects
@@ -199,8 +200,8 @@ export class GameService {
       const slicedInput = cleanInput.slice(0, 30);
 
       this.displayItems.update((items) => {
-        items.shift();
-        return [`> ${slicedInput}`, ...items];
+        const itemsWithoutPlaceholder = items.filter((item) => item !== ""); // remove empty placeholder
+        return [...itemsWithoutPlaceholder, `> ${slicedInput}`];
       });
 
       this.freeInputsHistory.push(slicedInput);
@@ -241,10 +242,8 @@ export class GameService {
     // replace the numbered choices with the selected choice
     const choicesCount = availableChoices.length;
     this.displayItems.update((items) => {
-      // remove the numbered choices (they are at the beginning of the array due to reverse order)
-      const itemsWithoutChoices = items.slice(choicesCount);
-      // add the selected choice in the "> text" format
-      return [`> ${choice.text}`, ...itemsWithoutChoices];
+      const itemsWithoutChoices = items.slice(0, -choicesCount);
+      return [...itemsWithoutChoices, `> ${choice.text}`];
     });
 
     // effects run
@@ -374,16 +373,14 @@ export class GameService {
     // ending node
     if (filteredChoices.length === 0) {
       this.isEndingNode.set(true);
-      return this.endingChoices
-        .map((choice, idx) => `${idx + 1}. ${choice.text}`)
-        .reverse();
+      return this.endingChoices.map(
+        (choice, idx) => `${idx + 1}. ${choice.text}`,
+      );
     }
 
-    return filteredChoices
-      .map((choice, idx) =>
-        node.isFreeInput ? "" + choice.text : `${idx + 1}. ${choice.text}`,
-      )
-      .reverse();
+    return filteredChoices.map((choice, idx) =>
+      node.isFreeInput ? "" : `${idx + 1}. ${choice.text}`,
+    );
   }
 
   traverseNodes(nodeIds: string[]) {
@@ -442,7 +439,7 @@ export class GameService {
       }
     }
 
-    this.displayItems.set([...display].reverse());
+    this.displayItems.set(display);
   }
 
   findNode(nodeId: string) {

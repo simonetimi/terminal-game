@@ -26,8 +26,8 @@ export function typewriter(
   let isPaused = false;
   let currentTimeout: number | null = null;
 
-  targetSignal.update((items) => ["", ...items]);
-  const firstIndex = 0;
+  targetSignal.update((items) => [...items, ""]);
+  const firstIndex = targetSignal().length - 1;
 
   // event helpers
   const eventTarget: Document = document;

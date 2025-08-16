@@ -1,7 +1,7 @@
 <div class="h-full overflow-hidden">
   <ul
     #scrollContainer
-    class="list-none h-full overflow-y-auto flex flex-col-reverse"
+    class="list-none h-full overflow-y-auto flex flex-col justify-end"
   >
     @for (item of displayItems(); track $index) {
       <li [innerHTML]="item"></li>

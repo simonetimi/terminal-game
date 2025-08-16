@@ -2,7 +2,7 @@
   class="w-[80vw] h-[20vh] flex flex-col gap-6 items-center"
   (ngSubmit)="onSubmit()"
 >
-  <ul class="flex flex-col-reverse list-none text-center">
+  <ul class="flex flex-col list-none text-center">
     @for (message of displayMessages(); track $index) {
       <li>
         {{ message }}
