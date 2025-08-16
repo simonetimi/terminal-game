@@ -4,12 +4,12 @@ import {
   effect,
   ElementRef,
   inject,
+  output,
   viewChild,
 } from "@angular/core";
 import { GameService } from "../../services/game-service";
 import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { TranslatePipe } from "@ngx-translate/core";
-import { SfxService } from "../../services/sfx-service";
 
 @Component({
   selector: "app-input-area",
@@ -20,8 +20,9 @@ import { SfxService } from "../../services/sfx-service";
 })
 export class InputArea {
   #gameService = inject(GameService);
-  #sfxService = inject(SfxService);
   inputRef = viewChild<ElementRef>("commandInput");
+
+  toggleSettings = output<boolean>();
 
   constructor() {
     effect(() => {
@@ -36,10 +37,9 @@ export class InputArea {
   protected inputCommand = new FormControl("");
   protected isSystemWriting = this.#gameService.isSystemWriting;
   protected playerState = this.#gameService.playerState;
-  protected isSoundOn = this.#sfxService.isSoundOn;
 
-  onToggleSound() {
-    this.isSoundOn.update((prev) => !prev);
+  openSettings() {
+    this.toggleSettings.emit(true);
   }
 
   onSubmit() {

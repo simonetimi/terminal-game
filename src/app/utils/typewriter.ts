@@ -18,6 +18,11 @@ export function typewriter(
     effectsSelector,
   } = options;
 
+  // converts speed to delay
+  const minDelay = 10;
+  const maxDelay = 80;
+  const delay = maxDelay - Math.round((speed / 100) * (maxDelay - minDelay));
+
   // split text by double backslashes
   const lines = text.split("\\");
   let currentLineIndex = 0;
@@ -137,7 +142,7 @@ export function typewriter(
         if (!finished && !isPaused) {
           processNextCharacter();
         }
-      }, speed);
+      }, delay);
     }
   };
 

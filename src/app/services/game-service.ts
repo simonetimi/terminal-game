@@ -14,17 +14,18 @@ import { PersistenceService } from "./persistence-service";
 import { TranslateService } from "@ngx-translate/core";
 import { EffectsManagerService } from "./effects-manager-service";
 import { CONFIG, DEFAULT_PLAYER_DATA } from "../lib/config";
+import { SettingsService } from "./settings-service";
 
 @Injectable({
   providedIn: "root",
 })
 export class GameService {
-  #translateService = inject(TranslateService);
   #persistenceService = inject(PersistenceService);
   #effectsManagerService = inject(EffectsManagerService);
+  #settingsService = inject(SettingsService);
+  #translateService = inject(TranslateService);
 
   nodes = gameData.nodes as GameNode[];
-  endingChoices = gameData.endingChoices as Choice[];
 
   playerState = signal<PlayerData>(DEFAULT_PLAYER_DATA);
   displayItems = signal<string[]>([]);
@@ -32,8 +33,6 @@ export class GameService {
   freeInputsHistory: string[] = [];
 
   isSystemWriting = signal(false);
-  isUserQuitting = signal(false);
-  isEndingNode = signal(false);
 
   skipAnimation = () => {};
 
@@ -126,7 +125,7 @@ export class GameService {
       this.displayItems,
       text,
       {
-        speed: CONFIG.TYPEWRITER_SPEED,
+        speed: this.#settingsService.typewriterSpeed(),
         lineBreakDelay: CONFIG.NARRATION_BREAK_DELAY,
         effectsSelector: CONFIG.DEFAULT_SCREEN_SELECTOR,
       },
@@ -138,6 +137,11 @@ export class GameService {
   }
 
   sendUserInput(input: string) {
+    if (this.currentNode().choices.length === 0) {
+      // allow any input to restart at the end of the game
+      return this.#persistenceService.clearAllDataAndRefresh();
+    }
+
     const cleanInput = strip(input).trim();
     if (!cleanInput) return;
 
@@ -157,48 +161,6 @@ export class GameService {
 
       this.playerState.update((playerState) => ({ ...playerState, name }));
       return this.#persistenceService.savePlayerData({ name });
-    }
-
-    if (this.isUserQuitting()) {
-      const confirm = this.#translateService.instant("commands.yes");
-      if (confirm.keys.includes(cleanInput.toLowerCase())) {
-        return this.#persistenceService.clearAllDataAndRefresh();
-      } else {
-        // remove the quit confirmation text from the end
-        this.displayItems.update((items) => items.slice(0, -1));
-        return this.isUserQuitting.set(false);
-      }
-    }
-    const exit = this.#translateService.instant("commands.exit");
-    if (exit.keys.includes(cleanInput.toLowerCase())) {
-      this.isUserQuitting.set(true);
-      return this.displayItems.update((items) => [...items, exit.text]);
-    }
-
-    if (this.isEndingNode()) {
-      const choiceNumber = parseInt(cleanInput);
-      if (isNaN(choiceNumber)) return;
-
-      if (choiceNumber > this.endingChoices.length || choiceNumber < 1) return;
-
-      const endingChoice = this.endingChoices[choiceNumber - 1];
-
-      // replace the numbered choices with the selected choice
-      this.displayItems.update((items) => {
-        const itemsWithoutChoices = items.slice(0, -this.endingChoices.length);
-        return [...itemsWithoutChoices, `> ${endingChoice.text}`];
-      });
-
-      // handle ending choice effects
-      switch (endingChoice.gameEffect) {
-        case "restart":
-          this.#persistenceService.clearAllDataAndRefresh();
-          break;
-        case "close":
-          location.reload();
-          break;
-      }
-      return;
     }
 
     // if free input, the input will have to match the choice with the match keyword. if it doesn't, it picks the other choice
@@ -378,12 +340,8 @@ export class GameService {
   renderChoices(node: GameNode) {
     const filteredChoices = this.filterChoices(node.choices);
 
-    // ending node
     if (filteredChoices.length === 0) {
-      this.isEndingNode.set(true);
-      return this.endingChoices.map(
-        (choice, idx) => `${idx + 1}. ${choice.text}`,
-      );
+      return [`> ${this.#translateService.instant("game.leave")}`];
     }
 
     return filteredChoices.map((choice, idx) =>

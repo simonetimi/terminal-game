@@ -1,13 +1,13 @@
-import { Injectable, signal } from "@angular/core";
+import { inject, Injectable, signal } from "@angular/core";
+import { SettingsService } from "./settings-service";
 
 @Injectable({
   providedIn: "root",
 })
 export class SfxService {
+  #settingsService = inject(SettingsService);
   #path = "assets/sounds/";
   #ext = ".wav";
-
-  isSoundOn = signal(true);
 
   #sounds = ["blip", "win", "lose"];
 
@@ -23,7 +23,7 @@ export class SfxService {
   }
 
   playAudio(key: string) {
-    if (!this.isSoundOn()) return;
+    if (!this.#settingsService.soundsEnabled()) return;
     const audio = this.AUDIO_MAP[key];
     audio.currentTime = 0;
     audio.play();

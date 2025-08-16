@@ -8,14 +8,6 @@
     "button": "Premi INVIO"
   },
   "commands": {
-    "exit": {
-      "keys": [
-        "esci",
-        "ricomincia",
-        "riavvia"
-      ],
-      "text": "Vuoi davvero uscire? Perderai tutti i progressi fatti finora! (s/N)"
-    },
     "yes": {
       "keys": [
         "si",
@@ -27,13 +19,36 @@
   "items": {
     "map": "Mappa"
   },
+  "game": {
+    "leave": "Premi INVIO per uscire"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "version": "Versione",
+    "writingSpeed": {
+      "title": "Velocità di scrittura",
+      "slow": "Lenta",
+      "fast": "Veloce",
+      "speed": "Velocità"
+    },
+    "audio": {
+      "title": "Audio",
+      "enabled": "Suoni abilitati",
+      "disabled": "Suoni disabilitati"
+    },
+    "game": {
+      "title": "Gioco",
+      "restart": "Riavvia",
+      "restartConfirm": "Sei sicuro di voler riavviare?"
+    },
+    "close": "Chiudi"
+  },
   "alt": {
     "playerStatus": {
       "heartIcon": "Vita"
     },
     "inputArea": {
-      "soundOff": "Suoni disattivati",
-      "soundOn": "Suoni attivati"
+      "settings": "Impostazioni"
     }
   }
 }

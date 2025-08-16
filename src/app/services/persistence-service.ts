@@ -46,8 +46,27 @@ export class PersistenceService {
     return this.load("freeInputsHistory");
   }
 
+  saveTypewriterSpeed(speed: number) {
+    this.save("typewriterSpeed", speed);
+  }
+
+  loadTypewriterSpeed(): number {
+    return this.load("typewriterSpeed");
+  }
+
+  saveSoundsEnabled(enabled: boolean) {
+    this.save("soundsEnabled", enabled);
+  }
+
+  loadSoundsEnabled(): boolean {
+    return this.load("soundsEnabled");
+  }
+
   clearAllDataAndRefresh() {
-    localStorage.clear();
+    localStorage.removeItem("player");
+    localStorage.removeItem("visitedNodes");
+    localStorage.removeItem("currentNode");
+    localStorage.removeItem("freeInputsHistory");
     location.reload();
   }
 }

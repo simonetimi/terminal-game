@@ -1,7 +1,6 @@
 <form
   spellcheck="false"
   class="flex gap-1 items-center w-full max-w-full text-sm"
-  input-bar
   (ngSubmit)="onSubmit()"
 >
   <p class="input-prompt font-mono text-base leading-4 flex-shrink-0 pr-1">
@@ -14,17 +13,17 @@
     autocomplete="off"
     [formControl]="inputCommand"
   />
-  <img
-    [alt]="
-      isSoundOn()
-        ? 'alt.inputArea.soundOn'
-        : ('alt.inputArea.soundOff' | translate)
-    "
-    [src]="`/assets/icons/sound-${isSoundOn() ? 'on' : 'off'}.svg`"
-    height="18px"
-    width="18px"
-    class="flex-shrink-0 cursor-pointer"
-    role="button"
-    (click)="onToggleSound()"
-  />
+  <button
+    (click)="openSettings()"
+    type="button"
+    class="text-green-400 hover:text-green-300 transition-colors cursor-pointer"
+    title="Settings"
+  >
+    <img
+      [alt]="'alt.inputArea.settings' | translate"
+      src="/assets/icons/cog.svg"
+      height="18px"
+      width="18px"
+    />
+  </button>
 </form>

@@ -8,6 +8,7 @@ import {
 import { TranslatePipe, TranslateService } from "@ngx-translate/core";
 import { typewriter } from "../../utils/typewriter";
 import { FormsModule } from "@angular/forms";
+import { SettingsService } from "../../services/settings-service";
 
 @Component({
   selector: "app-splash-screen",
@@ -17,6 +18,7 @@ import { FormsModule } from "@angular/forms";
 })
 export class SplashScreen implements AfterViewInit {
   #translateService = inject(TranslateService);
+  #settingsService = inject(SettingsService);
 
   protected displayMessages = signal<string[]>([]);
   protected showButton = signal(false);
@@ -24,7 +26,7 @@ export class SplashScreen implements AfterViewInit {
   hideSplashScreen = output<boolean>();
 
   ngAfterViewInit() {
-    const speed = 40;
+    const speed = this.#settingsService.typewriterSpeed();
     typewriter(
       this.displayMessages,
       this.#translateService.instant("splashScreen.welcome1"),
