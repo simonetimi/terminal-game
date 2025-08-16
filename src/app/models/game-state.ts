@@ -2,6 +2,8 @@ export interface GameNode {
   id: string;
   text: string;
   choices: Choice[];
+  autoRedirectTo?: string;
+  autoRedirectDelay?: number;
   altTextIfVisited?: string; // show when node has been visited
   altTextIfKnowledge?: string; // show when player has certain knowledge
   knowledgeForAltText?: string;

@@ -101,6 +101,20 @@ export class GameService {
     });
 
     this.writeOnScreen(this.chooseTextToDisplay(node), () => {
+      // handle auto-redirect nodes
+      if (node.autoRedirectTo) {
+        this.isSystemWriting.set(true);
+        const delay =
+          node.autoRedirectDelay ?? CONFIG.DEFAULT_AUTO_REDIRECT_DELAY;
+        setTimeout(() => {
+          const redirectNode = this.findNode(node.autoRedirectTo!);
+          if (redirectNode) {
+            this.setCurrentNode(redirectNode);
+          }
+        }, delay);
+        return; // no choice to render
+      }
+
       const choices = this.renderChoices(node);
       this.displayItems.update((items) => [...items, ...choices]);
     });
@@ -378,15 +392,9 @@ export class GameService {
   }
 
   traverseNodes(nodeIds: string[]) {
-    // Reset player stats (keep name from persistence)
+    // reset player stats but the na,e
     const { name } = this.playerState();
-    this.playerState.set({
-      name,
-      health: 3,
-      inventory: [],
-      knowledge: [],
-      moralPoints: 0,
-    });
+    this.playerState.set({ ...DEFAULT_PLAYER_DATA, name });
 
     // rebuild all nodes but the last one, which will use the regular game flow
     const display: string[] = [];
@@ -396,6 +404,19 @@ export class GameService {
     for (let i = 0; i < nodeIds.length - 1; i++) {
       const node = this.findNode(nodeIds[i]);
       if (!node) continue;
+
+      if (node.autoRedirectTo) {
+        // add auto-redirect node text
+        if (i > 0) {
+          display.push("&nbsp;");
+        }
+        const text = this.chooseTextToDisplay(
+          node,
+          tempVisitedNodes,
+        ).replaceAll("\\", "");
+        display.push(text);
+        continue;
+      }
 
       // add current node to temporary visited array
       tempVisitedNodes.push(node.id);
