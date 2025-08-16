@@ -2,7 +2,13 @@ import { inject, Injectable, signal } from "@angular/core";
 import { typewriter } from "../utils/typewriter";
 
 import gameData from "../game-data/data.json";
-import { Choice, Effect, GameNode, PlayerData } from "../models/game-state";
+import {
+  Choice,
+  Effect,
+  GameNode,
+  PlayerData,
+  SPECIAL_NODES,
+} from "../models/game-state";
 import { strip } from "../utils/strings";
 import { PersistenceService } from "./persistence-service";
 import { TranslateService } from "@ngx-translate/core";
@@ -130,7 +136,7 @@ export class GameService {
     if (!cleanInput) return;
 
     // setting name - game start
-    if (this.currentNode().id === "welcome") {
+    if (this.currentNode().id === SPECIAL_NODES.WELCOME) {
       const name = cleanInput.slice(0, 20);
 
       this.displayItems.update((items) => {
@@ -243,6 +249,10 @@ export class GameService {
 
     // effects run
     if (choice.effects) this.checkEffects(choice.effects);
+
+    if (this.playerState().health <= 0) {
+      return this.setCurrentNode(this.findNode(SPECIAL_NODES.GAME_OVER));
+    }
 
     // node is set
     this.setCurrentNode(this.findNode(choice.nextNodeId));

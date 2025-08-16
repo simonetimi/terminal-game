@@ -6,8 +6,8 @@ export interface GameNode {
   altTextIfKnowledge?: string; // show when player has certain knowledge
   knowledgeForAltText?: string;
   isFreeInput?: boolean;
-  vfx?: "shake" | "glitch" | "dark"; // visual effect
-  sfx?: "blip"; // sound effect
+  vfx?: Vfx;
+  sfx?: Sfx;
 }
 
 export interface Choice {
@@ -51,6 +51,9 @@ export interface Effect {
   moralPoints?: number;
 }
 
+export type Vfx = "shake" | "glitch" | "dark";
+export type Sfx = "blip" | "win" | "lose";
+
 export interface PlayerData {
   name: string;
   health: number;
@@ -62,3 +65,8 @@ export interface PlayerData {
 export interface SavedPlayerData {
   name: string;
 }
+
+export const SPECIAL_NODES = {
+  WELCOME: "welcome",
+  GAME_OVER: "gameOver",
+} as const;

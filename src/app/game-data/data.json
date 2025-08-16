@@ -106,6 +106,13 @@
       "sfx": "lose",
       "vfx": "shake",
       "choices": []
+    },
+    {
+      "id": "gameOver",
+      "text": "Sei morto.",
+      "sfx": "lose",
+      "vfx": "shake",
+      "choices": []
     }
   ],
   "endingChoices": [
