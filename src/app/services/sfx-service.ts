@@ -9,7 +9,7 @@ export class SfxService {
   #path = "assets/sounds/";
   #ext = ".wav";
 
-  #sounds = ["blip", "win", "lose"];
+  #sounds = ["blip", "win", "lose", "hurt"];
 
   public AUDIO_MAP: Record<string, HTMLAudioElement> = {};
 

@@ -15,6 +15,9 @@ import { SettingsService } from "../../services/settings-service";
   imports: [FormsModule, TranslatePipe],
   templateUrl: "./splash-screen.html",
   styleUrl: "./splash-screen.css",
+  host: {
+    "(window:keydown)": "handleKeydown($event)",
+  },
 })
 export class SplashScreen implements AfterViewInit {
   #translateService = inject(TranslateService);
@@ -22,6 +25,8 @@ export class SplashScreen implements AfterViewInit {
 
   protected displayMessages = signal<string[]>([]);
   protected showButton = signal(false);
+
+  #textLoaded = signal(false);
 
   hideSplashScreen = output<boolean>();
 
@@ -40,6 +45,7 @@ export class SplashScreen implements AfterViewInit {
           },
           () => {
             this.showButton.set(true);
+            this.#textLoaded.set(true);
           },
         );
       },
@@ -47,6 +53,12 @@ export class SplashScreen implements AfterViewInit {
   }
 
   protected onSubmit() {
-    this.hideSplashScreen.emit(true);
+    if (this.#textLoaded()) this.hideSplashScreen.emit(true);
+  }
+
+  protected handleKeydown(event: KeyboardEvent) {
+    if (event.key === "Enter" || event.key === " ") {
+      this.onSubmit();
+    }
   }
 }
