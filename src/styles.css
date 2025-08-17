@@ -5,11 +5,11 @@
   /* default = terminal-green */
   --color-bg: #000000;
   --color-bg-elevated: #0a0a0a;
-  --color-text: #4ade80; /* tw green-400 */
-  --color-text-muted: #16a34a; /* tw green-600 */
-  --color-accent: #22c55e; /* tw green-500 */
-  --color-border: #14532d; /* tw green-900 */
-  --color-link: #86efac; /* tw green-300 */
+  --color-text: #4ade80;
+  --color-text-muted: #16a34a;
+  --color-accent: #22c55e;
+  --color-border: #14532d;
+  --color-link: #86efac;
   --color-cursor: #22c55e;
   --color-error: #ef4444;
   --color-warning: #f59e0b;
@@ -30,22 +30,22 @@
 [data-theme="terminalAmber"] {
   --color-bg: #000000;
   --color-bg-elevated: #0a0a0a;
-  --color-text: #fbbf24; /* tw amber-400 */
-  --color-text-muted: #b45309; /* tw amber-700 */
-  --color-accent: #f59e0b; /* tw amber-500 */
-  --color-border: #78350f; /* tw amber-900 */
-  --color-link: #fde68a; /* tw amber-200 */
+  --color-text: #fbbf24;
+  --color-text-muted: #b45309;
+  --color-accent: #f59e0b;
+  --color-border: #78350f;
+  --color-link: #fde68a;
   --color-cursor: #f59e0b;
 }
 
 [data-theme="terminalGrey"] {
   --color-bg: #000000;
   --color-bg-elevated: #0a0a0a;
-  --color-text: #cbd5e1; /* tw slate-300 */
-  --color-text-muted: #64748b; /* tw slate-500 */
-  --color-accent: #94a3b8; /* tw slate-400 */
-  --color-border: #1f2937; /* tw gray-800 */
-  --color-link: #e2e8f0; /* tw slate-200 */
+  --color-text: #cbd5e1;
+  --color-text-muted: #64748b;
+  --color-accent: #94a3b8;
+  --color-border: #1f2937;
+  --color-link: #e2e8f0;
   --color-cursor: #94a3b8;
 }
 
@@ -88,9 +88,11 @@ body {
 .text-ui {
   color: var(--color-text);
 }
+
 .text-muted {
   color: var(--color-text-muted);
 }
+
 .text-accent {
   color: var(--color-accent);
 }
@@ -98,6 +100,7 @@ body {
 .bg-ui {
   background-color: var(--color-bg);
 }
+
 .bg-panel {
   background-color: var(--color-bg-elevated);
 }
@@ -105,6 +108,7 @@ body {
 .border-ui {
   border-color: var(--color-border);
 }
+
 .ring-ui {
   --tw-ring-color: var(--color-accent);
 }
@@ -113,6 +117,7 @@ body {
   background-color: var(--color-accent);
   color: #000;
 }
+
 a {
   color: var(--color-link);
 }
@@ -136,7 +141,6 @@ a {
     padding-bottom: env(safe-area-inset-bottom);
     padding-top: env(safe-area-inset-top);
     overflow: hidden;
-    height: 100vh;
     height: 100dvh;
   }
 
@@ -182,6 +186,53 @@ input[type="checkbox"]:checked::after {
   transform: translate(-50%, -50%);
   font-size: 1.3rem;
   font-weight: bold;
+}
+
+.custom-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+.custom-select:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.custom-select option {
+  background-color: var(--color-bg-elevated);
+  color: var(--color-text);
+  border: none;
+}
+
+.custom-select option:hover {
+  background-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.custom-select,
+[data-theme="terminalGreen"] .custom-select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+[data-theme="terminalAmber"] .custom-select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+[data-theme="terminalGrey"] .custom-select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+[data-theme="pastelDark"] .custom-select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a6b1e1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+[data-theme="pastelLight"] .custom-select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23905bcb' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 
 .ascii-art {

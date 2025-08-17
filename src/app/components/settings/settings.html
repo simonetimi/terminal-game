@@ -76,7 +76,7 @@
           {{ "settings.theme.title" | translate | uppercase }}
         </h3>
         <select
-          class="w-full bg-panel border border-[var(--color-accent)] text-[var(--color-accent)] rounded px-2 py-2 focus:outline-none cursor-pointer"
+          class="custom-select w-full bg-panel border border-[var(--color-accent)] text-[var(--color-accent)] rounded px-2 py-2 focus:outline-none cursor-pointer"
           [ngModel]="currentTheme()"
           (ngModelChange)="onThemeChange($event)"
         >
