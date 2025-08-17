@@ -11,6 +11,9 @@ import { FormsModule } from "@angular/forms";
   imports: [TranslatePipe, UpperCasePipe, FormsModule],
   templateUrl: "./settings.html",
   styleUrl: "./settings.css",
+  host: {
+    "(window:keydown)": "handleKeydown($event)",
+  },
 })
 export class Settings {
   #settingsService = inject(SettingsService);
@@ -55,5 +58,11 @@ export class Settings {
     document.documentElement.setAttribute("data-theme", theme);
     this.currentTheme.set(theme);
     this.#persistenceService.saveTheme(theme);
+  }
+
+  protected handleKeydown(event: KeyboardEvent) {
+    if (event.key === "Escape") {
+      this.closeSettings();
+    }
   }
 }
