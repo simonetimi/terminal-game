@@ -20,7 +20,8 @@ export class SettingsService {
     if (savedSpeed) this.typewriterSpeed.set(savedSpeed);
 
     const soundsEnabledSaved = this.#persistenceService.loadSoundsEnabled();
-    this.soundsEnabled.set(soundsEnabledSaved);
+    if (soundsEnabledSaved !== undefined)
+      this.soundsEnabled.set(soundsEnabledSaved);
   }
 
   setTypewriterSpeed(speed: number) {
