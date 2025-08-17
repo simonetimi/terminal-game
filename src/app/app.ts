@@ -12,6 +12,7 @@ import { SplashScreen } from "./components/splash-screen/splash-screen";
 import { TranslateService } from "@ngx-translate/core";
 import { Title } from "@angular/platform-browser";
 import { Settings } from "./components/settings/settings";
+import { PersistenceService } from "./services/persistence-service";
 
 @Component({
   selector: "app-root",
@@ -22,12 +23,15 @@ import { Settings } from "./components/settings/settings";
 })
 export class App implements OnInit {
   #translateService = inject(TranslateService);
+  #persistenceService = inject(PersistenceService);
   #titleService = inject(Title);
   protected hideSplashScreen = signal(false);
   protected showSettingsModal = signal(false);
 
   ngOnInit() {
     this.#titleService.setTitle(this.#translateService.instant("app.title"));
+    const theme = this.#persistenceService.loadTheme();
+    if (theme) document.documentElement.setAttribute("data-theme", theme);
   }
 
   toggleSplashScreen($event: boolean) {

@@ -9,11 +9,11 @@ import {
 } from "@angular/core";
 import { GameService } from "../../services/game-service";
 import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { TranslatePipe } from "@ngx-translate/core";
+import { SvgIcon } from "../../ui/svg-icon/svg-icon";
 
 @Component({
   selector: "app-input-area",
-  imports: [ReactiveFormsModule, FormsModule, TranslatePipe],
+  imports: [ReactiveFormsModule, FormsModule, SvgIcon],
   templateUrl: "./input-area.html",
   styleUrl: "./input-area.css",
   changeDetection: ChangeDetectionStrategy.OnPush,

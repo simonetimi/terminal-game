@@ -36,6 +36,16 @@
       "enabled": "Suoni abilitati",
       "disabled": "Suoni disabilitati"
     },
+    "theme": {
+      "title": "Temi",
+      "options": {
+        "terminalGreen": "Terminal Green",
+        "terminalAmber": "Terminal Amber",
+        "terminalGrey": "Terminal Grey",
+        "pastelDark": "Pastel Dark",
+        "pastelLight": "Pastel Light"
+      }
+    },
     "game": {
       "title": "Gioco",
       "restart": "Riavvia",

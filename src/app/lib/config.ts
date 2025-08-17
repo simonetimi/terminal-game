@@ -12,3 +12,11 @@ export const DEFAULT_PLAYER_DATA = {
   knowledge: [],
   moralPoints: 0,
 };
+
+export const THEME_OPTIONS: string[] = [
+  "terminalGreen",
+  "terminalAmber",
+  "terminalGrey",
+  "pastelDark",
+  "pastelLight",
+] as const;

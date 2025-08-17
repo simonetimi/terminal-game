@@ -62,6 +62,14 @@ export class PersistenceService {
     return this.load("soundsEnabled");
   }
 
+  saveTheme(theme: string) {
+    this.save("theme", theme);
+  }
+
+  loadTheme(): string {
+    return this.load("theme");
+  }
+
   clearAllDataAndRefresh() {
     localStorage.removeItem("player");
     localStorage.removeItem("visitedNodes");
