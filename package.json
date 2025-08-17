@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "release": "git checkout main && git pull && npm version patch && git push && vercel --prod"
   },
   "prettier": {
     "overrides": [
