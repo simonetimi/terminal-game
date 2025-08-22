@@ -38,8 +38,13 @@ export class InputArea {
   protected isSystemWriting = this.#gameService.isSystemWriting;
   protected playerState = this.#gameService.playerState;
 
-  openSettings() {
+  openSettings($event: MouseEvent | TouchEvent) {
+    $event.stopPropagation();
     this.toggleSettings.emit(true);
+  }
+
+  captureFocus() {
+    this.inputRef()?.nativeElement.focus();
   }
 
   onSubmit() {

@@ -17,7 +17,8 @@
     }
   },
   "items": {
-    "map": "Mappa"
+    "map": "Mappa",
+    "rustyKey": "Chiave arrugginita"
   },
   "game": {
     "leave": "Premi INVIO per uscire"
