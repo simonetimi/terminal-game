@@ -18,7 +18,7 @@ export interface Choice {
   conditions?: Condition[];
   effects?: Effect[];
   matchKeyword?: string;
-  gameEffect?: string;
+  exactMatch?: boolean;
 }
 
 export interface Condition {

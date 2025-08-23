@@ -15,6 +15,7 @@ import { TranslateService } from "@ngx-translate/core";
 import { EffectsManagerService } from "./effects-manager-service";
 import { CONFIG, DEFAULT_PLAYER_DATA } from "../lib/config";
 import { SettingsService } from "./settings-service";
+import Fuse from "fuse.js";
 
 @Injectable({
   providedIn: "root",
@@ -177,10 +178,43 @@ export class GameService {
 
       const availableChoices = this.filterChoices(this.currentNode().choices);
 
-      // exact match
-      const matchedKeywordChoice = availableChoices.find(
-        (choice) => choice.matchKeyword === slicedInput.toLowerCase(),
-      );
+      // set up fuzzy search
+      const fuse = new Fuse(availableChoices, {
+        keys: ["matchKeyword"],
+        includeScore: true,
+        ignoreLocation: true,
+        threshold: 0.6,
+        ignoreDiacritics: true,
+      });
+
+      const results = fuse.search(slicedInput.toLowerCase());
+      const bestMatch = results.length > 0 ? results[0] : null;
+
+      let matchedKeywordChoice: (typeof availableChoices)[number] | undefined;
+
+      // use score and length to define a reasonable match
+      if (bestMatch) {
+        const { item, score } = bestMatch;
+
+        // length-based completeness check
+        const minLengthRatio = 0.8; // require at least 80% of keyword length
+        const query = slicedInput.trim().toLowerCase();
+        const keyword = item.matchKeyword?.toLowerCase() ?? "";
+
+        const lengthRatio = query.length / keyword?.length;
+
+        let isAcceptable;
+
+        if (item.exactMatch) {
+          isAcceptable = score === 0;
+        } else {
+          // only accept fuzzy matches if the query is long enough
+          isAcceptable = lengthRatio >= minLengthRatio;
+        }
+        if (isAcceptable) {
+          matchedKeywordChoice = item;
+        }
+      }
 
       if (matchedKeywordChoice) {
         return this.setCurrentNode(
@@ -188,7 +222,7 @@ export class GameService {
         );
       }
 
-      // if no exact match, find the fallback choice (one without matchKeyword or with different matchKeyword)
+      // if no exact match, find the fallback choice (one without matchKeyword)
       const fallbackChoice = availableChoices.find(
         (choice) => !choice.matchKeyword,
       );
