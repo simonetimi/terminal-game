@@ -1,130 +1,18 @@
 {
+  "$schema": "./game-schema.json",
   "nodes": [
     {
       "id": "welcome",
-      "text": "Ciao. Hai un'aria familiare, ma...\\ no, non ci siamo mai incontrati. Come ti chiami?",
+      "text": "Ti svegli in una stanza buia. La tua memoria è confusa...\nCome ti chiami?",
       "choices": [
         {
           "text": "",
-          "nextNodeId": "start"
+          "nextNodeId": "awakening"
         }
       ],
-      "isFreeInput": true
-    },
-    {
-      "id": "start",
-      "text": "Ti trovi a un crocevia.",
-      "vfx": "dark",
-      "choices": [
-        {
-          "text": "Vai verso la foresta",
-          "nextNodeId": "forest",
-          "conditions": [
-            {
-              "type": "hasItem",
-              "item": "map"
-            }
-          ]
-        },
-        {
-          "text": "Vai al negozio.",
-          "nextNodeId": "shop"
-        },
-        {
-          "text": "Vai verso il fiume",
-          "nextNodeId": "river"
-        }
-      ]
-    },
-    {
-      "id": "forest",
-      "text": "Arrivi in una foresta",
-      "choices": [
-        {
-          "text": "Torna all'inizio",
-          "nextNodeId": "start"
-        },
-        {
-          "text": "Vai verso il fiume",
-          "nextNodeId": "river"
-        }
-      ]
-    },
-    {
-      "id": "shop",
-      "text": "Arrivi al negozio",
-      "altTextIfVisited": "Arrivi al negozio.\\ Ha un'aria familiare...",
-      "choices": [
-        {
-          "text": "Compra una mappa",
-          "nextNodeId": "start",
-          "conditions": [
-            {
-              "type": "hasNotItem",
-              "item": "map"
-            }
-          ],
-          "effects": [
-            {
-              "type": "addItem",
-              "item": "map"
-            }
-          ]
-        },
-        {
-          "text": "Torna all'inizio",
-          "nextNodeId": "start"
-        }
-      ]
-    },
-    {
-      "id": "river",
-      "text": "Qual è il significato della vita?",
       "isFreeInput": true,
-      "vfx": "glitch",
-      "choices": [
-        {
-          "text": "",
-          "nextNodeId": "goodEnding",
-          "matchKeyword": "42"
-        },
-        {
-          "text": "",
-          "nextNodeId": "badEnding"
-        }
-      ]
-    },
-    {
-      "id": "goodEnding",
-      "text": "Giusto. Sei in pace con te stesso. Hai vinto!",
-      "sfx": "win",
-      "choices": []
-    },
-    {
-      "id": "badEnding",
-      "text": "Sei morto.",
-      "sfx": "lose",
-      "vfx": "shake",
-      "choices": []
-    },
-    {
-      "id": "gameOver",
-      "text": "Sei morto.",
-      "sfx": "lose",
-      "vfx": "shake",
-      "choices": []
+      "sfx": "blip"
     }
-  ],
-  "endingChoices": [
-    {
-      "text": "Ricomincia",
-      "gameEffect": "restart",
-      "nextNodeId": ""
-    },
-    {
-      "text": "Esci",
-      "gameEffect": "close",
-      "nextNodeId": ""
-    }
+    
   ]
 }
