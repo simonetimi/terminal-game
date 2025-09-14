@@ -33,7 +33,7 @@
     {
       "id": "direidino",
       "text": "Oh, i nostri finanziatori ne saranno D \n-E \n-V \n-A\n-S\n-T\n-A\n-T\n-I\n. D'accordo. Allora...iniziamo!",
-      "autoRedirectTo": "welcome",
+      "autoRedirectTo": "welcomed",
       "choices": [
       ]
     },
@@ -57,18 +57,18 @@
     {
       "id": "domande3",
       "text": "...a me fa schifo, invece. Beh, direi che già mi annoi, quindi iniziamo! 3...\n Oh, al diavolo, abbiamo perso troppo tempo! VIA!",
-      "autoRedirectTo": "welcome",
+      "autoRedirectTo": "welcomed",
       "choices": [
       ]
     },
     {
       "id": "skip1",
       "text": "E' tua facoltà... ma ti pentirai di non aver parlato un pò insieme... Pronti...partenza...via!",
-      "autoRedirectTo": "welcome",
+      "autoRedirectTo": "welcomed",
       "choices": []
     },
     {
-      "id": "welcome",
+      "id": "welcomed",
       "vfx": "glitch",
       "text": "Ti risvegli in un vicolo buio, le mani legate dietro la schiena e le caviglie pressate tra loro da una corda.",
       "altTextIfVisited": "Hai ancora le mani e i piedi legati, senza riuscire a vedere bene il vicolo.",
@@ -90,7 +90,7 @@
       ]
     },
     {
-      "id": "welcome1",
+      "id": "welcomed1",
       "text": "Ti risvegli in un vicolo buio, le mani legate dietro la schiena e le caviglie pressate tra loro da una corda.",
       "altTextIfVisited": "Hai ancora le mani e i piedi legati, senza riuscire a vedere bene il vicolo.",
       "choices": [
