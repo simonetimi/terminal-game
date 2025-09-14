@@ -1,0 +1,621 @@
+{
+  "nodes": [
+    {
+      "id": "welcome",
+      "text": "Ti svegli in una stanza buia. La tua memoria è confusa...\nCome ti chiami?",
+      "choices": [
+        {
+          "text": "",
+          "nextNodeId": "awakening"
+        }
+      ],
+      "isFreeInput": true
+    },
+    {
+      "id": "awakening",
+      "text": "Ricordi vagamente di essere un detective. Sei in quello che sembra un vecchio laboratorio abbandonato.",
+      "altTextIfVisited": "Sei ancora nel vecchio laboratorio abbandonato. La polvere ti irrita gli occhi.",
+      "vfx": "dark",
+      "choices": [
+        {
+          "text": "Esamina la scrivania",
+          "nextNodeId": "desk"
+        },
+        {
+          "text": "Controlla la porta",
+          "nextNodeId": "door"
+        },
+        {
+          "text": "Guarda dalla finestra",
+          "nextNodeId": "window"
+        }
+      ]
+    },
+    {
+      "id": "desk",
+      "text": "Sulla scrivania trovi un diario con annotazioni misteriose e una chiave arrugginita.",
+      "choices": [
+        {
+          "text": "Leggi il diario",
+          "nextNodeId": "diary",
+          "effects": [
+            {
+              "type": "addKnowledge",
+              "knowledge": "diaryRead"
+            }
+          ]
+        },
+        {
+          "text": "Prendi la chiave",
+          "nextNodeId": "takeKeyFeedback",
+          "conditions": [
+            {
+              "type": "hasNotItem",
+              "item": "rustyKey"
+            }
+          ],
+          "effects": [
+            {
+              "type": "addItem",
+              "item": "rustyKey"
+            }
+          ]
+        },
+        {
+          "text": "Rovista nei cassetti",
+          "nextNodeId": "searchDrawersFeedback",
+          "effects": [
+            {
+              "type": "removeHealth",
+              "health": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "takeKeyFeedback",
+      "text": "Afferri la chiave arrugginita. È pesante e fredda al tatto, con incisioni misteriose sui bordi.",
+      "autoRedirectTo": "desk",
+      "choices": []
+    },
+    {
+      "id": "searchDrawersFeedback",
+      "text": "Frughi tra i cassetti ma trovi solo polvere e vecchie carte illeggibili. Ti tagli leggermente con un pezzo di vetro rotto.",
+      "autoRedirectTo": "desk",
+      "vfx": "shake",
+      "sfx": "hurt",
+      "choices": []
+    },
+    {
+      "id": "diary",
+      "text": "Il diario parla di esperimenti su \"portali dimensionali\". L'ultimo appunto dice: \"Il codice è nel riflesso della verità\".",
+      "altTextIfKnowledge": "Rileggi il diario. Ora che conosci il segreto, capisci che si riferiva allo specchio nel laboratorio segreto.",
+      "knowledgeForAltText": "mirrorSecret",
+      "choices": [
+        {
+          "text": "Torna a esplorare",
+          "nextNodeId": "awakening"
+        }
+      ]
+    },
+    {
+      "id": "door",
+      "text": "La porta è chiusa a chiave. Serve una chiave per aprirla.",
+      "altTextIfVisited": "La porta è ancora chiusa.",
+      "choices": [
+        {
+          "text": "Usa la chiave arrugginita",
+          "nextNodeId": "corridor",
+          "conditions": [
+            {
+              "type": "hasItem",
+              "item": "rustyKey"
+            }
+          ]
+        },
+        {
+          "text": "Forza la porta",
+          "nextNodeId": "forceDoorFeedback",
+          "effects": [
+            {
+              "type": "removeHealth",
+              "health": 1
+            }
+          ]
+        },
+        {
+          "text": "Torna indietro",
+          "nextNodeId": "awakening"
+        }
+      ]
+    },
+    {
+      "id": "forceDoorFeedback",
+      "text": "Provi a forzare la porta con la spalla. Il legno è troppo solido e ti fai male inutilmente.",
+      "autoRedirectTo": "door",
+      "vfx": "shake",
+      "sfx": "hurt",
+      "choices": []
+    },
+    {
+      "id": "window",
+      "text": "Fuori vedi una città in rovina. Nel riflesso del vetro noti qualcosa di strano dietro di te.",
+      "choices": [
+        {
+          "text": "Voltati rapidamente",
+          "nextNodeId": "mirrorDiscovery"
+        },
+        {
+          "text": "Continua a guardare fuori",
+          "nextNodeId": "windowObserveFeedback"
+        },
+        {
+          "text": "Prova a rompere il vetro",
+          "nextNodeId": "breakWindowFeedback",
+          "effects": [
+            {
+              "type": "removeHealth",
+              "health": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "windowObserveFeedback",
+      "text": "Osservi la città distrutta. La vista è desolante e ti riempie di tristezza, ma non noti altro di particolare.",
+      "autoRedirectTo": "awakening",
+      "choices": []
+    },
+    {
+      "id": "breakWindowFeedback",
+      "text": "Colpisci il vetro con il pugno. Si crepa ma non si rompe. Ti ferisci la mano e sanguini.",
+      "autoRedirectTo": "window",
+      "vfx": "shake",
+      "sfx": "hurt",
+      "choices": []
+    },
+    {
+      "id": "mirrorDiscovery",
+      "text": "Scopri uno specchio nascosto dietro una tenda. La superficie riflette non te, ma un laboratorio diverso.",
+      "vfx": "glitch",
+      "choices": [
+        {
+          "text": "Tocca lo specchio",
+          "nextNodeId": "mirrorWorld",
+          "effects": [
+            {
+              "type": "addKnowledge",
+              "knowledge": "mirrorSecret"
+            }
+          ]
+        },
+        {
+          "text": "Allontanati",
+          "nextNodeId": "awakening"
+        }
+      ]
+    },
+    {
+      "id": "corridor",
+      "text": "Entri in un lungo corridoio illuminato da luci tremolanti. Senti dei passi in lontananza.",
+      "sfx": "blip",
+      "choices": [
+        {
+          "text": "Segui i passi",
+          "nextNodeId": "chase"
+        },
+        {
+          "text": "Vai nella direzione opposta",
+          "nextNodeId": "elevator"
+        },
+        {
+          "text": "Nasconditi",
+          "nextNodeId": "hide"
+        },
+        {
+          "text": "Grida \"Chi è là?\"",
+          "nextNodeId": "shoutFeedback"
+        }
+      ]
+    },
+    {
+      "id": "shoutFeedback",
+      "text": "La tua voce echeggia nel corridoio. I passi si fermano improvvisamente. Dopo qualche secondo di silenzio, ricominciano più velocemente.",
+      "autoRedirectTo": "corridor",
+      "vfx": "dark",
+      "choices": []
+    },
+    {
+      "id": "chase",
+      "text": "I passi si allontanano sempre più velocemente. Improvvisamente tutto diventa silenzio.",
+      "vfx": "dark",
+      "choices": [
+        {
+          "text": "Continua a seguire",
+          "nextNodeId": "trap"
+        },
+        {
+          "text": "Torna indietro",
+          "nextNodeId": "corridor"
+        }
+      ]
+    },
+    {
+      "id": "hide",
+      "text": "Ti nascondi dietro una colonna. Una figura incappucciata passa senza notarti.",
+      "choices": [
+        {
+          "text": "Segui la figura di nascosto",
+          "nextNodeId": "secretRoom",
+          "effects": [
+            {
+              "type": "addMoralPoints",
+              "moralPoints": 1
+            }
+          ]
+        },
+        {
+          "text": "Aspetta che se ne vada",
+          "nextNodeId": "corridor"
+        }
+      ]
+    },
+    {
+      "id": "elevator",
+      "text": "Trovi un vecchio ascensore. I pulsanti mostrano: Piano Terra, Sottosuolo, e un simbolo strano.",
+      "choices": [
+        {
+          "text": "Piano Terra",
+          "nextNodeId": "groundFloor"
+        },
+        {
+          "text": "Sottosuolo",
+          "nextNodeId": "basement"
+        },
+        {
+          "text": "Pulsante con simbolo strano",
+          "nextNodeId": "secretFloor",
+          "conditions": [
+            {
+              "type": "hasKnowledge",
+              "knowledge": "diaryRead"
+            }
+          ]
+        },
+        {
+          "text": "Esamina l'ascensore",
+          "nextNodeId": "examineElevatorFeedback"
+        }
+      ]
+    },
+    {
+      "id": "examineElevatorFeedback",
+      "text": "L'ascensore è vecchio ma funzionante. Noti dei graffi sui pulsanti e macchie scure sul pavimento che preferisci non identificare.",
+      "autoRedirectTo": "elevator",
+      "choices": []
+    },
+    {
+      "id": "groundFloor",
+      "text": "Arrivi al piano terra. È un atrio abbandonato con porte sigillate e polvere ovunque.",
+      "choices": [
+        {
+          "text": "Esamina le porte sigillate",
+          "nextNodeId": "sealedDoors"
+        },
+        {
+          "text": "Torna all'ascensore",
+          "nextNodeId": "elevator"
+        }
+      ]
+    },
+    {
+      "id": "basement",
+      "text": "Il sottosuolo è pieno di macchinari strani e cavi elettrici. Senti un ronzio costante.",
+      "vfx": "glitch",
+      "choices": [
+        {
+          "text": "Esamina i macchinari",
+          "nextNodeId": "machinery"
+        },
+        {
+          "text": "Segui i cavi elettrici",
+          "nextNodeId": "powerSource"
+        },
+        {
+          "text": "Tocca un cavo",
+          "nextNodeId": "electricShockFeedback",
+          "effects": [
+            {
+              "type": "removeHealth",
+              "health": 1
+            }
+          ]
+        },
+        {
+          "text": "Torna su",
+          "nextNodeId": "elevator"
+        }
+      ]
+    },
+    {
+      "id": "electricShockFeedback",
+      "text": "Appena tocchi il cavo ricevi una scossa elettrica che ti paralizza momentaneamente. Il dolore è intenso.",
+      "autoRedirectTo": "basement",
+      "vfx": "shake",
+      "sfx": "hurt",
+      "choices": []
+    },
+    {
+      "id": "secretFloor",
+      "text": "L'ascensore si muove lateralmente invece che verticalmente. Arrivi in una stanza piena di specchi.",
+      "vfx": "glitch",
+      "choices": [
+        {
+          "text": "Esamina gli specchi",
+          "nextNodeId": "mirrorWorld"
+        }
+      ]
+    },
+    {
+      "id": "mirrorWorld",
+      "text": "Negli specchi vedi versioni diverse di te stesso. Uno di loro ti sta guardando direttamente. Cosa gli chiedi?",
+      "vfx": "glitch",
+      "isFreeInput": true,
+      "choices": [
+        {
+          "text": "",
+          "nextNodeId": "truthEnding",
+          "matchKeyword": "chi sei"
+        },
+        {
+          "text": "",
+          "nextNodeId": "falseEnding"
+        }
+      ]
+    },
+    {
+      "id": "secretRoom",
+      "text": "La figura ti conduce in una stanza segreta. Si toglie il cappuccio rivelando il tuo stesso volto.",
+      "choices": [
+        {
+          "text": "\"Chi sei tu?\"",
+          "nextNodeId": "revelation"
+        },
+        {
+          "text": "Attacca",
+          "nextNodeId": "fightSelfFeedback",
+          "effects": [
+            {
+              "type": "removeHealth",
+              "health": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fightSelfFeedback",
+      "text": "Attacchi il tuo doppio ma ogni colpo che infliggi lo senti anche tu. È come combattere contro un riflesso doloroso.",
+      "autoRedirectTo": "secretRoom",
+      "vfx": "shake",
+      "sfx": "hurt",
+      "choices": []
+    },
+    {
+      "id": "revelation",
+      "text": "\"Sono te dal futuro. Devi fermare l'esperimento prima che distrugga la realtà.\"",
+      "choices": [
+        {
+          "text": "\"Come posso fermarlo?\"",
+          "nextNodeId": "instructions",
+          "effects": [
+            {
+              "type": "addKnowledge",
+              "knowledge": "futureSelf"
+            }
+          ]
+        },
+        {
+          "text": "\"Non ti credo\"",
+          "nextNodeId": "disbelief"
+        }
+      ]
+    },
+    {
+      "id": "instructions",
+      "text": "\"Vai al generatore nel sottosuolo. Inserisci il codice 2847. Ma attenzione: hai solo un tentativo.\"",
+      "choices": [
+        {
+          "text": "Vai al sottosuolo",
+          "nextNodeId": "basement",
+          "effects": [
+            {
+              "type": "addKnowledge",
+              "knowledge": "shutdownCode"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "powerSource",
+      "text": "Trovi un grande generatore con un pannello di controllo. Serve un codice a 4 cifre.",
+      "choices": [
+        {
+          "text": "Inserisci il codice",
+          "nextNodeId": "codeInput"
+        },
+        {
+          "text": "Esamina il generatore",
+          "nextNodeId": "examineGeneratorFeedback"
+        }
+      ]
+    },
+    {
+      "id": "codeInput",
+      "text": "Inserisci il codice",
+      "isFreeInput": true,
+      "choices": [
+        {
+          "text": "",
+          "nextNodeId": "goodEnding",
+          "matchKeyword": "2847",
+          "exactMatch": true
+        },
+        {
+          "text": "",
+          "nextNodeId": "explosion"
+        }
+      ]
+    },
+    {
+      "id": "examineGeneratorFeedback",
+      "text": "Il generatore è enorme e complesso. Vedi tubi che spariscono nel soffitto e cavi che vanno in ogni direzione. È chiaramente il cuore di tutto l'edificio.",
+      "autoRedirectTo": "powerSource",
+      "choices": []
+    },
+    {
+      "id": "trap",
+      "text": "Cadi in una trappola. Il pavimento crolla sotto di te.",
+      "vfx": "shake",
+      "sfx": "hurt",
+      "choices": [
+        {
+          "text": "Cerca una via d'uscita",
+          "nextNodeId": "escapeAttemptFeedback",
+          "conditions": [
+            {
+              "type": "hasHealth",
+              "health": 1
+            }
+          ],
+          "effects": [
+            {
+              "type": "removeHealth",
+              "health": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "escapeAttemptFeedback",
+      "text": "Riesci faticosamente a risalire dalla buca. Sei ferito ma vivo. Devi essere più attento.",
+      "autoRedirectTo": "corridor",
+      "choices": []
+    },
+    {
+      "id": "explosion",
+      "text": "Codice sbagliato. Il generatore esplode e la realtà inizia a collassare.",
+      "vfx": "shake",
+      "sfx": "lose",
+      "choices": [
+        {
+          "text": "Cerca di scappare",
+          "nextNodeId": "gameOver"
+        }
+      ]
+    },
+    {
+      "id": "goodEnding",
+      "text": "Il generatore si spegne. La realtà si stabilizza. Hai salvato non solo te stesso, ma tutti i mondi paralleli.",
+      "sfx": "win",
+      "choices": []
+    },
+    {
+      "id": "truthEnding",
+      "text": "Sono la verità che hai dimenticato,\" risponde. Ricordi tutto: sei uno scienziato che ha creato questa realtà parallela. Ora puoi tornare a casa.",
+      "sfx": "win",
+      "choices": []
+    },
+    {
+      "id": "falseEnding",
+      "text": "Non riesci a comunicare con il riflesso. Rimani intrappolato nel mondo degli specchi per sempre.",
+      "vfx": "glitch",
+      "sfx": "lose",
+      "choices": []
+    },
+    {
+      "id": "disbelief",
+      "text": "Il tuo alter ego scompare. \"Hai scelto di non credere. Ora dovrai trovare la verità da solo.\"",
+      "choices": [
+        {
+          "text": "Esplora da solo",
+          "nextNodeId": "elevator"
+        }
+      ]
+    },
+    {
+      "id": "machinery",
+      "text": "I macchinari sono collegati a qualcosa nel piano superiore. Senti delle voci provenienti dai tubi.",
+      "choices": [
+        {
+          "text": "Segui i tubi",
+          "nextNodeId": "powerSource"
+        },
+        {
+          "text": "Ascolta le voci",
+          "nextNodeId": "voices"
+        }
+      ]
+    },
+    {
+      "id": "voices",
+      "text": "Le voci sussurrano il tuo nome e parlano di 'esperimenti falliti' e 'realtà multiple'.",
+      "vfx": "dark",
+      "choices": [
+        {
+          "text": "Cerca la fonte delle voci",
+          "nextNodeId": "powerSource"
+        }
+      ]
+    },
+    {
+      "id": "sealedDoors",
+      "text": "Le porte sono sigillate con simboli strani. Uno dei simboli sembra familiare.",
+      "altTextIfKnowledge": "Ora che hai letto il diario, riconosci i simboli. Sono la stessa scrittura delle annotazioni.",
+      "knowledgeForAltText": "diaryRead",
+      "choices": [
+        {
+          "text": "Prova a decifrare i simboli",
+          "nextNodeId": "symbolPuzzle",
+          "conditions": [
+            {
+              "type": "hasKnowledge",
+              "knowledge": "diaryRead"
+            }
+          ]
+        },
+        {
+          "text": "Torna all'ascensore",
+          "nextNodeId": "elevator"
+        }
+      ]
+    },
+    {
+      "id": "symbolPuzzle",
+      "text": "I simboli formano una mappa dell'edificio. Vedi una stanza segreta non segnata su nessun piano.",
+      "choices": [
+        {
+          "text": "Cerca la stanza segreta",
+          "nextNodeId": "secretFloor",
+          "effects": [
+            {
+              "type": "addKnowledge",
+              "knowledge": "secretLocation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "gameOver",
+      "text": "La realtà si frantuma intorno a te. Tutto diventa nero.",
+      "sfx": "lose",
+      "vfx": "shake",
+      "choices": []
+    }
+  ]
+}
