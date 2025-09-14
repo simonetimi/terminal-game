@@ -1,0 +1,119 @@
+{
+  "$schema": "story-schema.json",
+  "nodes": [
+    {
+      "id": "welcome",
+      "text": "Benvenuto all'interno del nostro gioco, mio fragile utente! Come ti chiami? ",
+      "choices": [
+        {
+          "text": "",
+          "nextNodeId": "Presentazione1"
+        }
+      ],
+      "isFreeInput": true
+    },
+    {
+      "id": "Presentazione1",
+      "text": "Bene, vedo che sai scrivere il tuo nome... \nDirei che abbiamo le basi. Disponibile ad un assessment approfondito per capire i tuoi gusti e preferenze... e rivenderli online? ",
+      "choices": [
+        {
+          "text": "Direi di no.",
+          "nextNodeId": "direidino"
+        },
+        {
+          "text": "Fammi tutte le domande che vuoi!",
+          "nextNodeId": "domande"
+        },
+        {
+          "text": "Posso saltare e passare direttamente al gioco?",
+          "nextNodeId": "Skip"
+        }
+      ]
+    },
+    {
+      "id": "direidino",
+      "text": "Oh, i nostri finanziatori ne saranno D \n-E \n-V \n-A\n-S\n-T\n-A\n-T\n-I\n. D'accordo. Allora...iniziamo!",
+      "autoRedirectTo": "welcome",
+      "choices": [
+      ]
+    },
+    {
+      "id": "domande",
+      "text": "... \nSul serio? Pensavo fossi qui per giocare, mica per un'intervista.",
+      "autoRedirectTo": "domande2",
+      "choices": []
+    },
+    {
+      "id": "domande2",
+      "text": "Beh, allora direi che possiamo iniziare con... \ncosa ti piace nei videogiochi?",
+      "choices": [
+        {
+          "text": "",
+          "nextNodeId": "domande3"
+        }
+      ],
+      "isFreeInput": true
+    },
+    {
+      "id": "domande3",
+      "text": "...a me fa schifo, invece. Beh, direi che già mi annoi, quindi iniziamo! 3...\n Oh, al diavolo, abbiamo perso troppo tempo! VIA!",
+      "autoRedirectTo": "welcome",
+      "choices": [
+      ]
+    },
+    {
+      "id": "skip1",
+      "text": "E' tua facoltà... ma ti pentirai di non aver parlato un pò insieme... Pronti...partenza...via!",
+      "autoRedirectTo": "welcome",
+      "choices": []
+    },
+    {
+      "id": "welcome",
+      "vfx": "glitch",
+      "text": "Ti risvegli in un vicolo buio, le mani legate dietro la schiena e le caviglie pressate tra loro da una corda.",
+      "altTextIfVisited": "Hai ancora le mani e i piedi legati, senza riuscire a vedere bene il vicolo.",
+      "choices": [
+        {
+          "text": "Urli cercando di attirare l'attenzione di qualcuno",
+          "nextNodeId": "urli"
+        },
+        {
+          "text": "Provi ad allentare la corda agitando i polsi",
+          "altTextIfVisited": "Continui a provare ad allentare la corda.",
+          "nextNodeId": "polsi"
+        },
+        {
+          "text": "Ti guardi intorno per notare qualcosa di utile",
+          "altTextIfVisited": "Torni a guardare il pezzo di vetro.",
+          "nextNodeId": "pezzodivetro"
+        }
+      ]
+    },
+    {
+      "id": "welcome1",
+      "text": "Ti risvegli in un vicolo buio, le mani legate dietro la schiena e le caviglie pressate tra loro da una corda.",
+      "altTextIfVisited": "Hai ancora le mani e i piedi legati, senza riuscire a vedere bene il vicolo.",
+      "choices": [
+        {
+          "text": "Urli cercando di attirare l'attenzione di qualcuno",
+          "nextNodeId": "urli"
+        },
+        {
+          "text": "Provi ad allentare la corda agitando i polsi",
+          "altTextIfVisited": "Continui a provare ad allentare la corda.",
+          "nextNodeId": "polsi"
+        },
+        {
+          "text": "Ti guardi intorno per notare qualcosa di utile",
+          "altTextIfVisited": "Torni a guardare il pezzo di vetro.",
+          "nextNodeId": "pezzodivetro"
+        }
+      ]
+    },
+    {
+      "id": "urli",
+      "text": "Urli più forte che puoi, ma il vicolo è deserto e non arriva nessuno.",
+      "autoRedirectTo": "welcome1"
+    }
+  ]
+}

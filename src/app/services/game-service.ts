@@ -1,9 +1,10 @@
-import { inject, Injectable, signal } from "@angular/core";
+import { effect, inject, Injectable, signal } from "@angular/core";
 import { typewriter } from "../utils/typewriter";
 
 import {
   Choice,
   Effect,
+  GameData,
   GameNode,
   PlayerData,
   SPECIAL_NODES,
@@ -15,7 +16,7 @@ import { EffectsManagerService } from "./effects-manager-service";
 import { CONFIG, DEFAULT_PLAYER_DATA } from "../lib/config";
 import { SettingsService } from "./settings-service";
 import Fuse from "fuse.js";
-import { GAME_DATA } from "../data/game-data";
+import { httpResource } from "@angular/common/http";
 
 @Injectable({
   providedIn: "root",
@@ -31,7 +32,7 @@ export class GameService {
   visitedNodes: string[] = [];
   freeInputsHistory: string[] = [];
 
-  nodes = GAME_DATA.nodes;
+  nodes: GameNode[] = [];
 
   isSystemWriting = signal(false);
   skipAnimation = () => {};
@@ -61,22 +62,35 @@ export class GameService {
     const savedNodeId = this.#persistenceService.loadCurrentNodeId();
     const savedVisitedNodes = this.#persistenceService.loadVisitedNodes();
 
-    if (savedNodeId && savedVisitedNodes) {
-      // restore visited nodes
-      this.visitedNodes = savedVisitedNodes;
+    const storyData = httpResource<GameData>(() => "/assets/data/story.json");
 
-      // reconstruct player state and display by traversing nodes
-      this.traverseNodes(savedVisitedNodes);
+    const init = effect(
+      () => {
+        const gameData = storyData.value();
+        if (!gameData) return;
 
-      // show the last visited node (current) using setCurrentNode with record=false
-      const lastNodeId = savedVisitedNodes[savedVisitedNodes.length - 1];
-      const lastNode = this.findNode(lastNodeId);
-      if (lastNode) {
-        this.setCurrentNode(lastNode, { record: false });
-      }
-    } else {
-      this.setCurrentNode(this.nodes[0]);
-    }
+        this.nodes = gameData.nodes;
+
+        if (savedNodeId && savedVisitedNodes) {
+          // restore visited nodes
+          this.visitedNodes = savedVisitedNodes;
+
+          // reconstruct player state and display by traversing nodes
+          this.traverseNodes(savedVisitedNodes);
+
+          // show the last visited node (current) using setCurrentNode with record=false
+          const lastNodeId = savedVisitedNodes[savedVisitedNodes.length - 1];
+          const lastNode = this.findNode(lastNodeId);
+          if (lastNode) {
+            this.setCurrentNode(lastNode, { record: false });
+          }
+        } else {
+          this.setCurrentNode(this.nodes[0]);
+        }
+        init.destroy();
+      },
+      { manualCleanup: true },
+    );
   }
 
   setCurrentNode(node: GameNode, { record = true } = {}) {

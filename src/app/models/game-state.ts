@@ -1,4 +1,5 @@
 export interface GameData {
+  $schema: string;
   nodes: GameNode[];
 }
 
