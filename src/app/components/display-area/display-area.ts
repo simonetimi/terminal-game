@@ -23,6 +23,8 @@ export class DisplayArea {
   protected displayItems = this.#gameService.displayItems;
 
   constructor() {
+    this.#gameService.initStory();
+
     effect(() => {
       this.displayItems();
       const container = this.scrollContainer()?.nativeElement;

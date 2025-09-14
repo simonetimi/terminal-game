@@ -9,6 +9,7 @@ import { TranslatePipe, TranslateService } from "@ngx-translate/core";
 import { typewriter } from "../../utils/typewriter";
 import { FormsModule } from "@angular/forms";
 import { SettingsService } from "../../services/settings-service";
+import { GameService } from "../../services/game-service";
 
 @Component({
   selector: "app-splash-screen",
@@ -22,11 +23,14 @@ import { SettingsService } from "../../services/settings-service";
 export class SplashScreen implements AfterViewInit {
   #translateService = inject(TranslateService);
   #settingsService = inject(SettingsService);
+  #gameService = inject(GameService);
 
   protected displayMessages = signal<string[]>([]);
   protected showButton = signal(false);
 
   #textLoaded = signal(false);
+
+  protected isGameDataLoading = this.#gameService.gameData.isLoading;
 
   hideSplashScreen = output<boolean>();
 

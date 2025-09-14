@@ -32,6 +32,7 @@ export class GameService {
   visitedNodes: string[] = [];
   freeInputsHistory: string[] = [];
 
+  gameData = httpResource<GameData>(() => "/assets/data/story.json");
   nodes: GameNode[] = [];
 
   isSystemWriting = signal(false);
@@ -58,39 +59,33 @@ export class GameService {
 
     this.freeInputsHistory =
       this.#persistenceService.loadFreeInputsHistory() ?? [];
+  }
+
+  initStory() {
+    const data = this.gameData.value();
+    if (!data) return;
 
     const savedNodeId = this.#persistenceService.loadCurrentNodeId();
     const savedVisitedNodes = this.#persistenceService.loadVisitedNodes();
 
-    const storyData = httpResource<GameData>(() => "/assets/data/story.json");
+    this.nodes = data.nodes;
 
-    const init = effect(
-      () => {
-        const gameData = storyData.value();
-        if (!gameData) return;
+    if (savedNodeId && savedVisitedNodes) {
+      // restore visited nodes
+      this.visitedNodes = savedVisitedNodes;
 
-        this.nodes = gameData.nodes;
+      // reconstruct player state and display by traversing nodes
+      this.traverseNodes(savedVisitedNodes);
 
-        if (savedNodeId && savedVisitedNodes) {
-          // restore visited nodes
-          this.visitedNodes = savedVisitedNodes;
-
-          // reconstruct player state and display by traversing nodes
-          this.traverseNodes(savedVisitedNodes);
-
-          // show the last visited node (current) using setCurrentNode with record=false
-          const lastNodeId = savedVisitedNodes[savedVisitedNodes.length - 1];
-          const lastNode = this.findNode(lastNodeId);
-          if (lastNode) {
-            this.setCurrentNode(lastNode, { record: false });
-          }
-        } else {
-          this.setCurrentNode(this.nodes[0]);
-        }
-        init.destroy();
-      },
-      { manualCleanup: true },
-    );
+      // show the last visited node (current) using setCurrentNode with record=false
+      const lastNodeId = savedVisitedNodes[savedVisitedNodes.length - 1];
+      const lastNode = this.findNode(lastNodeId);
+      if (lastNode) {
+        this.setCurrentNode(lastNode, { record: false });
+      }
+    } else {
+      this.setCurrentNode(this.nodes[0]);
+    }
   }
 
   setCurrentNode(node: GameNode, { record = true } = {}) {
