@@ -357,6 +357,10 @@ export class GameService {
             return condition.item
               ? !player.inventory.includes(condition.item)
               : false;
+          case "hasNotKnowledge":
+            return condition.knowledge
+              ? !player.knowledge.includes(condition.knowledge)
+              : false;
           case "hasNotVisitedNextNode":
             return !this.visitedNodes.includes(choice.nextNodeId);
           default:
