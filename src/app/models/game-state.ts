@@ -1,3 +1,7 @@
+export interface GameData {
+  nodes: GameNode[];
+}
+
 export interface GameNode {
   id: string;
   text: string;
@@ -19,6 +23,7 @@ export interface Choice {
   effects?: Effect[];
   matchKeyword?: string;
   exactMatch?: boolean;
+  altTextIfVisited?: string; // show when node has been visited
 }
 
 export interface Condition {

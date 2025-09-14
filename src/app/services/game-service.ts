@@ -1,7 +1,6 @@
 import { inject, Injectable, signal } from "@angular/core";
 import { typewriter } from "../utils/typewriter";
 
-import gameData from "../game-data/data.json";
 import {
   Choice,
   Effect,
@@ -16,6 +15,7 @@ import { EffectsManagerService } from "./effects-manager-service";
 import { CONFIG, DEFAULT_PLAYER_DATA } from "../lib/config";
 import { SettingsService } from "./settings-service";
 import Fuse from "fuse.js";
+import { GAME_DATA } from "../data/game-data";
 
 @Injectable({
   providedIn: "root",
@@ -26,15 +26,14 @@ export class GameService {
   #settingsService = inject(SettingsService);
   #translateService = inject(TranslateService);
 
-  nodes = gameData.nodes as GameNode[];
-
   playerState = signal<PlayerData>(DEFAULT_PLAYER_DATA);
   displayItems = signal<string[]>([]);
   visitedNodes: string[] = [];
   freeInputsHistory: string[] = [];
 
-  isSystemWriting = signal(false);
+  nodes = GAME_DATA.nodes;
 
+  isSystemWriting = signal(false);
   skipAnimation = () => {};
 
   currentNode = signal<GameNode>({} as GameNode);
