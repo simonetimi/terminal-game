@@ -16,6 +16,7 @@ Simulated terminal rpg text-based game
 ### TODO
 
 - [ ] Better 8-bit icons and sound effects
+- [ ] Favicon
 - [x] Add menu for tweaking settings (eg. reading speed) and basic commands
 - [x] Better save saving nodes
 - [x] Narration breaks using `\\` in game data
