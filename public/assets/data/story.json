@@ -113,7 +113,8 @@
     {
       "id": "urli",
       "text": "Urli più forte che puoi, ma il vicolo è deserto e non arriva nessuno.",
-      "autoRedirectTo": "welcome1"
+      "autoRedirectTo": "welcome1",
+      "choices": []
     }
   ]
 }

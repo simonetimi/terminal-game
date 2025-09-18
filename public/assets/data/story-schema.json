@@ -1,7 +1,11 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Story Schema",
+  "title": "GameData",
   "type": "object",
+  "required": [
+    "$schema",
+    "nodes"
+  ],
   "properties": {
     "$schema": {
       "type": "string"
@@ -53,6 +57,7 @@
                           "hasHealth",
                           "hasMoralPoints",
                           "hasNotItem",
+                          "hasNotKnowledge",
                           "hasNotVisitedNextNode"
                         ]
                       },
@@ -68,8 +73,7 @@
                       "moralPoints": {
                         "type": "number"
                       }
-                    },
-                    "additionalProperties": false
+                    }
                   }
                 },
                 "effects": {
@@ -107,8 +111,7 @@
                       "moralPoints": {
                         "type": "number"
                       }
-                    },
-                    "additionalProperties": false
+                    }
                   }
                 },
                 "matchKeyword": {
@@ -116,9 +119,17 @@
                 },
                 "exactMatch": {
                   "type": "boolean"
+                },
+                "altTextOnChoiceRepeat": {
+                  "type": "string"
+                },
+                "altNextNodeId": {
+                  "type": "string"
+                },
+                "altRedirectThreshold": {
+                  "type": "number"
                 }
-              },
-              "additionalProperties": false
+              }
             }
           },
           "autoRedirectTo": {
@@ -155,13 +166,8 @@
               "lose"
             ]
           }
-        },
-        "additionalProperties": false
+        }
       }
     }
-  },
-  "required": [
-    "nodes"
-  ],
-  "additionalProperties": false
+  }
 }
