@@ -46,6 +46,13 @@ export class PersistenceService {
     return this.load("freeInputsHistory");
   }
 
+  saveChoicePickCounts(counts: Record<string, number>) {
+    this.save("choicePickCounts", counts);
+  }
+  loadChoicePickCounts(): Record<string, number> {
+    return this.load("choicePickCounts") ?? {};
+  }
+
   saveTypewriterSpeed(speed: number) {
     this.save("typewriterSpeed", speed);
   }

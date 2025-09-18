@@ -9,8 +9,8 @@ export interface GameNode {
   choices: Choice[];
   autoRedirectTo?: string;
   autoRedirectDelay?: number;
-  altTextIfVisited?: string; // show when node has been visited
-  altTextIfKnowledge?: string; // show when player has certain knowledge
+  altTextIfVisited?: string; // text when node has been visited
+  altTextIfKnowledge?: string; // text when player has certain knowledge (has predence over alt text)
   knowledgeForAltText?: string;
   isFreeInput?: boolean;
   vfx?: Vfx;
@@ -24,7 +24,9 @@ export interface Choice {
   effects?: Effect[];
   matchKeyword?: string;
   exactMatch?: boolean;
-  altTextIfVisited?: string; // show when node has been visited
+  altTextOnChoiceRepeat?: string; // alt text when this choice is picked again, starting from the first revisit
+  altNextNodeId?: string; // alt node id to jump to after threshold
+  altRedirectThreshold?: number; // treshold for altNextNodeId
 }
 
 export interface Condition {

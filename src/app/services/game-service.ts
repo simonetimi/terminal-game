@@ -35,6 +35,8 @@ export class GameService {
   gameData = httpResource<GameData>(() => "/assets/data/story.json");
   nodes: GameNode[] = [];
 
+  choicePickCounts: Record<string, number> = {};
+
   isSystemWriting = signal(false);
   skipAnimation = () => {};
 
@@ -59,6 +61,10 @@ export class GameService {
 
     this.freeInputsHistory =
       this.#persistenceService.loadFreeInputsHistory() ?? [];
+
+    // restore choice picks from local storage if present
+    this.choicePickCounts =
+      this.#persistenceService.loadChoicePickCounts?.() ?? {};
   }
 
   initStory() {
@@ -67,8 +73,14 @@ export class GameService {
 
     const savedNodeId = this.#persistenceService.loadCurrentNodeId();
     const savedVisitedNodes = this.#persistenceService.loadVisitedNodes();
+    const savedChoicePickCounts =
+      this.#persistenceService.loadChoicePickCounts?.();
 
     this.nodes = data.nodes;
+
+    if (savedChoicePickCounts) {
+      this.choicePickCounts = savedChoicePickCounts;
+    }
 
     if (savedNodeId && savedVisitedNodes) {
       // restore visited nodes
@@ -225,9 +237,39 @@ export class GameService {
       }
 
       if (matchedKeywordChoice) {
-        return this.setCurrentNode(
-          this.findNode(matchedKeywordChoice.nextNodeId),
-        );
+        // Register pick for free input choice (first index matching)
+        const nodeId = this.currentNode().id;
+        const choiceIdx = availableChoices.indexOf(matchedKeywordChoice);
+        this.registerChoicePick(nodeId, choiceIdx);
+
+        // Alt-redirect/threshold logic for free input
+        const key = `${nodeId}:${choiceIdx}`;
+        const choicePickCount = this.choicePickCounts[key];
+        let nextNodeId = matchedKeywordChoice.nextNodeId;
+        if (
+          matchedKeywordChoice.altNextNodeId &&
+          matchedKeywordChoice.altRedirectThreshold &&
+          choicePickCount >= matchedKeywordChoice.altRedirectThreshold
+        ) {
+          nextNodeId = matchedKeywordChoice.altNextNodeId;
+        }
+
+        if (
+          matchedKeywordChoice.altTextOnChoiceRepeat &&
+          choicePickCount === 2 &&
+          !(
+            matchedKeywordChoice.altNextNodeId &&
+            matchedKeywordChoice.altRedirectThreshold &&
+            choicePickCount >= matchedKeywordChoice.altRedirectThreshold
+          )
+        ) {
+          this.displayItems.update((items) => [
+            ...items,
+            matchedKeywordChoice.altTextOnChoiceRepeat!,
+          ]);
+        }
+
+        return this.setCurrentNode(this.findNode(nextNodeId));
       }
 
       // if no exact match, find the fallback choice (one without matchKeyword)
@@ -236,7 +278,37 @@ export class GameService {
       );
 
       if (fallbackChoice) {
-        return this.setCurrentNode(this.findNode(fallbackChoice.nextNodeId));
+        // Register pick/fallback
+        const nodeId = this.currentNode().id;
+        const choiceIdx = availableChoices.indexOf(fallbackChoice);
+        this.registerChoicePick(nodeId, choiceIdx);
+        const key = `${nodeId}:${choiceIdx}`;
+        const choicePickCount = this.choicePickCounts[key];
+        let nextNodeId = fallbackChoice.nextNodeId;
+
+        if (
+          fallbackChoice.altNextNodeId &&
+          fallbackChoice.altRedirectThreshold &&
+          choicePickCount >= fallbackChoice.altRedirectThreshold
+        ) {
+          nextNodeId = fallbackChoice.altNextNodeId;
+        }
+        if (
+          fallbackChoice.altTextOnChoiceRepeat &&
+          choicePickCount === 2 &&
+          !(
+            fallbackChoice.altNextNodeId &&
+            fallbackChoice.altRedirectThreshold &&
+            choicePickCount >= fallbackChoice.altRedirectThreshold
+          )
+        ) {
+          this.displayItems.update((items) => [
+            ...items,
+            fallbackChoice.altTextOnChoiceRepeat!,
+          ]);
+        }
+
+        return this.setCurrentNode(this.findNode(nextNodeId));
       }
     }
 
@@ -256,6 +328,40 @@ export class GameService {
       return [...itemsWithoutChoices, `> ${choice.text}`];
     });
 
+    // Register pick and handle alternate logic for normal choice
+    const nodeId = this.currentNode().id;
+    const choiceIdx = availableChoices.indexOf(choice);
+    this.registerChoicePick(nodeId, choiceIdx);
+
+    const key = `${nodeId}:${choiceIdx}`;
+    const choicePickCount = this.choicePickCounts[key];
+
+    // Show alt text on first revisit
+    if (
+      choice.altTextOnChoiceRepeat &&
+      choicePickCount === 2 &&
+      !(
+        choice.altNextNodeId &&
+        choice.altRedirectThreshold &&
+        choicePickCount >= choice.altRedirectThreshold
+      )
+    ) {
+      this.displayItems.update((items) => [
+        ...items,
+        choice.altTextOnChoiceRepeat!,
+      ]);
+    }
+
+    // After threshold, redirect to altNextNodeId
+    let nextNodeId = choice.nextNodeId;
+    if (
+      choice.altNextNodeId &&
+      choice.altRedirectThreshold &&
+      choicePickCount >= choice.altRedirectThreshold
+    ) {
+      nextNodeId = choice.altNextNodeId;
+    }
+
     // effects run
     if (choice.effects) this.checkEffects(choice.effects);
 
@@ -264,7 +370,7 @@ export class GameService {
     }
 
     // node is set
-    this.setCurrentNode(this.findNode(choice.nextNodeId));
+    this.setCurrentNode(this.findNode(nextNodeId));
   }
 
   checkEffects(effects: Effect[]) {
@@ -324,6 +430,13 @@ export class GameService {
           break;
       }
     });
+  }
+
+  registerChoicePick(nodeId: string, choiceIndex: number) {
+    const key = `${nodeId}:${choiceIndex}`;
+    if (this.choicePickCounts[key] == null) this.choicePickCounts[key] = 0;
+    this.choicePickCounts[key]++;
+    this.#persistenceService.saveChoicePickCounts(this.choicePickCounts);
   }
 
   filterChoices(choices: Choice[]): Choice[] {
@@ -405,6 +518,9 @@ export class GameService {
     const tempVisitedNodes: string[] = [];
     let freeInputIndex = 0;
 
+    // Clear and reconstruct pick counts
+    this.choicePickCounts = {};
+
     for (let i = 0; i < nodeIds.length - 1; i++) {
       const node = this.findNode(nodeIds[i]);
       if (!node) continue;
@@ -439,8 +555,35 @@ export class GameService {
 
       // determine which choice led to the next node
       const nextId = nodeIds[i + 1];
-      const selectedChoice =
-        node.choices?.find((c) => c.nextNodeId === nextId) ?? undefined;
+      // Find *all* possible matching choices, including altNextNodeId
+      let selectedChoice, selectedIdx;
+      for (const [idx, c] of node.choices.entries()) {
+        if (c.nextNodeId === nextId || c.altNextNodeId === nextId) {
+          selectedChoice = c;
+          selectedIdx = idx;
+          break;
+        }
+      }
+
+      // Track pick for this node/choice
+      if (selectedChoice !== undefined && selectedIdx !== undefined) {
+        const key = `${node.id}:${selectedIdx}`;
+        if (this.choicePickCounts[key] == null) this.choicePickCounts[key] = 0;
+        this.choicePickCounts[key]++;
+
+        // Show alt text if this is the first revisit for this choice
+        if (
+          selectedChoice.altTextOnChoiceRepeat &&
+          this.choicePickCounts[key] === 2 &&
+          !(
+            selectedChoice.altNextNodeId &&
+            selectedChoice.altRedirectThreshold &&
+            this.choicePickCounts[key] >= selectedChoice.altRedirectThreshold
+          )
+        ) {
+          display.push(selectedChoice.altTextOnChoiceRepeat!);
+        }
+      }
 
       // add the choice that was selected by the user
       if (node.isFreeInput) {
@@ -457,6 +600,9 @@ export class GameService {
         this.checkEffects(selectedChoice.effects);
       }
     }
+
+    // Save reconstructed counts to persistence (so it gets loaded for last restore)
+    this.#persistenceService.saveChoicePickCounts(this.choicePickCounts);
 
     this.displayItems.set(display);
   }
