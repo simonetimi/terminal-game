@@ -3,137 +3,444 @@
   "nodes": [
     {
       "id": "welcome",
-      "text": "Benvenuto all'interno del nostro gioco, mio fragile utente! Come ti chiami? ",
+      "text": "Benvenuto, viaggiatore. Qual è il tuo nome?",
       "choices": [
         {
-          "id": "enter-name",
+          "id": "c1",
           "text": "",
-          "nextNodeId": "presentazione"
+          "nextNodeId": "intro"
         }
       ],
       "isFreeInput": true
     },
     {
-      "id": "presentazione",
-      "text": "Bene, vedo che sai scrivere il tuo nome... \nDirei che abbiamo le basi. Disponibile ad un assessment approfondito per capire i tuoi gusti e preferenze... e rivenderli online? ",
+      "id": "intro",
+      "vfx": "glitch",
+      "sfx": "blip",
+      "text": "Piacere di conoscerti. Ti trovi davanti a un tempio antico. Nubi scure si addensano nel cielo.",
+      "autoRedirectTo": "templeEntrance",
+      "autoRedirectDelay": 1000,
+      "choices": []
+    },
+    {
+      "id": "templeEntrance",
+      "text": "La porta del tempio incombe davanti a te. Strani simboli brillano debolmente sulla sua superficie.",
+      "altTextIfVisited": "Sei di nuovo all’ingresso del tempio. I simboli brillano ancora.",
       "choices": [
         {
-          "id": "refuse-assessment",
-          "text": "Direi di no.",
-          "nextNodeId": "direidino"
+          "id": "c1",
+          "text": "Esamina i simboli",
+          "nextNodeId": "examineSymbols",
+          "effects": [
+            {
+              "type": "addKnowledge",
+              "knowledge": "ancientLanguage"
+            }
+          ]
         },
         {
-          "id": "accept-questions",
-          "text": "Fammi tutte le domande che vuoi!",
-          "nextNodeId": "domande"
+          "id": "c2",
+          "text": "Entra nel tempio",
+          "nextNodeId": "mainHall"
         },
         {
-          "id": "skip-intro",
-          "text": "Posso saltare e passare direttamente al gioco?",
-          "nextNodeId": "skip1"
+          "id": "c3",
+          "text": "Perlustra i dintorni",
+          "nextNodeId": "searchGrounds",
+          "conditions": [
+            {
+              "type": "hasNotVisitedNextNode"
+            }
+          ]
         }
       ]
     },
     {
-      "id": "direidino",
-      "text": "Oh, i nostri finanziatori ne saranno D \n-E \n-V \n-A\n-S\n-T\n-A\n-T\n-I\n. D'accordo. Allora...iniziamo!",
-      "autoRedirectTo": "trueWelcome",
+      "id": "examineSymbols",
+      "text": "I simboli parlano di un grande tesoro… e di un terribile guardiano.",
+      "altTextIfKnowledge": "Grazie alle tue conoscenze ora comprendi: «Solo i degni possono passare».",
+      "knowledgeForAltText": "ancientLanguage",
+      "autoRedirectTo": "templeEntrance",
       "choices": []
     },
     {
-      "id": "domande",
-      "text": "... \nSul serio? Pensavo fossi qui per giocare, mica per un'intervista.",
-      "autoRedirectTo": "domande2",
-      "choices": []
-    },
-    {
-      "id": "domande2",
-      "text": "Beh, allora direi che possiamo iniziare con... \ncosa ti piace nei videogiochi?",
+      "id": "searchGrounds",
+      "text": "Trovi una chiave arrugginita, mezza sepolta nella terra!",
+      "altTextIfKnowledge": "Il terreno qui è stato smosso. La chiave non c’è più.",
+      "knowledgeForAltText": "keyTaken",
       "choices": [
         {
-          "id": "answer-question",
+          "id": "c1",
+          "text": "Prendi la chiave",
+          "nextNodeId": "templeEntrance",
+          "conditions": [
+            {
+              "type": "hasNotKnowledge",
+              "knowledge": "keyTaken"
+            }
+          ],
+          "effects": [
+            {
+              "type": "addItem",
+              "item": "rustyKey"
+            },
+            {
+              "type": "addKnowledge",
+              "knowledge": "keyTaken"
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "text": "Torna all’ingresso",
+          "nextNodeId": "templeEntrance"
+        }
+      ]
+    },
+    {
+      "id": "mainHall",
+      "vfx": "dark",
+      "text": "Entri nell’oscurità. L’aria si fa gelida. Davanti a te si diramano due passaggi.",
+      "altTextIfVisited": "La sala fredda. Sinistra o destra?",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Prendi il passaggio a sinistra",
+          "nextNodeId": "riddleDoor"
+        },
+        {
+          "id": "c2",
+          "text": "Prendi il passaggio a destra",
+          "nextNodeId": "lockedDoor"
+        },
+        {
+          "id": "c3",
+          "text": "Torna all’ingresso",
+          "nextNodeId": "templeEntrance"
+        }
+      ]
+    },
+    {
+      "id": "riddleDoor",
+      "text": "Una porta di pietra ti blocca il cammino. Un’iscrizione recita:\n«Pronuncia la parola che apre tutte le porte, la parola dell’accesso».",
+      "altTextIfVisited": "La porta attende la parola magica…",
+      "isFreeInput": true,
+      "choices": [
+        {
+          "id": "c1",
+          "text": "password",
+          "matchKeyword": "degno",
+          "exactMatch": false,
+          "nextNodeId": "secretPath",
+          "altTextOnChoiceRepeat": "La porta ti riconosce come un vero cercatore…",
+          "effects": [
+            {
+              "type": "addKnowledge",
+              "knowledge": "secretPath"
+            },
+            {
+              "type": "addMoralPoints",
+              "moralPoints": 2
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "text": "open",
+          "matchKeyword": "apriti",
+          "nextNodeId": "normalPath",
+          "altTextOnChoiceRepeat": "La ripeti con maggiore sicurezza."
+        },
+        {
+          "id": "c3",
           "text": "",
-          "nextNodeId": "domande3"
-        }
-      ],
-      "isFreeInput": true
-    },
-    {
-      "id": "domande3",
-      "text": "...a me fa schifo, invece. Beh, direi che già mi annoi, quindi iniziamo! 3...\n Oh, al diavolo, abbiamo perso troppo tempo! VIA!",
-      "autoRedirectTo": "trueWelcome",
-      "choices": []
-    },
-    {
-      "id": "skip1",
-      "text": "E' tua facoltà... ma ti pentirai di non aver parlato un pò insieme... Pronti...partenza...via!",
-      "autoRedirectTo": "trueWelcome",
-      "choices": []
-    },
-    {
-      "id": "trueWelcome",
-      "text": "Ti risvegli in un vicolo buio, le mani legate dietro la schiena e le caviglie pressate tra loro da una corda.",
-      "altTextIfVisited": "Hai ancora le mani e i piedi legati, senza riuscire a vedere bene il vicolo.",
-      "choices": [
-        {
-          "id": "scream",
-          "text": "Urli cercando di attirare l'attenzione di qualcuno",
-          "nextNodeId": "urli"
-        },
-        {
-          "id": "loosen-rope",
-          "text": "Provi ad allentare la corda agitando i polsi",
-          "nextNodeId": "polsi"
-        },
-        {
-          "id": "look-around",
-          "text": "Ti guardi intorno per notare qualcosa di utile",
-          "nextNodeId": "pezzodivetro"
+          "nextNodeId": "wrongAnswer"
         }
       ]
     },
     {
-      "id": "urli",
-      "text": "Urli più forte che puoi, ma il vicolo è deserto e non arriva nessuno.",
-      "autoRedirectTo": "trueWelcome",
-      "choices": []
-    },
-    {
-      "id": "polsi",
-      "text": "Provi ad allentare la corda agitando i polsi, ma è troppo stretta. Ti servirebbero le mani libere o qualcosa di tagliente.",
-      "autoRedirectTo": "trueWelcome",
-      "choices": []
-    },
-    {
-      "id": "pezzodivetro",
-      "text": "Noti un pezzo di vetro rotto poco distante da te. Potrebbe essere utile per tagliare le corde...",
+      "id": "secretPath",
+      "sfx": "win",
+      "text": "La porta scintilla e svanisce! Oltre si trova una camera segreta colma di antichi tesori!",
+      "altTextIfKnowledge": "La camera ora è vuota, i tesori sono stati reclamati.",
+      "knowledgeForAltText": "amuletTaken",
       "choices": [
         {
-          "id": "grab-glass",
-          "text": "Cerchi di afferrarlo rotolando verso di esso",
-          "nextNodeId": "afferraVetro"
+          "id": "c1",
+          "text": "Prendi un amuleto d’oro",
+          "nextNodeId": "mainHall",
+          "conditions": [
+            {
+              "type": "hasNotKnowledge",
+              "knowledge": "amuletTaken"
+            }
+          ],
+          "effects": [
+            {
+              "type": "addItem",
+              "item": "amulet"
+            },
+            {
+              "type": "addHealth",
+              "health": 3
+            },
+            {
+              "type": "addKnowledge",
+              "knowledge": "amuletTaken"
+            }
+          ]
         },
         {
-          "id": "ignore-glass",
-          "text": "Decidi di lasciarlo stare",
-          "nextNodeId": "trueWelcome"
+          "id": "c2",
+          "text": "Torna alla sala principale",
+          "nextNodeId": "mainHall"
         }
       ]
     },
     {
-      "id": "afferraVetro",
-      "text": "Con uno sforzo riesci ad afferrare il pezzo di vetro. Ora puoi provare a tagliare le corde!",
+      "id": "normalPath",
+      "text": "La porta si apre lentamente con un rumore stridente. Un corridoio stretto si estende nell’ombra.",
+      "autoRedirectTo": "guardianRoom",
+      "choices": []
+    },
+    {
+      "id": "wrongAnswer",
+      "text": "Non succede nulla. La porta resta sigillata.",
+      "autoRedirectTo": "mainHall",
+      "choices": []
+    },
+    {
+      "id": "lockedDoor",
+      "text": "Una pesante porta di ferro ti blocca il passaggio. Serve una chiave.",
+      "altTextIfKnowledge": "Una pesante porta di ferro ti blocca il passaggio. Sembra che tu l’abbia già aperta con una chiave.",
+      "knowledgeForAltText": "doorOpened",
       "choices": [
         {
-          "id": "cut-ropes",
-          "text": "Tagli le corde",
-          "nextNodeId": "libero"
+          "id": "c1",
+          "text": "Usa la chiave arrugginita",
+          "nextNodeId": "treasureRoom",
+          "conditions": [
+            {
+              "type": "hasItem",
+              "item": "rustyKey"
+            }
+          ],
+          "effects": [
+            {
+              "type": "removeItem",
+              "item": "rustyKey"
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "text": "Torna indietro",
+          "nextNodeId": "mainHall"
         }
       ]
     },
     {
-      "id": "libero",
-      "text": "Sei finalmente libero! Ora puoi esplorare il vicolo e cercare una via d'uscita.",
+      "id": "treasureRoom",
+      "sfx": "win",
+      "text": "La porta si apre! All’interno: un forziere pieno d’oro e pozioni curative.",
+      "altTextIfKnowledge": "Il forziere è vuoto, già saccheggiato.",
+      "knowledgeForAltText": "potionsTaken",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Prendi le pozioni",
+          "nextNodeId": "mainHall",
+          "conditions": [
+            {
+              "type": "hasNotKnowledge",
+              "knowledge": "potionsTaken"
+            }
+          ],
+          "effects": [
+            {
+              "type": "addHealth",
+              "health": 3
+            },
+            {
+              "type": "addKnowledge",
+              "knowledge": "doorOpened"
+            },
+            {
+              "type": "addKnowledge",
+              "knowledge": "potionsTaken"
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "text": "Torna alla sala",
+          "nextNodeId": "mainHall"
+        }
+      ]
+    },
+    {
+      "id": "guardianRoom",
+      "vfx": "shake",
+      "sfx": "hurt",
+      "text": "Un guardiano di pietra si risveglia! I suoi occhi brillano di un'antica furia!\nRuggisce: «DICHIARA LE TUE INTENZIONI!»",
+      "altTextIfVisited": "Il guardiano ti fronteggia di nuovo!",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Pace! Vengo in pace!",
+          "nextNodeId": "peacefulResolution",
+          "conditions": [
+            {
+              "type": "hasNotKnowledge",
+              "knowledge": "guardianPeace"
+            }
+          ],
+          "effects": [
+            {
+              "type": "addMoralPoints",
+              "moralPoints": 3
+            },
+            {
+              "type": "addKnowledge",
+              "knowledge": "guardianPeace"
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "text": "Preparati a combattere!",
+          "nextNodeId": "fightGuardian",
+          "altTextOnChoiceRepeat": "Dichiari di nuovo battaglia!",
+          "altNextNodeId": "guardianAdapts",
+          "altRedirectThreshold": 3
+        },
+        {
+          "id": "c3",
+          "text": "Fuggi verso l'ingresso",
+          "nextNodeId": "templeEntrance",
+          "effects": [
+            {
+              "type": "removeHealth",
+              "health": 20,
+              "gameOverNodeId": "runAwayDeath"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "peacefulResolution",
+      "sfx": "win",
+      "text": "Il guardiano abbassa le armi. «Hai saggezza. Passa pure, degno».",
+      "autoRedirectTo": "victory",
+      "choices": []
+    },
+    {
+      "id": "fightGuardian",
+      "vfx": "shake",
+      "sfx": "hurt",
+      "text": "Ingaggi un feroce combattimento! Il guardiano è potente, ma non invincibile!",
+      "choices": [
+        {
+          "id": "c1",
+          "text": "Usa il potere dell’amuleto",
+          "nextNodeId": "amuletVictory",
+          "conditions": [
+            {
+              "type": "hasItem",
+              "item": "amulet"
+            }
+          ]
+        },
+        {
+          "id": "c2",
+          "text": "Combatti con tutte le tue forze",
+          "nextNodeId": "guardianDefeated",
+          "conditions": [
+            {
+              "type": "hasHealth",
+              "health": 4
+            }
+          ],
+          "effects": [
+            {
+              "type": "removeHealth",
+              "gameOverNodeId": "fightDeath",
+              "health": 3
+            }
+          ]
+        },
+        {
+          "id": "c3",
+          "text": "Fuggi verso l’ingresso",
+          "nextNodeId": "templeEntrance",
+          "effects": [
+            {
+              "type": "removeHealth",
+              "health": 3,
+              "gameOverNodeId": "runAwayDeath"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "guardianAngered",
+      "vfx": "shake",
+      "text": "Il guardiano si infuria e attacca senza pietà!",
+      "autoRedirectTo": "gameOver",
+      "choices": []
+    },
+    {
+      "id": "guardianAdapts",
+      "text": "Il guardiano impara il tuo schema! «Non puoi vincere con la sola ripetizione…»",
+      "autoRedirectTo": "gameOver",
+      "choices": []
+    },
+    {
+      "id": "amuletVictory",
+      "sfx": "win",
+      "text": "L’amuleto esplode di luce! Il guardiano si inchina con riverenza e si fa da parte.",
+      "autoRedirectTo": "secretEnding",
+      "choices": []
+    },
+    {
+      "id": "guardianDefeated",
+      "sfx": "win",
+      "text": "Esausto ma vittorioso, osservi il guardiano sgretolarsi. Il cammino è tuo.",
+      "autoRedirectTo": "victory",
+      "choices": []
+    },
+    {
+      "id": "victory",
+      "text": "Esci vittorioso! I segreti del tempio sono tuoi. FINE.",
+      "choices": []
+    },
+    {
+      "id": "secretEnding",
+      "sfx": "win",
+      "text": "Il guardiano rivela il più grande segreto del tempio: la saggezza eterna. FINE.",
+      "choices": []
+    },
+    {
+      "id": "runAwayDeath",
+      "vfx": "shake",
+      "sfx": "lose",
+      "text": "Provi a scappare, ma il guardiano ti raggiunge. L’oscurità ti avvolge… GAME OVER.",
+      "choices": []
+    },
+    {
+      "id": "figthDeath",
+      "vfx": "shake",
+      "sfx": "lose",
+      "text": "Non sei abbastanza forte, il guardiano ti abbatte. L’oscurità ti avvolge… GAME OVER.",
+      "choices": []
+    },
+    {
+      "id": "gameOver",
+      "vfx": "glitch",
+      "sfx": "lose",
+      "text": "L’oscurità ti avvolge… GAME OVER.",
       "choices": []
     }
   ]
