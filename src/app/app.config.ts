@@ -3,6 +3,7 @@ import {
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
+  provideZonelessChangeDetection,
 } from "@angular/core";
 import { provideRouter } from "@angular/router";
 
@@ -18,8 +19,8 @@ import { initializeTranslations } from "./translate.config";
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideZonelessChangeDetection(),
     provideBrowserGlobalErrorListeners(),
-    provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(),
     provideTranslateService({
