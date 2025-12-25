@@ -37,7 +37,7 @@ export class GameService {
   nodes: GameNode[] = [];
 
   isSystemWriting = signal(false);
-  skipAnimation = () => {};
+  skipAnimation: () => void = () => void 0;
 
   currentNode = signal<GameNode>({} as GameNode);
 
@@ -104,7 +104,7 @@ export class GameService {
     this.currentNode.set(node);
 
     // add empty space between nodes
-    this.displayItems().length > 0 &&
+    if (this.displayItems().length > 0)
       this.displayItems.update((items) => [...items, "&nbsp;"]);
 
     // effects

@@ -3,15 +3,16 @@
   class="flex gap-1 items-center w-full max-w-full text-sm"
   (ngSubmit)="onSubmit()"
   (click)="captureFocus()"
+  (keyup)="captureFocus()"
   (touchstart)="captureFocus()"
 >
-  <p class="input-prompt font-mono text-base flex-shrink-0 pr-1 text-ui">
+  <p class="input-prompt font-mono text-base shrink-0 pr-1 text-ui">
     {{ playerState().name }}&#64;terminal ~ %
   </p>
   <input
     #commandInput
     type="text"
-    class="terminal-input bg-transparent border-none outline-none text-ui font-mono text-base caret-[var(--color-cursor)] flex-1 min-w-0"
+    class="terminal-input bg-transparent border-none outline-none text-ui font-mono text-base caret-(--color-cursor) flex-1 min-w-0"
     autocomplete="off"
     [formControl]="inputCommand"
   />
@@ -19,7 +20,7 @@
     <button
       (click)="openSettings($event)"
       type="button"
-      class="text-accent hover:text-[var(--color-link)] transition-colors cursor-pointer"
+      class="text-accent hover:text-(--color-link) transition-colors cursor-pointer"
       title="Settings"
     >
       <app-svg-icon
