@@ -46,11 +46,12 @@ export class PersistenceService {
     return this.load("freeInputsHistory");
   }
 
-  saveChoicePickCounts(counts: Record<string, number>) {
-    this.save("choicePickCounts", counts);
+  saveChoiceHistory(history: string[]) {
+    this.save("choiceHistory", history);
   }
-  loadChoicePickCounts(): Record<string, number> {
-    return this.load("choicePickCounts") ?? {};
+
+  loadChoiceHistory(): string[] {
+    return this.load("choiceHistory") ?? [];
   }
 
   saveTypewriterSpeed(speed: number) {
@@ -82,6 +83,7 @@ export class PersistenceService {
     localStorage.removeItem("visitedNodes");
     localStorage.removeItem("currentNode");
     localStorage.removeItem("freeInputsHistory");
+    localStorage.removeItem("choiceHistory");
     location.reload();
   }
 }

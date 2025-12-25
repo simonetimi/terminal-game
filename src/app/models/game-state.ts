@@ -18,6 +18,7 @@ export interface GameNode {
 }
 
 export interface Choice {
+  id: string;
   text: string;
   nextNodeId: string;
   conditions?: Condition[];

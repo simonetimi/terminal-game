@@ -6,36 +6,39 @@
       "text": "Benvenuto all'interno del nostro gioco, mio fragile utente! Come ti chiami? ",
       "choices": [
         {
+          "id": "enter-name",
           "text": "",
-          "nextNodeId": "Presentazione1"
+          "nextNodeId": "presentazione"
         }
       ],
       "isFreeInput": true
     },
     {
-      "id": "Presentazione1",
+      "id": "presentazione",
       "text": "Bene, vedo che sai scrivere il tuo nome... \nDirei che abbiamo le basi. Disponibile ad un assessment approfondito per capire i tuoi gusti e preferenze... e rivenderli online? ",
       "choices": [
         {
+          "id": "refuse-assessment",
           "text": "Direi di no.",
           "nextNodeId": "direidino"
         },
         {
+          "id": "accept-questions",
           "text": "Fammi tutte le domande che vuoi!",
           "nextNodeId": "domande"
         },
         {
+          "id": "skip-intro",
           "text": "Posso saltare e passare direttamente al gioco?",
-          "nextNodeId": "Skip"
+          "nextNodeId": "skip1"
         }
       ]
     },
     {
       "id": "direidino",
       "text": "Oh, i nostri finanziatori ne saranno D \n-E \n-V \n-A\n-S\n-T\n-A\n-T\n-I\n. D'accordo. Allora...iniziamo!",
-      "autoRedirectTo": "welcome",
-      "choices": [
-      ]
+      "autoRedirectTo": "trueWelcome",
+      "choices": []
     },
     {
       "id": "domande",
@@ -48,6 +51,7 @@
       "text": "Beh, allora direi che possiamo iniziare con... \ncosa ti piace nei videogiochi?",
       "choices": [
         {
+          "id": "answer-question",
           "text": "",
           "nextNodeId": "domande3"
         }
@@ -57,55 +61,33 @@
     {
       "id": "domande3",
       "text": "...a me fa schifo, invece. Beh, direi che già mi annoi, quindi iniziamo! 3...\n Oh, al diavolo, abbiamo perso troppo tempo! VIA!",
-      "autoRedirectTo": "welcome",
-      "choices": [
-      ]
+      "autoRedirectTo": "trueWelcome",
+      "choices": []
     },
     {
       "id": "skip1",
       "text": "E' tua facoltà... ma ti pentirai di non aver parlato un pò insieme... Pronti...partenza...via!",
-      "autoRedirectTo": "welcome",
+      "autoRedirectTo": "trueWelcome",
       "choices": []
     },
     {
-      "id": "welcome",
-      "vfx": "glitch",
+      "id": "trueWelcome",
       "text": "Ti risvegli in un vicolo buio, le mani legate dietro la schiena e le caviglie pressate tra loro da una corda.",
       "altTextIfVisited": "Hai ancora le mani e i piedi legati, senza riuscire a vedere bene il vicolo.",
       "choices": [
         {
+          "id": "scream",
           "text": "Urli cercando di attirare l'attenzione di qualcuno",
           "nextNodeId": "urli"
         },
         {
+          "id": "loosen-rope",
           "text": "Provi ad allentare la corda agitando i polsi",
-          "altTextIfVisited": "Continui a provare ad allentare la corda.",
           "nextNodeId": "polsi"
         },
         {
+          "id": "look-around",
           "text": "Ti guardi intorno per notare qualcosa di utile",
-          "altTextIfVisited": "Torni a guardare il pezzo di vetro.",
-          "nextNodeId": "pezzodivetro"
-        }
-      ]
-    },
-    {
-      "id": "welcome1",
-      "text": "Ti risvegli in un vicolo buio, le mani legate dietro la schiena e le caviglie pressate tra loro da una corda.",
-      "altTextIfVisited": "Hai ancora le mani e i piedi legati, senza riuscire a vedere bene il vicolo.",
-      "choices": [
-        {
-          "text": "Urli cercando di attirare l'attenzione di qualcuno",
-          "nextNodeId": "urli"
-        },
-        {
-          "text": "Provi ad allentare la corda agitando i polsi",
-          "altTextIfVisited": "Continui a provare ad allentare la corda.",
-          "nextNodeId": "polsi"
-        },
-        {
-          "text": "Ti guardi intorno per notare qualcosa di utile",
-          "altTextIfVisited": "Torni a guardare il pezzo di vetro.",
           "nextNodeId": "pezzodivetro"
         }
       ]
@@ -113,7 +95,45 @@
     {
       "id": "urli",
       "text": "Urli più forte che puoi, ma il vicolo è deserto e non arriva nessuno.",
-      "autoRedirectTo": "welcome1",
+      "autoRedirectTo": "trueWelcome",
+      "choices": []
+    },
+    {
+      "id": "polsi",
+      "text": "Provi ad allentare la corda agitando i polsi, ma è troppo stretta. Ti servirebbero le mani libere o qualcosa di tagliente.",
+      "autoRedirectTo": "trueWelcome",
+      "choices": []
+    },
+    {
+      "id": "pezzodivetro",
+      "text": "Noti un pezzo di vetro rotto poco distante da te. Potrebbe essere utile per tagliare le corde...",
+      "choices": [
+        {
+          "id": "grab-glass",
+          "text": "Cerchi di afferrarlo rotolando verso di esso",
+          "nextNodeId": "afferraVetro"
+        },
+        {
+          "id": "ignore-glass",
+          "text": "Decidi di lasciarlo stare",
+          "nextNodeId": "trueWelcome"
+        }
+      ]
+    },
+    {
+      "id": "afferraVetro",
+      "text": "Con uno sforzo riesci ad afferrare il pezzo di vetro. Ora puoi provare a tagliare le corde!",
+      "choices": [
+        {
+          "id": "cut-ropes",
+          "text": "Tagli le corde",
+          "nextNodeId": "libero"
+        }
+      ]
+    },
+    {
+      "id": "libero",
+      "text": "Sei finalmente libero! Ora puoi esplorare il vicolo e cercare una via d'uscita.",
       "choices": []
     }
   ]
