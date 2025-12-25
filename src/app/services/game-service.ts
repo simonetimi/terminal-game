@@ -1,4 +1,4 @@
-import { effect, inject, Injectable, signal } from "@angular/core";
+import { inject, Injectable, signal } from "@angular/core";
 import { typewriter } from "../utils/typewriter";
 
 import {
@@ -40,6 +40,8 @@ export class GameService {
   skipAnimation = () => {};
 
   currentNode = signal<GameNode>({} as GameNode);
+
+  currentGameOverNodeId = signal("");
 
   constructor() {
     window.addEventListener("keydown", (event) => {
@@ -325,7 +327,6 @@ export class GameService {
     const nodeId = this.currentNode().id;
     this.registerChoicePick(nodeId, choice);
 
-    const key = `${nodeId}:${choice.id}`;
     const choicePickCount = this.getChoicePickCount(nodeId, choice.id);
 
     // Show alt text on first revisit
@@ -358,7 +359,10 @@ export class GameService {
     if (choice.effects) this.checkEffects(choice.effects);
 
     if (this.playerState().health <= 0) {
-      return this.setCurrentNode(this.findNode(SPECIAL_NODES.GAME_OVER));
+      const gameOverId = this.currentGameOverNodeId();
+      return this.setCurrentNode(
+        this.findNode(gameOverId || SPECIAL_NODES.GAME_OVER),
+      );
     }
 
     // node is set
@@ -375,6 +379,7 @@ export class GameService {
           }));
           break;
         case "removeHealth":
+          this.currentGameOverNodeId.set(effect.gameOverNodeId ?? "");
           this.playerState.update((player) => ({
             ...player,
             health: Math.max(0, player.health - (effect.health ?? 0)),

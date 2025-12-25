@@ -27,7 +27,7 @@ export interface Choice {
   exactMatch?: boolean;
   altTextOnChoiceRepeat?: string; // alt text when this choice is picked again, starting from the first revisit
   altNextNodeId?: string; // alt node id to jump to after threshold
-  altRedirectThreshold?: number; // treshold for altNextNodeId
+  altRedirectThreshold?: number; // treshold for altNextNodeId (number of visits)
 }
 
 export interface Condition {
@@ -61,6 +61,7 @@ export interface Effect {
   knowledge?: string;
   health?: number;
   moralPoints?: number;
+  gameOverNodeId?: string; // id of the game over node - mandatory if we're removing health
 }
 
 export type Vfx = "shake" | "glitch" | "dark";

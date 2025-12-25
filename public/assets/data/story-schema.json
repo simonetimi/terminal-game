@@ -113,6 +113,9 @@
                       },
                       "moralPoints": {
                         "type": "number"
+                      },
+                      "gameOverNodeId": {
+                        "type": "string"
                       }
                     }
                   }
@@ -166,7 +169,8 @@
             "enum": [
               "blip",
               "win",
-              "lose"
+              "lose",
+              "hurt"
             ]
           }
         }
