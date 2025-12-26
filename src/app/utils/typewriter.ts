@@ -1,7 +1,8 @@
 import { WritableSignal } from "@angular/core";
+import { ListItem } from "../models/game.model";
 
 export function typewriter(
-  targetSignal: WritableSignal<string[]>,
+  targetSignal: WritableSignal<ListItem[]>,
   text: string,
   options: {
     speed?: number;
@@ -31,7 +32,7 @@ export function typewriter(
   let isPaused = false;
   let currentTimeout: number | null = null;
 
-  targetSignal.update((items) => [...items, ""]);
+  targetSignal.update((items) => [...items, { text: "" }]);
   const firstIndex = targetSignal().length - 1;
 
   // event helpers
@@ -99,7 +100,7 @@ export function typewriter(
 
     targetSignal.update((items) => {
       const arr = [...items];
-      arr[firstIndex] = completeText;
+      arr[firstIndex].text = completeText;
       return arr;
     });
   };

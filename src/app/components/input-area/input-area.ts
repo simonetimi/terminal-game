@@ -10,6 +10,7 @@ import {
 import { GameService } from "../../services/game-service";
 import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { SvgIcon } from "../../ui/svg-icon/svg-icon";
+import { GAME_CHOICE_CLASS } from "../../models/game-state";
 
 @Component({
   selector: "app-input-area",
@@ -29,7 +30,13 @@ export class InputArea {
       if (this.isSystemWriting()) {
         this.inputRef()?.nativeElement.blur();
       } else {
-        this.inputRef()?.nativeElement.focus();
+        // Only auto-focus if no other element has focus
+        if (
+          !document.activeElement ||
+          document.activeElement === document.body
+        ) {
+          this.inputRef()?.nativeElement.focus();
+        }
       }
     });
   }
@@ -43,8 +50,18 @@ export class InputArea {
     this.toggleSettings.emit(true);
   }
 
-  captureFocus() {
-    this.inputRef()?.nativeElement.focus();
+  handleKeydown(event: KeyboardEvent) {
+    if (this.#gameService.isSystemWriting()) return;
+
+    // Handle arrow key navigation to choices
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      event.preventDefault();
+      const choices = document.querySelectorAll(`.${GAME_CHOICE_CLASS}`);
+      if (choices.length > 0) {
+        const firstChoice = choices[0] as HTMLElement;
+        firstChoice.focus();
+      }
+    }
   }
 
   onSubmit() {

@@ -83,3 +83,5 @@ export const SPECIAL_NODES = {
   WELCOME: "welcome",
   GAME_OVER: "gameOver",
 } as const;
+
+export const GAME_CHOICE_CLASS = "game-choice";

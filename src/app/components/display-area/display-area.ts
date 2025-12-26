@@ -7,6 +7,7 @@ import {
   viewChild,
 } from "@angular/core";
 import { GameService } from "../../services/game-service";
+import { GAME_CHOICE_CLASS } from "../../models/game-state";
 
 @Component({
   selector: "app-display-area",
@@ -32,5 +33,32 @@ export class DisplayArea {
         container.scrollTop = container.scrollHeight;
       }
     });
+  }
+
+  protected handleChoiceClick(event: MouseEvent) {
+    this.#handleChoiceInteraction(event);
+  }
+
+  protected handleChoiceKeydown(event: KeyboardEvent) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      event.stopPropagation(); // revent the global keydown listener from firing
+      this.#handleChoiceInteraction(event);
+    }
+  }
+
+  #handleChoiceInteraction(event: MouseEvent | KeyboardEvent) {
+    if (this.#gameService.isSystemWriting()) return;
+
+    const target = event.target as HTMLElement;
+
+    if (target.classList.contains(GAME_CHOICE_CLASS)) {
+      const li = target.closest("li");
+      const choiceNum = li?.getAttribute("data-choice-num");
+
+      if (choiceNum) {
+        this.#gameService.sendUserInput(choiceNum);
+      }
+    }
   }
 }

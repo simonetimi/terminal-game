@@ -304,3 +304,11 @@ input[type="checkbox"]:checked::after {
     animation: none !important;
   }
 }
+
+.game-choice:hover,
+.game-choice:focus {
+  color: var(--color-bg);
+  background-color: var(--color-text);
+  cursor: pointer;
+  outline: 0;
+}

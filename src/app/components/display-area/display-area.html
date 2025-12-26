@@ -4,7 +4,13 @@
     class="list-none h-full overflow-y-auto flex flex-col justify-end"
   >
     @for (item of displayItems(); track $index) {
-      <li [innerHTML]="item"></li>
+      <li
+        [innerHTML]="item.text"
+        [attr.data-choice-num]="item.choiceNumber"
+        (click)="handleChoiceClick($event)"
+        (keydown)="handleChoiceKeydown($event)"
+        role="presentation"
+      ></li>
     }
   </ul>
 </div>
