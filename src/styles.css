@@ -124,6 +124,7 @@ a {
 
 /* mobile font and layout settings */
 @media (max-width: 768px) {
+
   input,
   textarea,
   select {
@@ -146,10 +147,10 @@ a {
 
   /* mobile keyboard */
   @supports (height: 100dvh) {
+
     html,
     body {
       height: 100dvh;
-      position: fixed;
       width: 100%;
     }
   }
@@ -254,30 +255,21 @@ input[type="checkbox"]:checked::after {
   }
 
   25% {
-    transform: translate3d(
-        var(--vfx-shake-amp),
+    transform: translate3d(var(--vfx-shake-amp),
         calc(var(--vfx-shake-amp) * -0.5),
-        0
-      )
-      rotate(var(--vfx-shake-rot));
+        0) rotate(var(--vfx-shake-rot));
   }
 
   50% {
-    transform: translate3d(
-        calc(var(--vfx-shake-amp) * -1),
+    transform: translate3d(calc(var(--vfx-shake-amp) * -1),
         calc(var(--vfx-shake-amp) * 0.5),
-        0
-      )
-      rotate(calc(var(--vfx-shake-rot) * -1));
+        0) rotate(calc(var(--vfx-shake-rot) * -1));
   }
 
   75% {
-    transform: translate3d(
-        var(--vfx-shake-amp),
+    transform: translate3d(var(--vfx-shake-amp),
         calc(var(--vfx-shake-amp) * 0.5),
-        0
-      )
-      rotate(calc(var(--vfx-shake-rot) * 0.6));
+        0) rotate(calc(var(--vfx-shake-rot) * 0.6));
   }
 
   100% {
