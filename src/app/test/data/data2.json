@@ -14,6 +14,7 @@
     {
       "id": "start",
       "text": "Ti trovi a un crocevia.",
+      "vfx": "dark",
       "choices": [
         {
           "text": "Vai verso la foresta",
@@ -80,11 +81,12 @@
       "id": "river",
       "text": "Qual è il significato della vita?",
       "isFreeInput": true,
+      "vfx": "glitch",
       "choices": [
         {
           "text": "",
           "nextNodeId": "goodEnding",
-          "matchKeyword": "46"
+          "matchKeyword": "42"
         },
         {
           "text": "",
@@ -94,12 +96,35 @@
     },
     {
       "id": "goodEnding",
-      "text": "Giusto. Sei in pace con te stesso"
+      "text": "Giusto. Sei in pace con te stesso. Hai vinto!",
+      "sfx": "win",
+      "choices": []
     },
     {
       "id": "badEnding",
-      "text": "Sei morto"
+      "text": "Sei morto.",
+      "sfx": "lose",
+      "vfx": "shake",
+      "choices": []
+    },
+    {
+      "id": "gameOver",
+      "text": "Sei morto.",
+      "sfx": "lose",
+      "vfx": "shake",
+      "choices": []
+    }
+  ],
+  "endingChoices": [
+    {
+      "text": "Ricomincia",
+      "gameEffect": "restart",
+      "nextNodeId": ""
+    },
+    {
+      "text": "Esci",
+      "gameEffect": "close",
+      "nextNodeId": ""
     }
   ]
 }
-

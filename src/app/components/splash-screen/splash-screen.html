@@ -2,17 +2,16 @@
   class="w-[80vw] h-[20vh] flex flex-col gap-6 items-center"
   (ngSubmit)="onSubmit()"
 >
-  <ul class="flex flex-col-reverse list-none text-center">
+  <ul class="flex flex-col list-none text-center">
     @for (message of displayMessages(); track $index) {
       <li>
         {{ message }}
       </li>
     }
   </ul>
-  @if (showButton()) {
+  @if (showButton() && !isGameDataLoading()) {
     <button
-      autofocus
-      class="bg-transparent p-2 text-green-400 border border-green-400 shadow-none outline-none rounded-lg cursor-pointer"
+      class="bg-transparent p-2 border border-ui text-accent shadow-none outline-none rounded-lg cursor-pointer transition-colors focus-visible:outline-none"
     >
       {{ "splashScreen.button" | translate }}
     </button>

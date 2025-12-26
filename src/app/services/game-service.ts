@@ -1,43 +1,47 @@
 import { inject, Injectable, signal } from "@angular/core";
 import { typewriter } from "../utils/typewriter";
 
-import gameData from "../game-data/data.json";
-import { Choice, Effect, GameNode, PlayerData } from "../models/game-state";
+import {
+  Choice,
+  Effect,
+  GameData,
+  GameNode,
+  PlayerData,
+  SPECIAL_NODES,
+} from "../models/game-state";
 import { strip } from "../utils/strings";
 import { PersistenceService } from "./persistence-service";
 import { TranslateService } from "@ngx-translate/core";
-import { AudioService } from "./audio-service";
+import { EffectsManagerService } from "./effects-manager-service";
+import { CONFIG, DEFAULT_PLAYER_DATA } from "../lib/config";
+import { SettingsService } from "./settings-service";
+import Fuse from "fuse.js";
+import { httpResource } from "@angular/common/http";
 
 @Injectable({
   providedIn: "root",
 })
 export class GameService {
-  #translateService = inject(TranslateService);
   #persistenceService = inject(PersistenceService);
-  #audioService = inject(AudioService);
+  #effectsManagerService = inject(EffectsManagerService);
+  #settingsService = inject(SettingsService);
+  #translateService = inject(TranslateService);
 
-  nodes = gameData.nodes as GameNode[];
-
-  playerState = signal<PlayerData>({
-    name: "anonymous",
-    health: 3,
-    inventory: [],
-    knowledge: [],
-    moralPoints: 0,
-  });
+  playerState = signal<PlayerData>(DEFAULT_PLAYER_DATA);
   displayItems = signal<string[]>([]);
   visitedNodes: string[] = [];
   freeInputsHistory: string[] = [];
+  choiceHistory: string[] = [];
+
+  gameData = httpResource<GameData>(() => "/assets/data/story.json");
+  nodes: GameNode[] = [];
 
   isSystemWriting = signal(false);
-  isUserQuitting = signal(false);
-
-  skipAnimation = () => {};
+  skipAnimation: () => void = () => void 0;
 
   currentNode = signal<GameNode>({} as GameNode);
 
-  #typewriterSpeed = 60;
-  #lineBreakDelay = 1000;
+  currentGameOverNodeId = signal("");
 
   constructor() {
     window.addEventListener("keydown", (event) => {
@@ -59,8 +63,17 @@ export class GameService {
     this.freeInputsHistory =
       this.#persistenceService.loadFreeInputsHistory() ?? [];
 
+    this.choiceHistory = this.#persistenceService.loadChoiceHistory() ?? [];
+  }
+
+  initStory() {
+    const data = this.gameData.value();
+    if (!data) return;
+
     const savedNodeId = this.#persistenceService.loadCurrentNodeId();
     const savedVisitedNodes = this.#persistenceService.loadVisitedNodes();
+
+    this.nodes = data.nodes;
 
     if (savedNodeId && savedVisitedNodes) {
       // restore visited nodes
@@ -87,25 +100,49 @@ export class GameService {
       this.#persistenceService.saveVisitedNodes(this.visitedNodes);
       this.#persistenceService.saveCurrentNodeId(node.id);
     }
+
     this.currentNode.set(node);
 
     // add empty space between nodes
-    this.displayItems().length > 0 &&
-      this.displayItems.update((items) => ["&nbsp;", ...items]);
+    if (this.displayItems().length > 0)
+      this.displayItems.update((items) => [...items, "&nbsp;"]);
+
+    // effects
+    this.#effectsManagerService.clearEffects();
+    requestAnimationFrame(() => {
+      this.#effectsManagerService.playNodeEffects(node);
+    });
 
     this.writeOnScreen(this.chooseTextToDisplay(node), () => {
+      // handle auto-redirect nodes
+      if (node.autoRedirectTo) {
+        this.isSystemWriting.set(true);
+        const delay =
+          node.autoRedirectDelay ?? CONFIG.DEFAULT_AUTO_REDIRECT_DELAY;
+        setTimeout(() => {
+          const redirectNode = this.findNode(node.autoRedirectTo!);
+          if (redirectNode) {
+            this.setCurrentNode(redirectNode);
+          }
+        }, delay);
+        return; // no choice to render
+      }
+
       const choices = this.renderChoices(node);
-      this.displayItems.update((items) => [...choices, ...items]);
+      this.displayItems.update((items) => [...items, ...choices]);
     });
   }
 
   writeOnScreen(text: string, callback?: () => void) {
     this.isSystemWriting.set(true);
-    this.#audioService.playAudio("blip");
     this.skipAnimation = typewriter(
       this.displayItems,
       text,
-      { speed: this.#typewriterSpeed, lineBreakDelay: this.#lineBreakDelay },
+      {
+        speed: this.#settingsService.typewriterSpeed(),
+        lineBreakDelay: CONFIG.NARRATION_BREAK_DELAY,
+        effectsSelector: CONFIG.DEFAULT_SCREEN_SELECTOR,
+      },
       () => {
         this.isSystemWriting.set(false);
         if (callback) callback();
@@ -114,16 +151,21 @@ export class GameService {
   }
 
   sendUserInput(input: string) {
+    if (this.currentNode().choices.length === 0) {
+      // allow any input to restart at the end of the game
+      return this.#persistenceService.clearAllDataAndRefresh();
+    }
+
     const cleanInput = strip(input).trim();
     if (!cleanInput) return;
 
     // setting name - game start
-    if (this.currentNode().id === "welcome") {
+    if (this.currentNode().id === SPECIAL_NODES.WELCOME) {
       const name = cleanInput.slice(0, 20);
 
       this.displayItems.update((items) => {
-        items.shift();
-        return [`> ${name}`, ...items];
+        const itemsWithoutPlaceholder = items.filter((item) => item !== ""); // remove empty placeholder
+        return [...itemsWithoutPlaceholder, `> ${name}`];
       });
       this.freeInputsHistory.push(name);
       this.#persistenceService.saveFreeInputsHistory(this.freeInputsHistory);
@@ -135,28 +177,13 @@ export class GameService {
       return this.#persistenceService.savePlayerData({ name });
     }
 
-    if (this.isUserQuitting()) {
-      const confirm = this.#translateService.instant("commands.yes");
-      if (confirm.keys.includes(cleanInput.toLowerCase())) {
-        return this.#persistenceService.clearAllDataAndRefresh();
-      } else {
-        this.displayItems.update((items) => items.slice(1));
-        return this.isUserQuitting.set(false);
-      }
-    }
-    const exit = this.#translateService.instant("commands.exit");
-    if (exit.keys.includes(cleanInput.toLowerCase())) {
-      this.isUserQuitting.set(true);
-      return this.displayItems.update((items) => [exit.text, ...items]);
-    }
-
     // if free input, the input will have to match the choice with the match keyword. if it doesn't, it picks the other choice
     if (this.currentNode().isFreeInput) {
       const slicedInput = cleanInput.slice(0, 30);
 
       this.displayItems.update((items) => {
-        items.shift();
-        return [`> ${slicedInput}`, ...items];
+        const itemsWithoutPlaceholder = items.filter((item) => item !== ""); // remove empty placeholder
+        return [...itemsWithoutPlaceholder, `> ${slicedInput}`];
       });
 
       this.freeInputsHistory.push(slicedInput);
@@ -164,24 +191,119 @@ export class GameService {
 
       const availableChoices = this.filterChoices(this.currentNode().choices);
 
-      // exact match
-      const matchedKeywordChoice = availableChoices.find(
-        (choice) => choice.matchKeyword === slicedInput.toLowerCase(),
-      );
+      // set up fuzzy search
+      const fuse = new Fuse(availableChoices, {
+        keys: ["matchKeyword"],
+        includeScore: true,
+        ignoreLocation: true,
+        threshold: 0.6,
+        ignoreDiacritics: true,
+      });
 
-      if (matchedKeywordChoice) {
-        return this.setCurrentNode(
-          this.findNode(matchedKeywordChoice.nextNodeId),
-        );
+      const results = fuse.search(slicedInput.toLowerCase());
+      const bestMatch = results.length > 0 ? results[0] : null;
+
+      let matchedKeywordChoice: (typeof availableChoices)[number] | undefined;
+
+      // use score and length to define a reasonable match
+      if (bestMatch) {
+        const { item, score } = bestMatch;
+
+        // length-based completeness check
+        const minLengthRatio = 0.8; // require at least 80% of keyword length
+        const query = slicedInput.trim().toLowerCase();
+        const keyword = item.matchKeyword?.toLowerCase() ?? "";
+
+        const lengthRatio = query.length / keyword?.length;
+
+        let isAcceptable;
+
+        if (item.exactMatch) {
+          isAcceptable = score === 0;
+        } else {
+          // only accept fuzzy matches if the query is long enough
+          isAcceptable = lengthRatio >= minLengthRatio;
+        }
+        if (isAcceptable) {
+          matchedKeywordChoice = item;
+        }
       }
 
-      // if no exact match, find the fallback choice (one without matchKeyword or with different matchKeyword)
+      if (matchedKeywordChoice) {
+        // Register pick for free input choice
+        const nodeId = this.currentNode().id;
+        this.registerChoicePick(nodeId, matchedKeywordChoice);
+
+        // Alt-redirect/threshold logic for free input
+        const choicePickCount = this.getChoicePickCount(
+          nodeId,
+          matchedKeywordChoice.id,
+        );
+        let nextNodeId = matchedKeywordChoice.nextNodeId;
+        if (
+          matchedKeywordChoice.altNextNodeId &&
+          matchedKeywordChoice.altRedirectThreshold &&
+          choicePickCount >= matchedKeywordChoice.altRedirectThreshold
+        ) {
+          nextNodeId = matchedKeywordChoice.altNextNodeId;
+        }
+
+        if (
+          matchedKeywordChoice.altTextOnChoiceRepeat &&
+          choicePickCount === 2 &&
+          !(
+            matchedKeywordChoice.altNextNodeId &&
+            matchedKeywordChoice.altRedirectThreshold &&
+            choicePickCount >= matchedKeywordChoice.altRedirectThreshold
+          )
+        ) {
+          this.displayItems.update((items) => [
+            ...items,
+            matchedKeywordChoice.altTextOnChoiceRepeat!,
+          ]);
+        }
+
+        return this.setCurrentNode(this.findNode(nextNodeId));
+      }
+
+      // if no exact match, find the fallback choice (one without matchKeyword)
       const fallbackChoice = availableChoices.find(
         (choice) => !choice.matchKeyword,
       );
 
       if (fallbackChoice) {
-        return this.setCurrentNode(this.findNode(fallbackChoice.nextNodeId));
+        // Register pick/fallback
+        const nodeId = this.currentNode().id;
+        this.registerChoicePick(nodeId, fallbackChoice);
+        const choicePickCount = this.getChoicePickCount(
+          nodeId,
+          fallbackChoice.id,
+        );
+        let nextNodeId = fallbackChoice.nextNodeId;
+
+        if (
+          fallbackChoice.altNextNodeId &&
+          fallbackChoice.altRedirectThreshold &&
+          choicePickCount >= fallbackChoice.altRedirectThreshold
+        ) {
+          nextNodeId = fallbackChoice.altNextNodeId;
+        }
+        if (
+          fallbackChoice.altTextOnChoiceRepeat &&
+          choicePickCount === 2 &&
+          !(
+            fallbackChoice.altNextNodeId &&
+            fallbackChoice.altRedirectThreshold &&
+            choicePickCount >= fallbackChoice.altRedirectThreshold
+          )
+        ) {
+          this.displayItems.update((items) => [
+            ...items,
+            fallbackChoice.altTextOnChoiceRepeat!,
+          ]);
+        }
+
+        return this.setCurrentNode(this.findNode(nextNodeId));
       }
     }
 
@@ -197,17 +319,54 @@ export class GameService {
     // replace the numbered choices with the selected choice
     const choicesCount = availableChoices.length;
     this.displayItems.update((items) => {
-      // remove the numbered choices (they are at the beginning of the array due to reverse order)
-      const itemsWithoutChoices = items.slice(choicesCount);
-      // add the selected choice in the "> text" format
-      return [`> ${choice.text}`, ...itemsWithoutChoices];
+      const itemsWithoutChoices = items.slice(0, -choicesCount);
+      return [...itemsWithoutChoices, `> ${choice.text}`];
     });
+
+    // Register pick and handle alternate logic for normal choice
+    const nodeId = this.currentNode().id;
+    this.registerChoicePick(nodeId, choice);
+
+    const choicePickCount = this.getChoicePickCount(nodeId, choice.id);
+
+    // Show alt text on first revisit
+    if (
+      choice.altTextOnChoiceRepeat &&
+      choicePickCount === 2 &&
+      !(
+        choice.altNextNodeId &&
+        choice.altRedirectThreshold &&
+        choicePickCount >= choice.altRedirectThreshold
+      )
+    ) {
+      this.displayItems.update((items) => [
+        ...items,
+        choice.altTextOnChoiceRepeat!,
+      ]);
+    }
+
+    // After threshold, redirect to altNextNodeId
+    let nextNodeId = choice.nextNodeId;
+    if (
+      choice.altNextNodeId &&
+      choice.altRedirectThreshold &&
+      choicePickCount >= choice.altRedirectThreshold
+    ) {
+      nextNodeId = choice.altNextNodeId;
+    }
 
     // effects run
     if (choice.effects) this.checkEffects(choice.effects);
 
+    if (this.playerState().health <= 0) {
+      const gameOverId = this.currentGameOverNodeId();
+      return this.setCurrentNode(
+        this.findNode(gameOverId || SPECIAL_NODES.GAME_OVER),
+      );
+    }
+
     // node is set
-    this.setCurrentNode(this.findNode(choice.nextNodeId));
+    this.setCurrentNode(this.findNode(nextNodeId));
   }
 
   checkEffects(effects: Effect[]) {
@@ -220,6 +379,7 @@ export class GameService {
           }));
           break;
         case "removeHealth":
+          this.currentGameOverNodeId.set(effect.gameOverNodeId ?? "");
           this.playerState.update((player) => ({
             ...player,
             health: Math.max(0, player.health - (effect.health ?? 0)),
@@ -265,16 +425,20 @@ export class GameService {
             }));
           }
           break;
-        case "removeKnowledge":
-          if (effect.knowledge) {
-            this.playerState.update((player) => ({
-              ...player,
-              knowledge: player.knowledge.filter((k) => k !== effect.knowledge),
-            }));
-          }
-          break;
       }
     });
+  }
+
+  registerChoicePick(nodeId: string, choice: Choice) {
+    // track the choice in history
+    const choiceKey = `${nodeId}:${choice.id}`;
+    this.choiceHistory.push(choiceKey);
+    this.#persistenceService.saveChoiceHistory(this.choiceHistory);
+  }
+
+  getChoicePickCount(nodeId: string, choiceId: string): number {
+    const key = `${nodeId}:${choiceId}`;
+    return this.choiceHistory.filter((entry) => entry === key).length;
   }
 
   filterChoices(choices: Choice[]): Choice[] {
@@ -303,6 +467,12 @@ export class GameService {
             return condition.item
               ? !player.inventory.includes(condition.item)
               : false;
+          case "hasNotKnowledge":
+            return condition.knowledge
+              ? !player.knowledge.includes(condition.knowledge)
+              : false;
+          case "hasNotVisitedNextNode":
+            return !this.visitedNodes.includes(choice.nextNodeId);
           default:
             return true;
         }
@@ -329,22 +499,46 @@ export class GameService {
   }
 
   renderChoices(node: GameNode) {
-    return this.filterChoices(node.choices)
-      .map((choice, idx) =>
-        node.isFreeInput ? "" + choice.text : `${idx + 1}. ${choice.text}`,
-      )
-      .reverse();
+    const filteredChoices = this.filterChoices(node.choices);
+
+    if (filteredChoices.length === 0) {
+      return [`> ${this.#translateService.instant("game.leave")}`];
+    }
+
+    return filteredChoices.map((choice, idx) =>
+      node.isFreeInput ? "" : `${idx + 1}. ${choice.text}`,
+    );
   }
 
   traverseNodes(nodeIds: string[]) {
+    // reset player stats but the name
+    const { name } = this.playerState();
+    this.playerState.set({ ...DEFAULT_PLAYER_DATA, name });
+
     // rebuild all nodes but the last one, which will use the regular game flow
     const display: string[] = [];
     const tempVisitedNodes: string[] = [];
     let freeInputIndex = 0;
 
+    // Build temporary choice history for reconstruction
+    const tempChoiceHistory: string[] = [];
+
     for (let i = 0; i < nodeIds.length - 1; i++) {
       const node = this.findNode(nodeIds[i]);
       if (!node) continue;
+
+      if (node.autoRedirectTo) {
+        // add auto-redirect node text
+        if (i > 0) {
+          display.push("&nbsp;");
+        }
+        const text = this.chooseTextToDisplay(
+          node,
+          tempVisitedNodes,
+        ).replaceAll("\\", "");
+        display.push(text);
+        continue;
+      }
 
       // add current node to temporary visited array
       tempVisitedNodes.push(node.id);
@@ -354,31 +548,72 @@ export class GameService {
         display.push("&nbsp;");
       }
 
-      // use chooseTextToDisplay with temporary visited nodes array
+      // render node text with current reconstructed state
       const text = this.chooseTextToDisplay(node, tempVisitedNodes).replaceAll(
         "\\",
         "",
       );
       display.push(text);
 
+      // determine which choice led to the next node
+      const nextId = nodeIds[i + 1];
+      // Find matching choice by nextNodeId or altNextNodeId
+      let selectedChoice;
+      for (const c of node.choices) {
+        if (c.nextNodeId === nextId || c.altNextNodeId === nextId) {
+          selectedChoice = c;
+          break;
+        }
+      }
+
+      // Track pick for this node/choice using choice ID
+      if (selectedChoice !== undefined) {
+        const key = `${node.id}:${selectedChoice.id}`;
+        tempChoiceHistory.push(key);
+
+        // Calculate pick count from temp history
+        const choicePickCount = tempChoiceHistory.filter(
+          (entry) => entry === key,
+        ).length;
+
+        // Show alt text if this is the first revisit for this choice
+        if (
+          selectedChoice.altTextOnChoiceRepeat &&
+          choicePickCount === 2 &&
+          !(
+            selectedChoice.altNextNodeId &&
+            selectedChoice.altRedirectThreshold &&
+            choicePickCount >= selectedChoice.altRedirectThreshold
+          )
+        ) {
+          display.push(selectedChoice.altTextOnChoiceRepeat!);
+        }
+      }
+
       // add the choice that was selected by the user
       if (node.isFreeInput) {
-        // for free input nodes, use the saved free input history
         if (freeInputIndex < this.freeInputsHistory.length) {
           display.push(`> ${this.freeInputsHistory[freeInputIndex]}`);
           freeInputIndex++;
         }
-      } else {
-        // for regular choice nodes, find the choice that was selected
-        const nextId = nodeIds[i + 1];
-        const choice = node.choices?.find((c) => c.nextNodeId === nextId);
-        if (choice) display.push(`> ${choice.text}`);
+      } else if (selectedChoice) {
+        display.push(`> ${selectedChoice.text}`);
+      }
+
+      // apply effects of the selected choice to reconstruct player state
+      if (selectedChoice?.effects) {
+        this.checkEffects(selectedChoice.effects);
       }
     }
-    this.displayItems.set([...display].reverse());
+
+    this.displayItems.set(display);
   }
 
-  findNode(nodeId: string) {
-    return this.nodes.find((node) => node.id === nodeId)!;
+  findNode(nodeId: string): GameNode {
+    const node = this.nodes.find((node) => node.id === nodeId);
+    if (!node) {
+      throw new Error(`Node with id "${nodeId}" not found!`);
+    }
+    return node;
   }
 }

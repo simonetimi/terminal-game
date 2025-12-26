@@ -21,4 +21,8 @@ export class PlayerStatus {
     const hearts = this.#gameService.playerState().health;
     return Array.from({ length: hearts }, (_, i) => i + 1);
   });
+
+  protected inventory = computed(() => {
+    return this.#gameService.playerState().inventory;
+  });
 }

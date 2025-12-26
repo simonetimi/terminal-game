@@ -3,25 +3,86 @@ import { WritableSignal } from "@angular/core";
 export function typewriter(
   targetSignal: WritableSignal<string[]>,
   text: string,
-  options: { speed?: number; wordMode?: boolean; lineBreakDelay?: number } = {},
+  options: {
+    speed?: number;
+    wordMode?: boolean;
+    lineBreakDelay?: number;
+    effectsSelector?: string;
+  } = {},
   done?: () => void,
 ) {
-  const { speed = 50, wordMode = false, lineBreakDelay = 1000 } = options;
+  const {
+    speed = 50,
+    wordMode = false,
+    lineBreakDelay = 1000,
+    effectsSelector,
+  } = options;
 
-  // split text by double backslashes instead of newlines
+  // converts speed to delay
+  const minDelay = 10;
+  const maxDelay = 80;
+  const delay = maxDelay - Math.round((speed / 100) * (maxDelay - minDelay));
+
+  // split text by double backslashes
   const lines = text.split("\\");
   let currentLineIndex = 0;
   let currentCharIndex = 0;
   let finished = false;
+  let isPaused = false;
+  let currentTimeout: number | null = null;
 
-  targetSignal.update((items) => ["", ...items]);
-  const firstIndex = 0;
+  targetSignal.update((items) => [...items, ""]);
+  const firstIndex = targetSignal().length - 1;
+
+  // event helpers
+  const eventTarget: Document = document;
+  const getEffectsElement = (): HTMLElement | null =>
+    effectsSelector
+      ? (document.querySelector(effectsSelector) as HTMLElement | null)
+      : null;
+
+  const eventRelatesToTarget = (evt: Event): boolean => {
+    if (!effectsSelector) return true; // no filter
+    const el = getEffectsElement();
+    if (!el) return false;
+    const path = (
+      evt as Event & { composedPath?: () => EventTarget[] }
+    ).composedPath?.();
+    if (Array.isArray(path)) return path.includes(el);
+    const t = evt.target as Node | null;
+    return !!t && (t === el || el.contains(t));
+  };
+
+  // listen for glitch events
+  let glitchStartListener: ((event: Event) => void) | null = null;
+  let glitchEndListener: ((event: Event) => void) | null = null;
+
+  glitchStartListener = (e: Event) => {
+    if (!eventRelatesToTarget(e)) return;
+    isPaused = true;
+    if (currentTimeout !== null) {
+      clearTimeout(currentTimeout);
+      currentTimeout = null;
+    }
+  };
+
+  glitchEndListener = (e: Event) => {
+    if (!eventRelatesToTarget(e)) return;
+    isPaused = false;
+    if (!finished) {
+      // give the glitch a tick to clean up before resuming
+      setTimeout(() => processNextCharacter(), 50);
+    }
+  };
+
+  eventTarget.addEventListener("glitch-starting", glitchStartListener);
+  eventTarget.addEventListener("glitch-ended", glitchEndListener);
 
   const updateText = () => {
     // build the complete text up to current position
     let completeText = "";
 
-    // add all completed lines (no <br> tags, just concatenate)
+    // add all completed lines (no <br>, just concatenate)
     for (let i = 0; i < currentLineIndex; i++) {
       completeText += lines[i];
     }
@@ -31,9 +92,8 @@ export function typewriter(
       const currentLine = lines[currentLineIndex];
       const parts = wordMode ? currentLine.split(" ") : currentLine.split("");
       const currentPart = parts
-        .slice(0, currentCharIndex + 1)
+        .slice(0, Math.min(currentCharIndex + 1, parts.length))
         .join(wordMode ? " " : "");
-
       completeText += currentPart;
     }
 
@@ -45,8 +105,11 @@ export function typewriter(
   };
 
   const processNextCharacter = () => {
+    if (isPaused) return;
+
     if (currentLineIndex >= lines.length) {
       finished = true;
+      cleanupListeners();
       done?.();
       return;
     }
@@ -57,29 +120,40 @@ export function typewriter(
     updateText();
     currentCharIndex++;
 
-    // check if current line is finished
+    // finished current line?
     if (currentCharIndex >= parts.length) {
       currentLineIndex++;
       currentCharIndex = 0;
 
-      // pause before continuing to next line
       if (currentLineIndex < lines.length) {
-        setTimeout(() => {
-          if (!finished) {
+        currentTimeout = window.setTimeout(() => {
+          currentTimeout = null;
+          if (!finished && !isPaused) {
             processNextCharacter();
           }
         }, lineBreakDelay);
       } else {
         finished = true;
+        cleanupListeners();
         done?.();
       }
     } else {
-      // continue with next character in current line
-      setTimeout(() => {
-        if (!finished) {
+      // next character
+      currentTimeout = window.setTimeout(() => {
+        currentTimeout = null;
+        if (!finished && !isPaused) {
           processNextCharacter();
         }
-      }, speed);
+      }, delay);
+    }
+  };
+
+  const cleanupListeners = () => {
+    if (glitchStartListener) {
+      eventTarget.removeEventListener("glitch-starting", glitchStartListener);
+    }
+    if (glitchEndListener) {
+      eventTarget.removeEventListener("glitch-ended", glitchEndListener);
     }
   };
 
@@ -88,12 +162,17 @@ export function typewriter(
   // skip function
   return () => {
     if (!finished) {
-      // skip to the end
-      currentLineIndex = lines.length - 1;
-      currentCharIndex = wordMode
-        ? lines[currentLineIndex].split(" ").length - 1
-        : lines[currentLineIndex].split("").length - 1;
+      if (currentTimeout !== null) {
+        clearTimeout(currentTimeout);
+        currentTimeout = null;
+      }
+      cleanupListeners();
+
+      // fast-forward to end
+      currentLineIndex = lines.length;
+      currentCharIndex = 0;
       updateText();
+
       finished = true;
       done?.();
     }

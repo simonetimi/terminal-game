@@ -9,20 +9,20 @@ import {
 } from "@angular/core";
 import { GameService } from "../../services/game-service";
 import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { TranslatePipe } from "@ngx-translate/core";
-import { AudioService } from "../../services/audio-service";
+import { SvgIcon } from "../../ui/svg-icon/svg-icon";
 
 @Component({
   selector: "app-input-area",
-  imports: [ReactiveFormsModule, FormsModule, TranslatePipe],
+  imports: [ReactiveFormsModule, FormsModule, SvgIcon],
   templateUrl: "./input-area.html",
   styleUrl: "./input-area.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputArea {
   #gameService = inject(GameService);
-  #audioService = inject(AudioService);
   inputRef = viewChild<ElementRef>("commandInput");
+
+  toggleSettings = output<boolean>();
 
   constructor() {
     effect(() => {
@@ -37,10 +37,14 @@ export class InputArea {
   protected inputCommand = new FormControl("");
   protected isSystemWriting = this.#gameService.isSystemWriting;
   protected playerState = this.#gameService.playerState;
-  protected isSoundOn = this.#audioService.isSoundOn;
 
-  onToggleSound() {
-    this.isSoundOn.update((prev) => !prev);
+  openSettings($event: MouseEvent | TouchEvent) {
+    $event.stopPropagation();
+    this.toggleSettings.emit(true);
+  }
+
+  captureFocus() {
+    this.inputRef()?.nativeElement.focus();
   }
 
   onSubmit() {

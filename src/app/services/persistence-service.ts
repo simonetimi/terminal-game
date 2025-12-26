@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { GameNode, PlayerData, SavedPlayerData } from "../models/game-state";
+import { SavedPlayerData } from "../models/game-state";
 
 @Injectable({
   providedIn: "root",
@@ -46,8 +46,44 @@ export class PersistenceService {
     return this.load("freeInputsHistory");
   }
 
+  saveChoiceHistory(history: string[]) {
+    this.save("choiceHistory", history);
+  }
+
+  loadChoiceHistory(): string[] {
+    return this.load("choiceHistory") ?? [];
+  }
+
+  saveTypewriterSpeed(speed: number) {
+    this.save("typewriterSpeed", speed);
+  }
+
+  loadTypewriterSpeed(): number {
+    return this.load("typewriterSpeed");
+  }
+
+  saveSoundsEnabled(enabled: boolean) {
+    this.save("soundsEnabled", enabled);
+  }
+
+  loadSoundsEnabled(): boolean {
+    return this.load("soundsEnabled");
+  }
+
+  saveTheme(theme: string) {
+    this.save("theme", theme);
+  }
+
+  loadTheme(): string {
+    return this.load("theme");
+  }
+
   clearAllDataAndRefresh() {
-    localStorage.clear();
+    localStorage.removeItem("player");
+    localStorage.removeItem("visitedNodes");
+    localStorage.removeItem("currentNode");
+    localStorage.removeItem("freeInputsHistory");
+    localStorage.removeItem("choiceHistory");
     location.reload();
   }
 }

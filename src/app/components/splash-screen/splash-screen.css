@@ -1,0 +1,13 @@
+.button-theme {
+  color: var(--color-accent);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.button-theme:hover,
+.button-theme:focus-visible {
+  background: var(--color-accent);
+  color: var(--color-bg) !important;
+}
