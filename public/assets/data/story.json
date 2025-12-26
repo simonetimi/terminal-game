@@ -6,7 +6,7 @@
       "text": "Benvenuto, viaggiatore. Qual è il tuo nome?",
       "choices": [
         {
-          "id": "c1",
+          "id": 0,
           "text": "",
           "nextNodeId": "intro"
         }
@@ -28,7 +28,7 @@
       "altTextIfVisited": "Sei di nuovo all’ingresso del tempio. I simboli brillano ancora.",
       "choices": [
         {
-          "id": "c1",
+          "id": 0,
           "text": "Esamina i simboli",
           "nextNodeId": "examineSymbols",
           "effects": [
@@ -39,12 +39,12 @@
           ]
         },
         {
-          "id": "c2",
+          "id": 1,
           "text": "Entra nel tempio",
           "nextNodeId": "mainHall"
         },
         {
-          "id": "c3",
+          "id": 2,
           "text": "Perlustra i dintorni",
           "nextNodeId": "searchGrounds",
           "conditions": [
@@ -70,7 +70,7 @@
       "knowledgeForAltText": "keyTaken",
       "choices": [
         {
-          "id": "c1",
+          "id": 0,
           "text": "Prendi la chiave",
           "nextNodeId": "templeEntrance",
           "conditions": [
@@ -91,7 +91,7 @@
           ]
         },
         {
-          "id": "c2",
+          "id": 1,
           "text": "Torna all’ingresso",
           "nextNodeId": "templeEntrance"
         }
@@ -104,17 +104,17 @@
       "altTextIfVisited": "La sala fredda. Sinistra o destra?",
       "choices": [
         {
-          "id": "c1",
+          "id": 0,
           "text": "Prendi il passaggio a sinistra",
           "nextNodeId": "riddleDoor"
         },
         {
-          "id": "c2",
+          "id": 1,
           "text": "Prendi il passaggio a destra",
           "nextNodeId": "lockedDoor"
         },
         {
-          "id": "c3",
+          "id": 2,
           "text": "Torna all’ingresso",
           "nextNodeId": "templeEntrance"
         }
@@ -127,7 +127,7 @@
       "isFreeInput": true,
       "choices": [
         {
-          "id": "c1",
+          "id": 0,
           "text": "password",
           "matchKeyword": "degno",
           "exactMatch": false,
@@ -145,14 +145,14 @@
           ]
         },
         {
-          "id": "c2",
+          "id": 1,
           "text": "open",
           "matchKeyword": "apriti",
           "nextNodeId": "normalPath",
           "altTextOnChoiceRepeat": "La ripeti con maggiore sicurezza."
         },
         {
-          "id": "c3",
+          "id": 2,
           "text": "",
           "nextNodeId": "wrongAnswer"
         }
@@ -166,7 +166,7 @@
       "knowledgeForAltText": "amuletTaken",
       "choices": [
         {
-          "id": "c1",
+          "id": 0,
           "text": "Prendi un amuleto d’oro",
           "nextNodeId": "mainHall",
           "conditions": [
@@ -191,7 +191,7 @@
           ]
         },
         {
-          "id": "c2",
+          "id": 1,
           "text": "Torna alla sala principale",
           "nextNodeId": "mainHall"
         }
@@ -216,7 +216,7 @@
       "knowledgeForAltText": "doorOpened",
       "choices": [
         {
-          "id": "c1",
+          "id": 0,
           "text": "Usa la chiave arrugginita",
           "nextNodeId": "treasureRoom",
           "conditions": [
@@ -233,7 +233,7 @@
           ]
         },
         {
-          "id": "c2",
+          "id": 1,
           "text": "Torna indietro",
           "nextNodeId": "mainHall"
         }
@@ -247,7 +247,7 @@
       "knowledgeForAltText": "potionsTaken",
       "choices": [
         {
-          "id": "c1",
+          "id": 0,
           "text": "Prendi le pozioni",
           "nextNodeId": "mainHall",
           "conditions": [
@@ -272,7 +272,7 @@
           ]
         },
         {
-          "id": "c2",
+          "id": 1,
           "text": "Torna alla sala",
           "nextNodeId": "mainHall"
         }
@@ -286,7 +286,7 @@
       "altTextIfVisited": "Il guardiano ti fronteggia di nuovo!",
       "choices": [
         {
-          "id": "c1",
+          "id": 0,
           "text": "Pace! Vengo in pace!",
           "nextNodeId": "peacefulResolution",
           "conditions": [
@@ -307,7 +307,7 @@
           ]
         },
         {
-          "id": "c2",
+          "id": 1,
           "text": "Preparati a combattere!",
           "nextNodeId": "fightGuardian",
           "altTextOnChoiceRepeat": "Dichiari di nuovo battaglia!",
@@ -315,7 +315,7 @@
           "altRedirectThreshold": 3
         },
         {
-          "id": "c3",
+          "id": 2,
           "text": "Fuggi verso l'ingresso",
           "nextNodeId": "templeEntrance",
           "effects": [
@@ -342,7 +342,7 @@
       "text": "Ingaggi un feroce combattimento! Il guardiano è potente, ma non invincibile!",
       "choices": [
         {
-          "id": "c1",
+          "id": 0,
           "text": "Usa il potere dell’amuleto",
           "nextNodeId": "amuletVictory",
           "conditions": [
@@ -353,7 +353,7 @@
           ]
         },
         {
-          "id": "c2",
+          "id": 1,
           "text": "Combatti con tutte le tue forze",
           "nextNodeId": "guardianDefeated",
           "conditions": [
@@ -371,7 +371,7 @@
           ]
         },
         {
-          "id": "c3",
+          "id": 2,
           "text": "Fuggi verso l’ingresso",
           "nextNodeId": "templeEntrance",
           "effects": [

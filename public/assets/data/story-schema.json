@@ -36,7 +36,10 @@
               ],
               "properties": {
                 "id": {
-                  "type": "string"
+                  "type": [
+                    "integer",
+                    "string"
+                  ]
                 },
                 "text": {
                   "type": "string"
