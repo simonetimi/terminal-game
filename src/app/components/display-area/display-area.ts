@@ -8,6 +8,7 @@ import {
 } from "@angular/core";
 import { GameService } from "../../services/game-service";
 import { GAME_CHOICE_CLASS } from "../../models/game-state";
+import { NavigationService } from "../../services/navigation-service";
 
 @Component({
   selector: "app-display-area",
@@ -18,6 +19,7 @@ import { GAME_CHOICE_CLASS } from "../../models/game-state";
 })
 export class DisplayArea {
   #gameService = inject(GameService);
+  #navigationService = inject(NavigationService);
 
   protected scrollContainer = viewChild<ElementRef>("scrollContainer");
 
@@ -40,9 +42,20 @@ export class DisplayArea {
   }
 
   protected handleChoiceKeydown(event: KeyboardEvent) {
+    const target = event.target as HTMLElement;
+
+    // handle arrow key navigation between choices
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      if (target.classList.contains(GAME_CHOICE_CLASS)) {
+        this.#navigationService.navigateBetweenChoices(event, target);
+        return;
+      }
+    }
+
+    // Handle choice selection
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      event.stopPropagation(); // revent the global keydown listener from firing
+      event.stopPropagation(); // prevent the global keydown listener from firing
       this.#handleChoiceInteraction(event);
     }
   }
