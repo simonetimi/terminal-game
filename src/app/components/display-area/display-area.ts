@@ -70,6 +70,8 @@ export class DisplayArea {
       const choiceNum = li?.getAttribute("data-choice-num");
 
       if (choiceNum) {
+        (document.activeElement as HTMLElement | null)?.blur();
+        target.blur();
         this.#gameService.sendUserInput(choiceNum);
       }
     }

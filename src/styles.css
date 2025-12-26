@@ -305,10 +305,23 @@ input[type="checkbox"]:checked::after {
   }
 }
 
-.game-choice:hover,
 .game-choice:focus {
+  outline: 0;
+}
+
+.game-choice:focus-visible {
   color: var(--color-bg);
   background-color: var(--color-text);
   cursor: pointer;
   outline: 0;
+}
+
+/* avoid applying hover on mobile */
+@media (hover: hover) and (pointer: fine) {
+  .game-choice:hover {
+    color: var(--color-bg);
+    background-color: var(--color-text);
+    cursor: pointer;
+    outline: 0;
+  }
 }
