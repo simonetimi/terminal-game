@@ -2,10 +2,11 @@ import { Injectable, isDevMode } from "@angular/core";
 import gsap from "gsap";
 import { CONFIG } from "../lib/config";
 import { VfxOptions } from "../models/vfx.model";
+import { Vfx } from "../models/game-state";
 
 @Injectable({ providedIn: "root" })
 export class VfxService {
-  #permanentEffects = new Set<string>();
+  #permanentEffects = new Set<Vfx>();
   #currentTimeline: gsap.core.Timeline | null = null;
 
   play(effectName: string, options: VfxOptions = {}) {

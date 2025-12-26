@@ -65,7 +65,7 @@ export interface Effect {
 }
 
 export type Vfx = "shake" | "glitch" | "dark";
-export type Sfx = "blip" | "win" | "lose";
+export type Sfx = "blip" | "win" | "lose" | "hurt";
 
 export interface PlayerData {
   name: string;
