@@ -45,7 +45,9 @@ export function typewriter(
     if (!effectsSelector) return true; // no filter
     const el = getEffectsElement();
     if (!el) return false;
-    const path = (evt as any).composedPath?.() as EventTarget[] | undefined;
+    const path = (
+      evt as Event & { composedPath?: () => EventTarget[] }
+    ).composedPath?.();
     if (Array.isArray(path)) return path.includes(el);
     const t = evt.target as Node | null;
     return !!t && (t === el || el.contains(t));

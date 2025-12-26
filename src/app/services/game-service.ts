@@ -1,4 +1,4 @@
-import { effect, inject, Injectable, signal } from "@angular/core";
+import { inject, Injectable, signal } from "@angular/core";
 import { typewriter } from "../utils/typewriter";
 
 import {
@@ -31,16 +31,17 @@ export class GameService {
   displayItems = signal<string[]>([]);
   visitedNodes: string[] = [];
   freeInputsHistory: string[] = [];
+  choiceHistory: string[] = [];
 
   gameData = httpResource<GameData>(() => "/assets/data/story.json");
   nodes: GameNode[] = [];
 
-  choicePickCounts: Record<string, number> = {};
-
   isSystemWriting = signal(false);
-  skipAnimation = () => {};
+  skipAnimation: () => void = () => void 0;
 
   currentNode = signal<GameNode>({} as GameNode);
+
+  currentGameOverNodeId = signal("");
 
   constructor() {
     window.addEventListener("keydown", (event) => {
@@ -62,9 +63,7 @@ export class GameService {
     this.freeInputsHistory =
       this.#persistenceService.loadFreeInputsHistory() ?? [];
 
-    // restore choice picks from local storage if present
-    this.choicePickCounts =
-      this.#persistenceService.loadChoicePickCounts?.() ?? {};
+    this.choiceHistory = this.#persistenceService.loadChoiceHistory() ?? [];
   }
 
   initStory() {
@@ -73,14 +72,8 @@ export class GameService {
 
     const savedNodeId = this.#persistenceService.loadCurrentNodeId();
     const savedVisitedNodes = this.#persistenceService.loadVisitedNodes();
-    const savedChoicePickCounts =
-      this.#persistenceService.loadChoicePickCounts?.();
 
     this.nodes = data.nodes;
-
-    if (savedChoicePickCounts) {
-      this.choicePickCounts = savedChoicePickCounts;
-    }
 
     if (savedNodeId && savedVisitedNodes) {
       // restore visited nodes
@@ -111,7 +104,7 @@ export class GameService {
     this.currentNode.set(node);
 
     // add empty space between nodes
-    this.displayItems().length > 0 &&
+    if (this.displayItems().length > 0)
       this.displayItems.update((items) => [...items, "&nbsp;"]);
 
     // effects
@@ -237,14 +230,15 @@ export class GameService {
       }
 
       if (matchedKeywordChoice) {
-        // Register pick for free input choice (first index matching)
+        // Register pick for free input choice
         const nodeId = this.currentNode().id;
-        const choiceIdx = availableChoices.indexOf(matchedKeywordChoice);
-        this.registerChoicePick(nodeId, choiceIdx);
+        this.registerChoicePick(nodeId, matchedKeywordChoice);
 
         // Alt-redirect/threshold logic for free input
-        const key = `${nodeId}:${choiceIdx}`;
-        const choicePickCount = this.choicePickCounts[key];
+        const choicePickCount = this.getChoicePickCount(
+          nodeId,
+          matchedKeywordChoice.id,
+        );
         let nextNodeId = matchedKeywordChoice.nextNodeId;
         if (
           matchedKeywordChoice.altNextNodeId &&
@@ -280,10 +274,11 @@ export class GameService {
       if (fallbackChoice) {
         // Register pick/fallback
         const nodeId = this.currentNode().id;
-        const choiceIdx = availableChoices.indexOf(fallbackChoice);
-        this.registerChoicePick(nodeId, choiceIdx);
-        const key = `${nodeId}:${choiceIdx}`;
-        const choicePickCount = this.choicePickCounts[key];
+        this.registerChoicePick(nodeId, fallbackChoice);
+        const choicePickCount = this.getChoicePickCount(
+          nodeId,
+          fallbackChoice.id,
+        );
         let nextNodeId = fallbackChoice.nextNodeId;
 
         if (
@@ -330,11 +325,9 @@ export class GameService {
 
     // Register pick and handle alternate logic for normal choice
     const nodeId = this.currentNode().id;
-    const choiceIdx = availableChoices.indexOf(choice);
-    this.registerChoicePick(nodeId, choiceIdx);
+    this.registerChoicePick(nodeId, choice);
 
-    const key = `${nodeId}:${choiceIdx}`;
-    const choicePickCount = this.choicePickCounts[key];
+    const choicePickCount = this.getChoicePickCount(nodeId, choice.id);
 
     // Show alt text on first revisit
     if (
@@ -366,7 +359,10 @@ export class GameService {
     if (choice.effects) this.checkEffects(choice.effects);
 
     if (this.playerState().health <= 0) {
-      return this.setCurrentNode(this.findNode(SPECIAL_NODES.GAME_OVER));
+      const gameOverId = this.currentGameOverNodeId();
+      return this.setCurrentNode(
+        this.findNode(gameOverId || SPECIAL_NODES.GAME_OVER),
+      );
     }
 
     // node is set
@@ -383,6 +379,7 @@ export class GameService {
           }));
           break;
         case "removeHealth":
+          this.currentGameOverNodeId.set(effect.gameOverNodeId ?? "");
           this.playerState.update((player) => ({
             ...player,
             health: Math.max(0, player.health - (effect.health ?? 0)),
@@ -432,11 +429,16 @@ export class GameService {
     });
   }
 
-  registerChoicePick(nodeId: string, choiceIndex: number) {
-    const key = `${nodeId}:${choiceIndex}`;
-    if (this.choicePickCounts[key] == null) this.choicePickCounts[key] = 0;
-    this.choicePickCounts[key]++;
-    this.#persistenceService.saveChoicePickCounts(this.choicePickCounts);
+  registerChoicePick(nodeId: string, choice: Choice) {
+    // track the choice in history
+    const choiceKey = `${nodeId}:${choice.id}`;
+    this.choiceHistory.push(choiceKey);
+    this.#persistenceService.saveChoiceHistory(this.choiceHistory);
+  }
+
+  getChoicePickCount(nodeId: string, choiceId: string): number {
+    const key = `${nodeId}:${choiceId}`;
+    return this.choiceHistory.filter((entry) => entry === key).length;
   }
 
   filterChoices(choices: Choice[]): Choice[] {
@@ -509,7 +511,7 @@ export class GameService {
   }
 
   traverseNodes(nodeIds: string[]) {
-    // reset player stats but the na,e
+    // reset player stats but the name
     const { name } = this.playerState();
     this.playerState.set({ ...DEFAULT_PLAYER_DATA, name });
 
@@ -518,8 +520,8 @@ export class GameService {
     const tempVisitedNodes: string[] = [];
     let freeInputIndex = 0;
 
-    // Clear and reconstruct pick counts
-    this.choicePickCounts = {};
+    // Build temporary choice history for reconstruction
+    const tempChoiceHistory: string[] = [];
 
     for (let i = 0; i < nodeIds.length - 1; i++) {
       const node = this.findNode(nodeIds[i]);
@@ -555,30 +557,33 @@ export class GameService {
 
       // determine which choice led to the next node
       const nextId = nodeIds[i + 1];
-      // Find *all* possible matching choices, including altNextNodeId
-      let selectedChoice, selectedIdx;
-      for (const [idx, c] of node.choices.entries()) {
+      // Find matching choice by nextNodeId or altNextNodeId
+      let selectedChoice;
+      for (const c of node.choices) {
         if (c.nextNodeId === nextId || c.altNextNodeId === nextId) {
           selectedChoice = c;
-          selectedIdx = idx;
           break;
         }
       }
 
-      // Track pick for this node/choice
-      if (selectedChoice !== undefined && selectedIdx !== undefined) {
-        const key = `${node.id}:${selectedIdx}`;
-        if (this.choicePickCounts[key] == null) this.choicePickCounts[key] = 0;
-        this.choicePickCounts[key]++;
+      // Track pick for this node/choice using choice ID
+      if (selectedChoice !== undefined) {
+        const key = `${node.id}:${selectedChoice.id}`;
+        tempChoiceHistory.push(key);
+
+        // Calculate pick count from temp history
+        const choicePickCount = tempChoiceHistory.filter(
+          (entry) => entry === key,
+        ).length;
 
         // Show alt text if this is the first revisit for this choice
         if (
           selectedChoice.altTextOnChoiceRepeat &&
-          this.choicePickCounts[key] === 2 &&
+          choicePickCount === 2 &&
           !(
             selectedChoice.altNextNodeId &&
             selectedChoice.altRedirectThreshold &&
-            this.choicePickCounts[key] >= selectedChoice.altRedirectThreshold
+            choicePickCount >= selectedChoice.altRedirectThreshold
           )
         ) {
           display.push(selectedChoice.altTextOnChoiceRepeat!);
@@ -601,13 +606,14 @@ export class GameService {
       }
     }
 
-    // Save reconstructed counts to persistence (so it gets loaded for last restore)
-    this.#persistenceService.saveChoicePickCounts(this.choicePickCounts);
-
     this.displayItems.set(display);
   }
 
-  findNode(nodeId: string) {
-    return this.nodes.find((node) => node.id === nodeId)!;
+  findNode(nodeId: string): GameNode {
+    const node = this.nodes.find((node) => node.id === nodeId);
+    if (!node) {
+      throw new Error(`Node with id "${nodeId}" not found!`);
+    }
+    return node;
   }
 }

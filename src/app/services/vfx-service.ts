@@ -1,13 +1,14 @@
 import { Injectable, isDevMode } from "@angular/core";
 import gsap from "gsap";
 import { CONFIG } from "../lib/config";
+import { VfxOptions } from "../models/vfx.model";
 
 @Injectable({ providedIn: "root" })
 export class VfxService {
-  #permanentEffects: Set<string> = new Set();
+  #permanentEffects = new Set<string>();
   #currentTimeline: gsap.core.Timeline | null = null;
 
-  play(effectName: string, options: any = {}) {
+  play(effectName: string, options: VfxOptions = {}) {
     const effects: Record<string, () => void> = {
       shake: () =>
         this.#shake(options.selector || CONFIG.DEFAULT_SCREEN_SELECTOR),
@@ -284,7 +285,7 @@ export class VfxService {
 
   removeEffects(
     selector: string = CONFIG.DEFAULT_SCREEN_SELECTOR,
-    duration: number = 1.5,
+    duration = 1.5,
   ) {
     this.#permanentEffects.clear();
 
