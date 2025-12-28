@@ -4,6 +4,7 @@ import GraphView from "./components/GraphView";
 import NodePanel from "./components/NodePanel";
 import ValidationPanel from "./components/ValidationPanel";
 import schema from "../../../public/assets/data/story-schema.json";
+import defaultStory from "../../../public/assets/data/story.json";
 import { HISTORY_LIMIT, UNDO_COALESCE_WINDOW_MS } from "./config";
 import { StoryData, StoryNode, ValidationIssue, emptyNode } from "./types";
 
@@ -49,8 +50,7 @@ const rewriteNodeReferences = (
 
 const App: React.FC = () => {
   const [story, setStory] = useState<StoryData>({
-    $schema: "story-schema.json",
-    nodes: [],
+    ...(defaultStory as StoryData),
   });
   const [history, setHistory] = useState<{
     past: StoryData[];
