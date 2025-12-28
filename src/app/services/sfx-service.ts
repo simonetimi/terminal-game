@@ -1,5 +1,6 @@
 import { inject, Injectable } from "@angular/core";
 import { SettingsService } from "./settings-service";
+import { Sfx } from "../models/game-state";
 
 @Injectable({
   providedIn: "root",
@@ -9,7 +10,7 @@ export class SfxService {
   #path = "assets/sounds/";
   #ext = ".wav";
 
-  #sounds = ["blip", "win", "lose", "hurt"];
+  #sounds: Sfx[] = ["blip", "win", "lose", "hurt"];
 
   public AUDIO_MAP: Record<string, HTMLAudioElement> = {};
 

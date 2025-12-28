@@ -7,6 +7,8 @@ import {
   viewChild,
 } from "@angular/core";
 import { GameService } from "../../services/game-service";
+import { GAME_CHOICE_CLASS } from "../../models/game-state";
+import { NavigationService } from "../../services/navigation-service";
 
 @Component({
   selector: "app-display-area",
@@ -17,6 +19,7 @@ import { GameService } from "../../services/game-service";
 })
 export class DisplayArea {
   #gameService = inject(GameService);
+  #navigationService = inject(NavigationService);
 
   protected scrollContainer = viewChild<ElementRef>("scrollContainer");
 
@@ -32,5 +35,45 @@ export class DisplayArea {
         container.scrollTop = container.scrollHeight;
       }
     });
+  }
+
+  protected handleChoiceClick(event: MouseEvent) {
+    this.#handleChoiceInteraction(event);
+  }
+
+  protected handleChoiceKeydown(event: KeyboardEvent) {
+    const target = event.target as HTMLElement;
+
+    // handle arrow key navigation between choices
+    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+      if (target.classList.contains(GAME_CHOICE_CLASS)) {
+        this.#navigationService.navigateBetweenChoices(event, target);
+        return;
+      }
+    }
+
+    // Handle choice selection
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      event.stopPropagation(); // prevent the global keydown listener from firing
+      this.#handleChoiceInteraction(event);
+    }
+  }
+
+  #handleChoiceInteraction(event: MouseEvent | KeyboardEvent) {
+    if (this.#gameService.isSystemWriting()) return;
+
+    const target = event.target as HTMLElement;
+
+    if (target.classList.contains(GAME_CHOICE_CLASS)) {
+      const li = target.closest("li");
+      const choiceNum = li?.getAttribute("data-choice-num");
+
+      if (choiceNum) {
+        (document.activeElement as HTMLElement | null)?.blur();
+        target.blur();
+        this.#gameService.sendUserInput(choiceNum);
+      }
+    }
   }
 }

@@ -65,7 +65,7 @@ export interface Effect {
 }
 
 export type Vfx = "shake" | "glitch" | "dark";
-export type Sfx = "blip" | "win" | "lose";
+export type Sfx = "blip" | "win" | "lose" | "hurt";
 
 export interface PlayerData {
   name: string;
@@ -83,3 +83,5 @@ export const SPECIAL_NODES = {
   WELCOME: "welcome",
   GAME_OVER: "gameOver",
 } as const;
+
+export const GAME_CHOICE_CLASS = "game-choice";

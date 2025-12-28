@@ -4,6 +4,7 @@ import { typewriter } from "../utils/typewriter";
 import {
   Choice,
   Effect,
+  GAME_CHOICE_CLASS,
   GameData,
   GameNode,
   PlayerData,
@@ -17,6 +18,7 @@ import { CONFIG, DEFAULT_PLAYER_DATA } from "../lib/config";
 import { SettingsService } from "./settings-service";
 import Fuse from "fuse.js";
 import { httpResource } from "@angular/common/http";
+import { ListItem } from "../models/game.model";
 
 @Injectable({
   providedIn: "root",
@@ -28,7 +30,7 @@ export class GameService {
   #translateService = inject(TranslateService);
 
   playerState = signal<PlayerData>(DEFAULT_PLAYER_DATA);
-  displayItems = signal<string[]>([]);
+  displayItems = signal<ListItem[]>([]);
   visitedNodes: string[] = [];
   freeInputsHistory: string[] = [];
   choiceHistory: string[] = [];
@@ -105,7 +107,7 @@ export class GameService {
 
     // add empty space between nodes
     if (this.displayItems().length > 0)
-      this.displayItems.update((items) => [...items, "&nbsp;"]);
+      this.displayItems.update((items) => [...items, { text: "&nbsp;" }]);
 
     // effects
     this.#effectsManagerService.clearEffects();
@@ -128,7 +130,7 @@ export class GameService {
         return; // no choice to render
       }
 
-      const choices = this.renderChoices(node);
+      const choices: ListItem[] = this.renderChoices(node);
       this.displayItems.update((items) => [...items, ...choices]);
     });
   }
@@ -164,8 +166,10 @@ export class GameService {
       const name = cleanInput.slice(0, 20);
 
       this.displayItems.update((items) => {
-        const itemsWithoutPlaceholder = items.filter((item) => item !== ""); // remove empty placeholder
-        return [...itemsWithoutPlaceholder, `> ${name}`];
+        const itemsWithoutPlaceholder = items.filter(
+          (item) => item.text !== "",
+        ); // remove empty placeholder
+        return [...itemsWithoutPlaceholder, { text: `> ${name}` }];
       });
       this.freeInputsHistory.push(name);
       this.#persistenceService.saveFreeInputsHistory(this.freeInputsHistory);
@@ -182,8 +186,10 @@ export class GameService {
       const slicedInput = cleanInput.slice(0, 30);
 
       this.displayItems.update((items) => {
-        const itemsWithoutPlaceholder = items.filter((item) => item !== ""); // remove empty placeholder
-        return [...itemsWithoutPlaceholder, `> ${slicedInput}`];
+        const itemsWithoutPlaceholder = items.filter(
+          (item) => item.text !== "",
+        ); // remove empty placeholder
+        return [...itemsWithoutPlaceholder, { text: `> ${slicedInput}` }];
       });
 
       this.freeInputsHistory.push(slicedInput);
@@ -259,7 +265,7 @@ export class GameService {
         ) {
           this.displayItems.update((items) => [
             ...items,
-            matchedKeywordChoice.altTextOnChoiceRepeat!,
+            { text: matchedKeywordChoice.altTextOnChoiceRepeat! },
           ]);
         }
 
@@ -299,7 +305,7 @@ export class GameService {
         ) {
           this.displayItems.update((items) => [
             ...items,
-            fallbackChoice.altTextOnChoiceRepeat!,
+            { text: fallbackChoice.altTextOnChoiceRepeat! },
           ]);
         }
 
@@ -320,7 +326,7 @@ export class GameService {
     const choicesCount = availableChoices.length;
     this.displayItems.update((items) => {
       const itemsWithoutChoices = items.slice(0, -choicesCount);
-      return [...itemsWithoutChoices, `> ${choice.text}`];
+      return [...itemsWithoutChoices, { text: `> ${choice.text}` }];
     });
 
     // Register pick and handle alternate logic for normal choice
@@ -341,7 +347,7 @@ export class GameService {
     ) {
       this.displayItems.update((items) => [
         ...items,
-        choice.altTextOnChoiceRepeat!,
+        { text: choice.altTextOnChoiceRepeat! },
       ]);
     }
 
@@ -502,11 +508,16 @@ export class GameService {
     const filteredChoices = this.filterChoices(node.choices);
 
     if (filteredChoices.length === 0) {
-      return [`> ${this.#translateService.instant("game.leave")}`];
+      return [{ text: `> ${this.#translateService.instant("game.leave")}` }];
     }
 
     return filteredChoices.map((choice, idx) =>
-      node.isFreeInput ? "" : `${idx + 1}. ${choice.text}`,
+      node.isFreeInput
+        ? { text: "" }
+        : {
+            text: `<span class="${GAME_CHOICE_CLASS}" tabindex="0" role="button" aria-label="${choice.text}">${idx + 1}. ${choice.text}</span>`,
+            choiceNumber: idx + 1,
+          },
     );
   }
 
@@ -516,7 +527,7 @@ export class GameService {
     this.playerState.set({ ...DEFAULT_PLAYER_DATA, name });
 
     // rebuild all nodes but the last one, which will use the regular game flow
-    const display: string[] = [];
+    const display: ListItem[] = [];
     const tempVisitedNodes: string[] = [];
     let freeInputIndex = 0;
 
@@ -530,13 +541,13 @@ export class GameService {
       if (node.autoRedirectTo) {
         // add auto-redirect node text
         if (i > 0) {
-          display.push("&nbsp;");
+          display.push({ text: "&nbsp;" });
         }
         const text = this.chooseTextToDisplay(
           node,
           tempVisitedNodes,
         ).replaceAll("\\", "");
-        display.push(text);
+        display.push({ text });
         continue;
       }
 
@@ -545,7 +556,7 @@ export class GameService {
 
       // only add empty space if it's not the first reconstructed node
       if (i > 0) {
-        display.push("&nbsp;");
+        display.push({ text: "&nbsp;" });
       }
 
       // render node text with current reconstructed state
@@ -553,7 +564,7 @@ export class GameService {
         "\\",
         "",
       );
-      display.push(text);
+      display.push({ text });
 
       // determine which choice led to the next node
       const nextId = nodeIds[i + 1];
@@ -586,18 +597,18 @@ export class GameService {
             choicePickCount >= selectedChoice.altRedirectThreshold
           )
         ) {
-          display.push(selectedChoice.altTextOnChoiceRepeat!);
+          display.push({ text: selectedChoice.altTextOnChoiceRepeat! });
         }
       }
 
       // add the choice that was selected by the user
       if (node.isFreeInput) {
         if (freeInputIndex < this.freeInputsHistory.length) {
-          display.push(`> ${this.freeInputsHistory[freeInputIndex]}`);
+          display.push({ text: `> ${this.freeInputsHistory[freeInputIndex]}` });
           freeInputIndex++;
         }
       } else if (selectedChoice) {
-        display.push(`> ${selectedChoice.text}`);
+        display.push({ text: `> ${selectedChoice.text}` });
       }
 
       // apply effects of the selected choice to reconstruct player state

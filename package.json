@@ -8,7 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "release": "git checkout main && git pull && npm version patch && git push && vercel --prod",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "editor": "npm run dev --prefix ./tools/story-editor"
   },
   "prettier": {
     "overrides": [

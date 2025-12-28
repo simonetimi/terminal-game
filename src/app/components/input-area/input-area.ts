@@ -10,6 +10,7 @@ import {
 import { GameService } from "../../services/game-service";
 import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { SvgIcon } from "../../ui/svg-icon/svg-icon";
+import { NavigationService } from "../../services/navigation-service";
 
 @Component({
   selector: "app-input-area",
@@ -20,6 +21,7 @@ import { SvgIcon } from "../../ui/svg-icon/svg-icon";
 })
 export class InputArea {
   #gameService = inject(GameService);
+  #navigationService = inject(NavigationService);
   inputRef = viewChild<ElementRef>("commandInput");
 
   toggleSettings = output<boolean>();
@@ -29,7 +31,13 @@ export class InputArea {
       if (this.isSystemWriting()) {
         this.inputRef()?.nativeElement.blur();
       } else {
-        this.inputRef()?.nativeElement.focus();
+        // Only auto-focus if no other element has focus
+        if (
+          !document.activeElement ||
+          document.activeElement === document.body
+        ) {
+          this.inputRef()?.nativeElement.focus();
+        }
       }
     });
   }
@@ -43,8 +51,10 @@ export class InputArea {
     this.toggleSettings.emit(true);
   }
 
-  captureFocus() {
-    this.inputRef()?.nativeElement.focus();
+  handleKeydown(event: KeyboardEvent) {
+    if (this.#gameService.isSystemWriting()) return;
+
+    this.#navigationService.navigateFromInputToChoices(event);
   }
 
   onSubmit() {

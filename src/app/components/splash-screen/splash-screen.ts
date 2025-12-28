@@ -10,6 +10,7 @@ import { typewriter } from "../../utils/typewriter";
 import { FormsModule } from "@angular/forms";
 import { SettingsService } from "../../services/settings-service";
 import { GameService } from "../../services/game-service";
+import { ListItem } from "../../models/game.model";
 
 @Component({
   selector: "app-splash-screen",
@@ -25,7 +26,7 @@ export class SplashScreen implements AfterViewInit {
   #settingsService = inject(SettingsService);
   #gameService = inject(GameService);
 
-  protected displayMessages = signal<string[]>([]);
+  protected displayMessages = signal<ListItem[]>([]);
   protected showButton = signal(false);
 
   #textLoaded = signal(false);
