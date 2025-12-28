@@ -35,7 +35,31 @@ body {
   gap: 8px;
   align-items: center;
   margin-bottom: 8px;
+  flex-wrap: wrap;
+  justify-content: space-between;
 }
+
+.toolbar-section {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-section-right {
+  margin-left: auto;
+}
+
+.button-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+}
+
 
 .panel {
   background: #141924;
@@ -111,6 +135,16 @@ button.secondary {
   background: #1c2432;
   border: 1px solid #243043;
   color: #d8e0ec;
+}
+
+button.secondary.danger {
+  border-color: #3b1d24;
+  color: #f5c2c7;
+}
+
+button.secondary.danger:hover {
+  background: #3c1f27;
+  color: #ffd9de;
 }
 
 .grid-2 {

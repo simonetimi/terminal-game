@@ -4,12 +4,27 @@ import GraphView from "./components/GraphView";
 import NodePanel from "./components/NodePanel";
 import ValidationPanel from "./components/ValidationPanel";
 import schema from "../../../public/assets/data/story-schema.json";
-import defaultStory from "../../../public/assets/data/story.json";
 import { HISTORY_LIMIT, UNDO_COALESCE_WINDOW_MS } from "./config";
 import { StoryData, StoryNode, ValidationIssue, emptyNode } from "./types";
+import { FileDown, FolderOpen, Save as SaveIcon, Trash2 } from "lucide-react";
+
+type FileSystemAccessWindow = Window &
+  typeof globalThis & {
+    showOpenFilePicker?: (
+      ...args: unknown[]
+    ) => Promise<FileSystemFileHandle[]>;
+    showSaveFilePicker?: (...args: unknown[]) => Promise<FileSystemFileHandle>;
+  };
+
+const fsWindow = () => window as FileSystemAccessWindow;
 
 const createValidator = () =>
   new Ajv({ allErrors: true, allowUnionTypes: true }).compile(schema);
+
+const supportsFileSystemAccess =
+  typeof window !== "undefined" &&
+  !!fsWindow().showOpenFilePicker &&
+  !!fsWindow().showSaveFilePicker;
 
 const rewriteNodeReferences = (
   nodes: StoryNode[],
@@ -50,8 +65,10 @@ const rewriteNodeReferences = (
 
 const App: React.FC = () => {
   const [story, setStory] = useState<StoryData>({
-    ...(defaultStory as StoryData),
+    $schema: "story-schema.json",
+    nodes: [],
   });
+
   const [history, setHistory] = useState<{
     past: StoryData[];
     future: StoryData[];
@@ -60,6 +77,12 @@ const App: React.FC = () => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | undefined>();
   const editingNodeIdRef = useRef<string | undefined>(undefined);
   const [issues, setIssues] = useState<ValidationIssue[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [fileHandle, setFileHandle] = useState<FileSystemFileHandle | null>(
+    null,
+  );
+  const [fileName, setFileName] = useState<string>("story.json");
+  const [isSaving, setIsSaving] = useState(false);
 
   const selectedNode = useMemo(
     () => story.nodes.find((n) => n.id === selectedNodeId),
@@ -87,6 +110,19 @@ const App: React.FC = () => {
       setIssues(nextIssues);
     }
   }, [story, validator]);
+
+  const resetStory = (
+    next: StoryData,
+    handle: FileSystemFileHandle | null = null,
+    name?: string,
+  ) => {
+    setStory(next);
+    setHistory({ past: [], future: [] });
+    lastSnapshotTs.current = Date.now();
+    selectNode(undefined);
+    setFileHandle(handle);
+    setFileName(name ?? handle?.name ?? "story.json");
+  };
 
   const applyChange = (
     updater: (prev: StoryData) => StoryData,
@@ -250,63 +286,166 @@ const App: React.FC = () => {
     );
   };
 
-  const download = () => {
-    const blob = new Blob([JSON.stringify(story, null, 2)], {
+  const downloadJson = (data: StoryData, name: string) => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "story.json";
+    a.download = name;
     a.click();
     URL.revokeObjectURL(url);
   };
 
-  const copy = async () => {
-    await navigator.clipboard.writeText(JSON.stringify(story, null, 2));
-  };
+  const download = () => downloadJson(story, fileName || "story.json");
 
-  const importFile = async (file: File) => {
+  const importFile = async (
+    file: File,
+    handle: FileSystemFileHandle | null = null,
+  ) => {
     const text = await file.text();
     const json = JSON.parse(text) as StoryData;
-    applyChange(() => json, { forceSnapshot: true });
+    resetStory(json, handle, file.name ?? handle?.name);
+  };
+
+  const openFromDisk = async () => {
+    if (!supportsFileSystemAccess) return;
+    const w = fsWindow();
+    if (!w.showOpenFilePicker) return;
+    try {
+      const [handle] = await w.showOpenFilePicker({
+        types: [
+          {
+            description: "JSON Files",
+            accept: { "application/json": [".json"] },
+          },
+        ],
+        multiple: false,
+      });
+      const file = await handle.getFile();
+      await importFile(file, handle);
+    } catch (error) {
+      if ((error as DOMException)?.name !== "AbortError") {
+        console.error("Open JSON failed", error);
+      }
+    }
+  };
+
+  const triggerFileDialog = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+      fileInputRef.current.click();
+    }
+  };
+
+  const saveStory = async () => {
+    const data = JSON.stringify(story, null, 2);
+
+    if (!supportsFileSystemAccess) {
+      downloadJson(story, fileName);
+      return;
+    }
+    const w = fsWindow();
+    if (!w.showSaveFilePicker && !fileHandle) {
+      alert("Open a JSON file first, then save.");
+      return;
+    }
+
+    if (!fileHandle) {
+      alert("Open a JSON file first, then save.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const handle = fileHandle;
+      const writable = await handle.createWritable();
+      await writable.write(data);
+      await writable.close();
+
+      setFileHandle(handle);
+      setFileName(handle.name ?? fileName);
+    } catch (error) {
+      if ((error as DOMException)?.name !== "AbortError") {
+        console.error("Save JSON failed", error);
+      }
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const canUndo = history.past.length > 0;
   const canRedo = history.future.length > 0;
-
   return (
     <div className="app-shell">
       <div className="panel panel-column">
         <div className="toolbar">
-          <button onClick={addNode}>+ Node</button>
-          <button
-            className="secondary"
-            onClick={undo}
-            disabled={!canUndo}
-            title="Undo"
-            aria-label="Undo"
-          >
-            ↺
-          </button>
-          <button
-            className="secondary"
-            onClick={redo}
-            disabled={!canRedo}
-            title="Redo"
-            aria-label="Redo"
-          >
-            ↻
-          </button>
-          <button className="secondary" onClick={download}>
-            Export JSON
-          </button>
-          <button className="secondary" onClick={copy}>
-            Copy JSON
-          </button>
-          <label className="badge badge-clickable">
-            Import JSON
+          <div className="toolbar-section">
+            <button onClick={addNode}>+ Node</button>
+            {selectedNode && (
+              <button
+                className="secondary danger"
+                onClick={() => removeNode(selectedNode.id)}
+                title="Delete selected node"
+              >
+                <span className="button-label">
+                  <Trash2 size={16} className="icon" />
+                  <span>Delete</span>
+                </span>
+              </button>
+            )}
+            <button
+              className="secondary"
+              onClick={undo}
+              disabled={!canUndo}
+              title="Undo"
+              aria-label="Undo"
+            >
+              ↺
+            </button>
+            <button
+              className="secondary"
+              onClick={redo}
+              disabled={!canRedo}
+              title="Redo"
+              aria-label="Redo"
+            >
+              ↻
+            </button>
+          </div>
+          <div className="toolbar-section toolbar-section-right">
+            <button
+              className="secondary"
+              onClick={() =>
+                supportsFileSystemAccess ? openFromDisk() : triggerFileDialog()
+              }
+              title={supportsFileSystemAccess ? "Open" : "Import"}
+            >
+              <span className="button-label">
+                <FolderOpen size={16} className="icon" />
+                <span>Open</span>
+              </span>
+            </button>
+            <button
+              className="secondary"
+              onClick={saveStory}
+              disabled={isSaving}
+              title="Save"
+            >
+              <span className="button-label">
+                <SaveIcon size={16} className="icon" />
+                <span>Save</span>
+              </span>
+            </button>
+            <button className="secondary" onClick={download} title="Export">
+              <span className="button-label">
+                <FileDown size={16} className="icon" />
+                <span>Export</span>
+              </span>
+            </button>
             <input
+              ref={fileInputRef}
               type="file"
               accept="application/json"
               className="hidden-input"
@@ -315,15 +454,7 @@ const App: React.FC = () => {
                 if (file) importFile(file);
               }}
             />
-          </label>
-          {selectedNode && (
-            <button
-              className="secondary"
-              onClick={() => removeNode(selectedNode.id)}
-            >
-              Delete selected
-            </button>
-          )}
+          </div>
         </div>
         <div className="panel-content">
           <GraphView

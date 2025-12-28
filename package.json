@@ -9,6 +9,7 @@
     "test": "ng test",
     "release": "git checkout main && git pull && npm version patch && git push && vercel --prod",
     "lint": "ng lint",
+    "install-editor": "npm i --prefix ./tools/story-editor",
     "editor": "npm run dev --prefix ./tools/story-editor"
   },
   "prettier": {

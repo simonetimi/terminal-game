@@ -5,7 +5,7 @@ Simulated terminal rpg text-based game
 ## Instructions
 
 - Local web server: ```npm run dev```
-- Story editor: ```npm run editor```
+- Story editor: ```npm run editor``` (install first using ```npm run install-editor```)
 
 ## Features
 
