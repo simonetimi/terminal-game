@@ -1,5 +1,7 @@
 <div class="fixed inset-0 bg-overlay flex items-center justify-center z-50">
-  <div class="bg-panel border border-(--color-accent) p-6 max-w-md w-full mx-4">
+  <div
+    class="bg-panel border border-(--color-accent) p-6 pb-3 max-w-md w-full mx-4 flex flex-col"
+  >
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-xl font-bold text-(--color-accent)">
         {{ "settings.title" | translate }}
@@ -14,13 +16,6 @@
     </div>
 
     <div class="space-y-6">
-      <div class="border-b border-(--color-accent) pb-4">
-        <h3 class="text-(--color-accent) mb-2">
-          {{ "settings.version" | translate | uppercase }}
-        </h3>
-        <p class="text-(--color-link)">{{ appVersion }}</p>
-      </div>
-
       <div>
         <h3 class="text-(--color-accent) mb-2">
           {{ "settings.writingSpeed.title" | translate | uppercase }}
@@ -115,5 +110,6 @@
         {{ "settings.close" | translate | uppercase }}
       </button>
     </div>
+    <span class="self-end text-xs pt-5">{{ appVersion }}</span>
   </div>
 </div>

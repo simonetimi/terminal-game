@@ -1,7 +1,6 @@
 import { inject, Injectable, signal } from "@angular/core";
 import { CONFIG } from "../lib/config";
-
-import { version } from "../../../package.json";
+import { environment } from "@environments/environment";
 
 import { PersistenceService } from "./persistence-service";
 
@@ -13,7 +12,7 @@ export class SettingsService {
 
   typewriterSpeed = signal<number>(CONFIG.TYPEWRITER_SPEED);
   soundsEnabled = signal(true);
-  appVersion = version;
+  appVersion = environment.appVersion;
 
   constructor() {
     const savedSpeed = this.#persistenceService.loadTypewriterSpeed();

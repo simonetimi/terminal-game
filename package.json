@@ -1,13 +1,14 @@
 {
   "name": "terminal",
-  "version": "0.0.0-alpha-4",
+  "version": "0.0.0-alpha.4",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "release": "git checkout main && git pull && npm version patch && git push && vercel --prod",
+    "update-version": "node scripts/update-version.mjs",
+    "release": "git checkout main && git pull && npm version prerelease --no-git-tag-version && npm run update-version && git add package.json package-lock.json src/environments/*.ts && git commit -m \"Bump version to $(node -p \"require('./package.json').version\")\" && git push && git tag v$(node -p \"require('./package.json').version\") && git push --tags",
     "lint": "ng lint",
     "install-editor": "npm i --prefix ./tools/story-editor",
     "editor": "npm run dev --prefix ./tools/story-editor"
@@ -44,18 +45,15 @@
     "@angular/cli": "^21.0.3",
     "@angular/compiler-cli": "^21.0.5",
     "@types/jasmine": "~5.1.0",
-    "angular-eslint": "21.1.0",
+    "angular-eslint": "^21.2.0",
     "eslint": "^9.39.1",
     "jasmine-core": "~5.13.0",
+    "jsdom": "^28.0.0",
     "jsonc-parser": "^3.3.1",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
     "postcss": "^8.5.3",
     "prettier": "^3.7.4",
     "typescript": "~5.9.3",
-    "typescript-eslint": "8.47.0"
+    "typescript-eslint": "^8.54.0",
+    "vitest": "^4.0.18"
   }
 }
