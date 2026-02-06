@@ -32,6 +32,11 @@
       "fast": "Veloce",
       "speed": "Velocità"
     },
+    "scrollbar": {
+      "title": "Indicatore di scorrimento verticale",
+      "enabled": "Indicatore abilitato",
+      "disabled": "Indicatore disabilitato"
+    },
     "audio": {
       "title": "Audio",
       "enabled": "Suoni abilitati",

@@ -12,6 +12,7 @@ export class SettingsService {
 
   typewriterSpeed = signal<number>(CONFIG.TYPEWRITER_SPEED);
   soundsEnabled = signal(true);
+  scrollbarEnabled = signal(false);
   appVersion = environment.appVersion;
 
   constructor() {
@@ -21,6 +22,11 @@ export class SettingsService {
     const soundsEnabledSaved = this.#persistenceService.loadSoundsEnabled();
     if (soundsEnabledSaved !== undefined)
       this.soundsEnabled.set(soundsEnabledSaved);
+
+    const scrollbarEnabledSaved =
+      this.#persistenceService.loadScrollbarEnabled();
+    if (scrollbarEnabledSaved !== undefined)
+      this.scrollbarEnabled.set(scrollbarEnabledSaved);
   }
 
   setTypewriterSpeed(speed: number) {
@@ -31,5 +37,10 @@ export class SettingsService {
   setSoundsEnabled(enabled: boolean) {
     this.soundsEnabled.set(enabled);
     this.#persistenceService.saveSoundsEnabled(enabled);
+  }
+
+  setScrollbarEnabled(enabled: boolean) {
+    this.scrollbarEnabled.set(enabled);
+    this.#persistenceService.saveScrollbarEnabled(enabled);
   }
 }

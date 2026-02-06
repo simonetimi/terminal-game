@@ -23,6 +23,7 @@ export class Settings {
   protected appVersion = this.#settingsService.appVersion;
   protected typewriterSpeed = this.#settingsService.typewriterSpeed;
   protected soundsEnabled = this.#settingsService.soundsEnabled;
+  protected scrollbarEnabled = this.#settingsService.scrollbarEnabled;
   protected isRestarting = signal(false);
 
   protected themeOptions = THEME_OPTIONS;
@@ -47,6 +48,11 @@ export class Settings {
   protected onSoundsToggle(event: Event) {
     const target = event.target as HTMLInputElement;
     this.#settingsService.setSoundsEnabled(target.checked);
+  }
+
+  protected onScrollbarToggle(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.#settingsService.setScrollbarEnabled(target.checked);
   }
 
   protected onRestartGame() {

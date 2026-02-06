@@ -70,6 +70,14 @@ export class PersistenceService {
     return this.load("soundsEnabled");
   }
 
+  saveScrollbarEnabled(enabled: boolean) {
+    this.save("scrollbarEnabled", enabled);
+  }
+
+  loadScrollbarEnabled(): boolean {
+    return this.load("scrollbarEnabled");
+  }
+
   saveTheme(theme: string) {
     this.save("theme", theme);
   }

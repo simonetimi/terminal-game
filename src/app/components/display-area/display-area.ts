@@ -9,6 +9,7 @@ import {
 import { GameService } from "../../services/game-service";
 import { GAME_CHOICE_CLASS } from "../../models/game-state";
 import { NavigationService } from "../../services/navigation-service";
+import { SettingsService } from "../../services/settings-service";
 
 @Component({
   selector: "app-display-area",
@@ -16,14 +17,19 @@ import { NavigationService } from "../../services/navigation-service";
   templateUrl: "./display-area.html",
   styleUrl: "./display-area.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    "[class.hide-scrollbar]": "!scrollbarEnabled()",
+  },
 })
 export class DisplayArea {
   #gameService = inject(GameService);
   #navigationService = inject(NavigationService);
+  #settingsService = inject(SettingsService);
 
   protected scrollContainer = viewChild<ElementRef>("scrollContainer");
 
   protected displayItems = this.#gameService.displayItems;
+  protected scrollbarEnabled = this.#settingsService.scrollbarEnabled;
 
   constructor() {
     this.#gameService.initStory();
