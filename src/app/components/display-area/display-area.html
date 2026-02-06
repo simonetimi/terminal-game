@@ -1,8 +1,5 @@
-<div class="h-full overflow-hidden">
-  <ul
-    #scrollContainer
-    class="list-none h-full overflow-y-auto flex flex-col justify-end"
-  >
+<div class="h-full overflow-hidden flex flex-col justify-end">
+  <ul #scrollContainer class="list-none overflow-y-auto flex flex-col">
     @for (item of displayItems(); track $index) {
       <li
         [innerHTML]="item.text"

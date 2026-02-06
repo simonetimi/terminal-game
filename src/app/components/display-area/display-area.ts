@@ -32,7 +32,9 @@ export class DisplayArea {
       this.displayItems();
       const container = this.scrollContainer()?.nativeElement;
       if (container) {
-        container.scrollTop = container.scrollHeight;
+        requestAnimationFrame(() => {
+          container.scrollTop = container.scrollHeight;
+        });
       }
     });
   }
