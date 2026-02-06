@@ -16,31 +16,29 @@ export class SettingsService {
   appVersion = environment.appVersion;
 
   constructor() {
-    const savedSpeed = this.#persistenceService.loadTypewriterSpeed();
-    if (savedSpeed) this.typewriterSpeed.set(savedSpeed);
+    const settings = this.#persistenceService.loadSettings();
 
-    const soundsEnabledSaved = this.#persistenceService.loadSoundsEnabled();
-    if (soundsEnabledSaved !== undefined)
-      this.soundsEnabled.set(soundsEnabledSaved);
+    if (settings.typewriterSpeed)
+      this.typewriterSpeed.set(settings.typewriterSpeed);
 
-    const scrollbarEnabledSaved =
-      this.#persistenceService.loadScrollbarEnabled();
-    if (scrollbarEnabledSaved !== undefined)
-      this.scrollbarEnabled.set(scrollbarEnabledSaved);
+    if (settings.soundsEnabled) this.soundsEnabled.set(settings.soundsEnabled);
+
+    if (settings.scrollbarEnabled)
+      this.scrollbarEnabled.set(settings.scrollbarEnabled);
   }
 
   setTypewriterSpeed(speed: number) {
     this.typewriterSpeed.set(speed);
-    this.#persistenceService.saveTypewriterSpeed(speed);
+    this.#persistenceService.updateSettings({ typewriterSpeed: speed });
   }
 
   setSoundsEnabled(enabled: boolean) {
     this.soundsEnabled.set(enabled);
-    this.#persistenceService.saveSoundsEnabled(enabled);
+    this.#persistenceService.updateSettings({ soundsEnabled: enabled });
   }
 
   setScrollbarEnabled(enabled: boolean) {
     this.scrollbarEnabled.set(enabled);
-    this.#persistenceService.saveScrollbarEnabled(enabled);
+    this.#persistenceService.updateSettings({ scrollbarEnabled: enabled });
   }
 }

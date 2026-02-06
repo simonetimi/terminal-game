@@ -1,17 +1,46 @@
 import { Injectable } from "@angular/core";
 import { SavedPlayerData } from "../models/game-state";
 
+export interface PersistedSettings {
+  typewriterSpeed?: number;
+  soundsEnabled?: boolean;
+  scrollbarEnabled?: boolean;
+  theme?: string;
+}
+
 @Injectable({
   providedIn: "root",
 })
 export class PersistenceService {
+  static readonly SETTINGS_KEY = "settings";
+
   save(key: string, data: unknown) {
     localStorage.setItem(key, JSON.stringify(data));
   }
 
   load(key: string) {
     const result = localStorage.getItem(key);
-    if (result) return JSON.parse(result);
+    if (!result) return;
+    try {
+      return JSON.parse(result);
+    } catch {
+      return;
+    }
+  }
+
+  loadSettings(): PersistedSettings {
+    const value = this.load(PersistenceService.SETTINGS_KEY);
+    if (!value || typeof value !== "object") return {};
+    return value as PersistedSettings;
+  }
+
+  saveSettings(settings: PersistedSettings) {
+    this.save(PersistenceService.SETTINGS_KEY, settings);
+  }
+
+  updateSettings(patch: PersistedSettings) {
+    const current = this.loadSettings();
+    this.saveSettings({ ...current, ...patch });
   }
 
   savePlayerData(data: SavedPlayerData) {
@@ -54,44 +83,13 @@ export class PersistenceService {
     return this.load("choiceHistory") ?? [];
   }
 
-  saveTypewriterSpeed(speed: number) {
-    this.save("typewriterSpeed", speed);
-  }
-
-  loadTypewriterSpeed(): number {
-    return this.load("typewriterSpeed");
-  }
-
-  saveSoundsEnabled(enabled: boolean) {
-    this.save("soundsEnabled", enabled);
-  }
-
-  loadSoundsEnabled(): boolean {
-    return this.load("soundsEnabled");
-  }
-
-  saveScrollbarEnabled(enabled: boolean) {
-    this.save("scrollbarEnabled", enabled);
-  }
-
-  loadScrollbarEnabled(): boolean {
-    return this.load("scrollbarEnabled");
-  }
-
-  saveTheme(theme: string) {
-    this.save("theme", theme);
-  }
-
-  loadTheme(): string {
-    return this.load("theme");
-  }
-
   clearAllDataAndRefresh() {
     localStorage.removeItem("player");
     localStorage.removeItem("visitedNodes");
     localStorage.removeItem("currentNode");
     localStorage.removeItem("freeInputsHistory");
     localStorage.removeItem("choiceHistory");
+    localStorage.removeItem(PersistenceService.SETTINGS_KEY);
     location.reload();
   }
 }

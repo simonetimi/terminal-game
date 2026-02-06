@@ -30,7 +30,7 @@ export class App implements OnInit {
 
   ngOnInit() {
     this.#titleService.setTitle(this.#translateService.instant("app.title"));
-    const theme = this.#persistenceService.loadTheme();
+    const theme = this.#persistenceService.loadSettings().theme;
     if (theme) document.documentElement.setAttribute("data-theme", theme);
   }
 

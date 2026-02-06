@@ -32,7 +32,7 @@ export class Settings {
   );
 
   constructor() {
-    const theme = this.#persistenceService.loadTheme();
+    const theme = this.#persistenceService.loadSettings().theme;
     if (theme) this.currentTheme.set(theme);
   }
 
@@ -63,7 +63,7 @@ export class Settings {
   protected onThemeChange(theme: string) {
     document.documentElement.setAttribute("data-theme", theme);
     this.currentTheme.set(theme);
-    this.#persistenceService.saveTheme(theme);
+    this.#persistenceService.updateSettings({ theme });
   }
 
   protected handleKeydown(event: KeyboardEvent) {
