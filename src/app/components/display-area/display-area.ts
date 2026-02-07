@@ -2,10 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   effect,
-  ElementRef,
   inject,
   viewChild,
 } from "@angular/core";
+import {
+  CdkVirtualScrollViewport,
+  ScrollingModule,
+} from "@angular/cdk/scrolling";
+import { ScrollingModule as ExperimentalScrollingModule } from "@angular/cdk-experimental/scrolling";
 import { GameService } from "../../services/game-service";
 import { GAME_CHOICE_CLASS } from "../../models/game-state";
 import { NavigationService } from "../../services/navigation-service";
@@ -14,7 +18,7 @@ import { DOM_ATTRIBUTES, KEYBOARD_KEYS } from "../../lib/constants";
 
 @Component({
   selector: "app-display-area",
-  imports: [],
+  imports: [ScrollingModule, ExperimentalScrollingModule],
   templateUrl: "./display-area.html",
   styleUrl: "./display-area.css",
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,7 +31,9 @@ export class DisplayArea {
   #navigationService = inject(NavigationService);
   #settingsService = inject(SettingsService);
 
-  protected scrollContainer = viewChild<ElementRef>("scrollContainer");
+  protected scrollContainer =
+    viewChild<CdkVirtualScrollViewport>("scrollContainer");
+  protected readonly trackByIndex = (index: number) => index;
 
   protected displayItems = this.#gameService.displayItems;
   protected scrollbarEnabled = this.#settingsService.scrollbarEnabled;
@@ -36,13 +42,14 @@ export class DisplayArea {
     this.#gameService.initStory();
 
     effect(() => {
-      this.displayItems();
-      const container = this.scrollContainer()?.nativeElement;
-      if (container) {
-        requestAnimationFrame(() => {
-          container.scrollTop = container.scrollHeight;
-        });
-      }
+      const items = this.displayItems();
+      const viewport = this.scrollContainer();
+
+      if (!viewport || !items.length) return;
+
+      requestAnimationFrame(() => {
+        viewport.scrollTo({ bottom: 0 });
+      });
     });
   }
 

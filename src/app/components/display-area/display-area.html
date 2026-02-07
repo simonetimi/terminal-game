@@ -1,7 +1,18 @@
 <div class="h-full overflow-hidden flex flex-col justify-end">
-  <ul #scrollContainer class="list-none overflow-y-auto flex flex-col">
-    @for (item of displayItems(); track $index) {
+  <cdk-virtual-scroll-viewport
+    #scrollContainer
+    class="h-full w-full overflow-y-auto"
+    autosize
+    minBufferPx="600"
+    maxBufferPx="1200"
+  >
+    <ul class="list-none flex flex-col">
       <li
+        *cdkVirtualFor="
+          let item of displayItems();
+          let i = index;
+          trackBy: trackByIndex
+        "
         [innerHTML]="item.text"
         [attr.data-choice-num]="item.choiceNumber"
         (click)="handleChoiceClick($event)"
@@ -12,6 +23,6 @@
             : null
         "
       ></li>
-    }
-  </ul>
+    </ul>
+  </cdk-virtual-scroll-viewport>
 </div>
