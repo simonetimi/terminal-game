@@ -1,12 +1,16 @@
 import { Injectable } from "@angular/core";
 import { GAME_CHOICE_CLASS } from "../models/game-state";
+import { DOM_SELECTORS, KEYBOARD_KEYS } from "../lib/constants";
 
 @Injectable({
   providedIn: "root",
 })
 export class NavigationService {
   navigateFromInputToChoices(event: KeyboardEvent): boolean {
-    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") {
+    if (
+      event.key !== KEYBOARD_KEYS.arrowUp &&
+      event.key !== KEYBOARD_KEYS.arrowDown
+    ) {
       return false;
     }
 
@@ -21,7 +25,9 @@ export class NavigationService {
 
     // navigate to last choice on ArrowUp, first choice on ArrowDown
     const targetChoice =
-      event.key === "ArrowUp" ? choices[choices.length - 1] : choices[0];
+      event.key === KEYBOARD_KEYS.arrowUp
+        ? choices[choices.length - 1]
+        : choices[0];
     targetChoice.focus();
     return true;
   }
@@ -30,7 +36,10 @@ export class NavigationService {
     event: KeyboardEvent,
     currentElement: HTMLElement,
   ): boolean {
-    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") {
+    if (
+      event.key !== KEYBOARD_KEYS.arrowUp &&
+      event.key !== KEYBOARD_KEYS.arrowDown
+    ) {
       return false;
     }
 
@@ -49,7 +58,7 @@ export class NavigationService {
     }
 
     let nextIndex: number;
-    if (event.key === "ArrowDown") {
+    if (event.key === KEYBOARD_KEYS.arrowDown) {
       nextIndex = currentIndex + 1;
       if (nextIndex >= choices.length) {
         // reached the end, cycle to input
@@ -71,7 +80,9 @@ export class NavigationService {
   }
 
   private focusInput(): void {
-    const input = document.querySelector(".terminal-input") as HTMLElement;
+    const input = document.querySelector(
+      DOM_SELECTORS.terminalInput,
+    ) as HTMLElement | null;
     if (input) {
       input.focus();
     }

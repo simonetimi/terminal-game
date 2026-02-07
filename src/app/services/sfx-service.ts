@@ -1,30 +1,31 @@
 import { inject, Injectable } from "@angular/core";
 import { SettingsService } from "./settings-service";
 import { Sfx } from "../models/game-state";
+import { ASSET_PATHS, AUDIO_CONFIG, SFX_KEYS } from "../lib/constants";
 
 @Injectable({
   providedIn: "root",
 })
 export class SfxService {
   #settingsService = inject(SettingsService);
-  #path = "assets/sounds/";
-  #ext = ".wav";
+  #sounds: Sfx[] = Object.values(SFX_KEYS);
 
-  #sounds: Sfx[] = ["blip", "win", "lose", "hurt"];
-
-  public AUDIO_MAP: Record<string, HTMLAudioElement> = {};
+  public readonly AUDIO_MAP = {} as Record<Sfx, HTMLAudioElement>;
 
   constructor() {
     for (const sound of this.#sounds) {
-      const audioElement = new Audio(this.#path + sound + this.#ext);
+      const audioElement = new Audio(
+        ASSET_PATHS.soundsBase + sound + AUDIO_CONFIG.sfxExtension,
+      );
       audioElement.load();
-      audioElement.volume = 0.6;
+      audioElement.volume = AUDIO_CONFIG.defaultSfxVolume;
       this.AUDIO_MAP[sound] = audioElement;
     }
   }
 
-  playAudio(key: string) {
-    if (key === "blip" && !this.#settingsService.terminalBeepEnabled()) return;
+  playAudio(key: Sfx) {
+    if (key === SFX_KEYS.blip && !this.#settingsService.terminalBeepEnabled())
+      return;
     if (!this.#settingsService.sfxEnabled()) return;
 
     const audio = this.AUDIO_MAP[key];

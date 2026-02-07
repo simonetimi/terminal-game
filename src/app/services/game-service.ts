@@ -19,6 +19,7 @@ import { SettingsService } from "./settings-service";
 import Fuse from "fuse.js";
 import { httpResource } from "@angular/common/http";
 import { ListItem } from "../models/game.model";
+import { ASSET_PATHS, KEYBOARD_KEYS } from "../lib/constants";
 
 @Injectable({
   providedIn: "root",
@@ -35,7 +36,7 @@ export class GameService {
   freeInputsHistory: string[] = [];
   choiceHistory: string[] = [];
 
-  gameData = httpResource<GameData>(() => "/assets/data/story.json");
+  gameData = httpResource<GameData>(() => ASSET_PATHS.storyJson);
   nodes: GameNode[] = [];
 
   isSystemWriting = signal(false);
@@ -48,7 +49,8 @@ export class GameService {
   constructor() {
     window.addEventListener("keydown", (event) => {
       if (
-        (event.key === "Enter" || event.key === " ") &&
+        (event.key === KEYBOARD_KEYS.enter ||
+          event.key === KEYBOARD_KEYS.space) &&
         this.isSystemWriting()
       ) {
         this.skipAnimation();

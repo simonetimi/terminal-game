@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { SavedPlayerData } from "../models/game-state";
+import { STORAGE_KEYS } from "../lib/constants";
 
 export interface PersistedSettings {
   typewriterSpeed: number;
@@ -13,7 +14,7 @@ export interface PersistedSettings {
   providedIn: "root",
 })
 export class PersistenceService {
-  static readonly SETTINGS_KEY = "settings";
+  static readonly SETTINGS_KEY = STORAGE_KEYS.settings;
 
   save(key: string, data: unknown) {
     localStorage.setItem(key, JSON.stringify(data));
@@ -36,51 +37,51 @@ export class PersistenceService {
   }
 
   savePlayerData(data: SavedPlayerData) {
-    this.save("player", data);
+    this.save(STORAGE_KEYS.player, data);
   }
 
   loadPlayerData(): SavedPlayerData {
-    return this.load("player");
+    return this.load(STORAGE_KEYS.player);
   }
 
   saveVisitedNodes(nodeIds: string[]) {
-    this.save("visitedNodes", nodeIds);
+    this.save(STORAGE_KEYS.visitedNodes, nodeIds);
   }
 
   loadVisitedNodes(): string[] {
-    return this.load("visitedNodes");
+    return this.load(STORAGE_KEYS.visitedNodes);
   }
 
   saveCurrentNodeId(nodeId: string) {
-    this.save("currentNode", nodeId);
+    this.save(STORAGE_KEYS.currentNode, nodeId);
   }
 
   loadCurrentNodeId(): string {
-    return this.load("currentNode");
+    return this.load(STORAGE_KEYS.currentNode);
   }
 
   saveFreeInputsHistory(freeInputsHistory: string[]) {
-    this.save("freeInputsHistory", freeInputsHistory);
+    this.save(STORAGE_KEYS.freeInputsHistory, freeInputsHistory);
   }
 
   loadFreeInputsHistory(): string[] {
-    return this.load("freeInputsHistory");
+    return this.load(STORAGE_KEYS.freeInputsHistory);
   }
 
   saveChoiceHistory(history: string[]) {
-    this.save("choiceHistory", history);
+    this.save(STORAGE_KEYS.choiceHistory, history);
   }
 
   loadChoiceHistory(): string[] {
-    return this.load("choiceHistory") ?? [];
+    return this.load(STORAGE_KEYS.choiceHistory) ?? [];
   }
 
   clearAllDataAndRefresh() {
-    localStorage.removeItem("player");
-    localStorage.removeItem("visitedNodes");
-    localStorage.removeItem("currentNode");
-    localStorage.removeItem("freeInputsHistory");
-    localStorage.removeItem("choiceHistory");
+    localStorage.removeItem(STORAGE_KEYS.player);
+    localStorage.removeItem(STORAGE_KEYS.visitedNodes);
+    localStorage.removeItem(STORAGE_KEYS.currentNode);
+    localStorage.removeItem(STORAGE_KEYS.freeInputsHistory);
+    localStorage.removeItem(STORAGE_KEYS.choiceHistory);
     localStorage.removeItem(PersistenceService.SETTINGS_KEY);
     location.reload();
   }

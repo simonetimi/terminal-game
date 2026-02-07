@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
 import { CONFIG, DEFAULT_THEME } from "../lib/config";
 import { environment } from "@environments/environment";
+import { DOM_ATTRIBUTES } from "../lib/constants";
 
 import { PersistenceService } from "./persistence-service";
 
@@ -40,7 +41,10 @@ export class SettingsService {
       this.#settings.set(saved);
     }
 
-    document.documentElement.setAttribute("data-theme", this.#settings().theme);
+    document.documentElement.setAttribute(
+      DOM_ATTRIBUTES.theme,
+      this.#settings().theme,
+    );
   }
 
   setTypewriterSpeed(speed: number) {
@@ -77,7 +81,7 @@ export class SettingsService {
       ...current,
       theme,
     }));
-    document.documentElement.setAttribute("data-theme", theme);
+    document.documentElement.setAttribute(DOM_ATTRIBUTES.theme, theme);
     this.#persistenceService.saveSettings(this.#settings());
   }
 }

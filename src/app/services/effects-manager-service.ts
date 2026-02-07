@@ -2,6 +2,7 @@ import { inject, Injectable } from "@angular/core";
 import { SfxService } from "./sfx-service";
 import { VfxService } from "./vfx-service";
 import { GameNode } from "../models/game-state";
+import { SFX_KEYS } from "../lib/constants";
 
 @Injectable({ providedIn: "root" })
 export class EffectsManagerService {
@@ -13,7 +14,7 @@ export class EffectsManagerService {
     if (node.sfx) {
       this.#sfxService.playAudio(node.sfx);
     } else {
-      this.#sfxService.playAudio("blip");
+      this.#sfxService.playAudio(SFX_KEYS.blip);
     }
 
     // play visual effect if specified

@@ -10,6 +10,7 @@ import { GameService } from "../../services/game-service";
 import { GAME_CHOICE_CLASS } from "../../models/game-state";
 import { NavigationService } from "../../services/navigation-service";
 import { SettingsService } from "../../services/settings-service";
+import { DOM_ATTRIBUTES, KEYBOARD_KEYS } from "../../lib/constants";
 
 @Component({
   selector: "app-display-area",
@@ -53,7 +54,10 @@ export class DisplayArea {
     const target = event.target as HTMLElement;
 
     // handle arrow key navigation between choices
-    if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+    if (
+      event.key === KEYBOARD_KEYS.arrowUp ||
+      event.key === KEYBOARD_KEYS.arrowDown
+    ) {
       if (target.classList.contains(GAME_CHOICE_CLASS)) {
         this.#navigationService.navigateBetweenChoices(event, target);
         return;
@@ -61,7 +65,10 @@ export class DisplayArea {
     }
 
     // Handle choice selection
-    if (event.key === "Enter" || event.key === " ") {
+    if (
+      event.key === KEYBOARD_KEYS.enter ||
+      event.key === KEYBOARD_KEYS.space
+    ) {
       event.preventDefault();
       event.stopPropagation(); // prevent the global keydown listener from firing
       this.#handleChoiceInteraction(event);
@@ -75,7 +82,7 @@ export class DisplayArea {
 
     if (target.classList.contains(GAME_CHOICE_CLASS)) {
       const li = target.closest("li");
-      const choiceNum = li?.getAttribute("data-choice-num");
+      const choiceNum = li?.getAttribute(DOM_ATTRIBUTES.choiceNum);
 
       if (choiceNum) {
         (document.activeElement as HTMLElement | null)?.blur();

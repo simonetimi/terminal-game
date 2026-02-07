@@ -12,6 +12,7 @@ import { provideTranslateService } from "@ngx-translate/core";
 import { provideTranslateHttpLoader } from "@ngx-translate/http-loader";
 import { provideHttpClient } from "@angular/common/http";
 import { initializeTranslations } from "./translate.config";
+import { ASSET_PATHS } from "./lib/constants";
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,8 +22,8 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideTranslateService({
       loader: provideTranslateHttpLoader({
-        prefix: "assets/i18n/",
-        suffix: ".json",
+        prefix: ASSET_PATHS.i18nPrefix,
+        suffix: ASSET_PATHS.i18nSuffix,
       }),
     }),
     provideAppInitializer(initializeTranslations),

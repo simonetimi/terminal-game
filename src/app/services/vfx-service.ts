@@ -3,6 +3,12 @@ import gsap from "gsap";
 import { CONFIG } from "../lib/config";
 import { VfxOptions } from "../models/vfx.model";
 import { Vfx } from "../models/game-state";
+import {
+  DATASET_KEYS,
+  MEDIA_QUERIES,
+  VFX_CLASSES,
+  VFX_EVENTS,
+} from "../lib/constants";
 
 @Injectable({ providedIn: "root" })
 export class VfxService {
@@ -104,13 +110,15 @@ export class VfxService {
   }
 
   #createGrainOverlay(parentElement: HTMLElement) {
-    const existingGrain = parentElement.querySelector(".vfx-grain-overlay");
+    const existingGrain = parentElement.querySelector(
+      `.${VFX_CLASSES.grainOverlay}`,
+    );
     if (existingGrain) {
       existingGrain.remove();
     }
 
     const grain = document.createElement("div");
-    grain.className = "vfx-grain-overlay";
+    grain.className = VFX_CLASSES.grainOverlay;
 
     Object.assign(grain.style, {
       position: "absolute",
@@ -164,9 +172,9 @@ export class VfxService {
     const element = document.querySelector(selector) as HTMLElement | null;
     if (!element) return;
 
-    element.dataset["glitching"] = "true";
+    element.dataset[DATASET_KEYS.glitching] = "true";
     element.dispatchEvent(
-      new CustomEvent("glitch-starting", {
+      new CustomEvent(VFX_EVENTS.glitchStarting, {
         detail: { duration: duration * 1000 },
         bubbles: true,
         composed: true,
@@ -180,7 +188,7 @@ export class VfxService {
     }
 
     const overlay = document.createElement("div");
-    overlay.className = "vfx-glitch-overlay";
+    overlay.className = VFX_CLASSES.glitchOverlay;
     Object.assign(overlay.style, {
       position: "absolute",
       inset: "0",
@@ -205,7 +213,7 @@ export class VfxService {
     overlay.style.setProperty("--vfx-shake-rot", "0deg");
 
     const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
+      MEDIA_QUERIES.prefersReducedMotion,
     ).matches;
     const prevTransform = element.style.transform;
     let jitterTimer: number | null = null;
@@ -277,9 +285,12 @@ export class VfxService {
       if (prevPos === "static") {
         element.style.position = "";
       }
-      delete element.dataset["glitching"];
+      delete element.dataset[DATASET_KEYS.glitching];
       element.dispatchEvent(
-        new CustomEvent("glitch-ended", { bubbles: true, composed: true }),
+        new CustomEvent(VFX_EVENTS.glitchEnded, {
+          bubbles: true,
+          composed: true,
+        }),
       );
     }, duration * 1000);
   }
@@ -299,7 +310,7 @@ export class VfxService {
     if (!element) return;
 
     // remove grain overlay
-    const grain = element.querySelector(".vfx-grain-overlay");
+    const grain = element.querySelector(`.${VFX_CLASSES.grainOverlay}`);
     if (grain) {
       gsap.to(grain, {
         opacity: 0,
