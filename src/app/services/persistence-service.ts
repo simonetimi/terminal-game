@@ -82,7 +82,10 @@ export class PersistenceService {
     localStorage.removeItem(STORAGE_KEYS.currentNode);
     localStorage.removeItem(STORAGE_KEYS.freeInputsHistory);
     localStorage.removeItem(STORAGE_KEYS.choiceHistory);
-    localStorage.removeItem(PersistenceService.SETTINGS_KEY);
     location.reload();
+  }
+
+  clearSettings() {
+    localStorage.removeItem(PersistenceService.SETTINGS_KEY);
   }
 }
