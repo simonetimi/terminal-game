@@ -6,7 +6,11 @@
         [attr.data-choice-num]="item.choiceNumber"
         (click)="handleChoiceClick($event)"
         (keydown)="handleChoiceKeydown($event)"
-        role="presentation"
+        [attr.tabindex]="
+          item.choiceNumber !== null && item.choiceNumber !== undefined
+            ? 0
+            : null
+        "
       ></li>
     }
   </ul>
