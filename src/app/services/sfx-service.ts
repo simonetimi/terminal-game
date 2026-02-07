@@ -24,7 +24,9 @@ export class SfxService {
   }
 
   playAudio(key: string) {
-    if (!this.#settingsService.soundsEnabled()) return;
+    if (key === "blip" && !this.#settingsService.terminalBeepEnabled()) return;
+    if (!this.#settingsService.sfxEnabled()) return;
+
     const audio = this.AUDIO_MAP[key];
     audio.currentTime = 0;
     audio.play();

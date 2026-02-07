@@ -12,15 +12,15 @@ export class VfxService {
   play(effectName: string, options: VfxOptions = {}) {
     const effects: Record<string, () => void> = {
       shake: () =>
-        this.#shake(options.selector || CONFIG.DEFAULT_SCREEN_SELECTOR),
+        this.#shake(options.selector || CONFIG.defaultScreenSelector),
       dark: () =>
         this.#dark(
-          options.selector || CONFIG.DEFAULT_SCREEN_SELECTOR,
+          options.selector || CONFIG.defaultScreenSelector,
           options.duration || 2,
         ),
       glitch: () =>
         this.#glitch(
-          options.selector || CONFIG.DEFAULT_SCREEN_SELECTOR,
+          options.selector || CONFIG.defaultScreenSelector,
           options.duration || 1,
         ),
     };
@@ -285,7 +285,7 @@ export class VfxService {
   }
 
   removeEffects(
-    selector: string = CONFIG.DEFAULT_SCREEN_SELECTOR,
+    selector: string = CONFIG.defaultScreenSelector,
     duration = 1.5,
   ) {
     this.#permanentEffects.clear();

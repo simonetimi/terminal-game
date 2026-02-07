@@ -39,8 +39,10 @@
     },
     "audio": {
       "title": "Audio",
-      "enabled": "Suoni abilitati",
-      "disabled": "Suoni disabilitati"
+      "sfxEnabled": "Suoni della storia abilitati",
+      "sfxDisabled": "Suoni della storia disabilitati",
+      "terminalBeepEnabled": "Suoni terminale abilitati",
+      "terminalBeepDisabled": "Suoni terminale disabilitati"
     },
     "theme": {
       "title": "Temi",

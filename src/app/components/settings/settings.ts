@@ -22,19 +22,13 @@ export class Settings {
 
   protected appVersion = this.#settingsService.appVersion;
   protected typewriterSpeed = this.#settingsService.typewriterSpeed;
-  protected soundsEnabled = this.#settingsService.soundsEnabled;
+  protected sfxEnabled = this.#settingsService.sfxEnabled;
+  protected terminalBeepEnabled = this.#settingsService.terminalBeepEnabled;
   protected scrollbarEnabled = this.#settingsService.scrollbarEnabled;
   protected isRestarting = signal(false);
 
   protected themeOptions = THEME_OPTIONS;
-  protected currentTheme = signal<string>(
-    document.documentElement.getAttribute("data-theme") || "terminalGreen",
-  );
-
-  constructor() {
-    const theme = this.#persistenceService.loadSettings().theme;
-    if (theme) this.currentTheme.set(theme);
-  }
+  protected theme = this.#settingsService.theme;
 
   protected closeSettings() {
     this.toggleSettings.emit(false);
@@ -45,14 +39,19 @@ export class Settings {
     this.#settingsService.setTypewriterSpeed(parseInt(target.value));
   }
 
-  protected onSoundsToggle(event: Event) {
+  protected onSfxToggle(event: Event) {
     const target = event.target as HTMLInputElement;
-    this.#settingsService.setSoundsEnabled(target.checked);
+    this.#settingsService.setSfx(target.checked);
+  }
+
+  protected onTerminalBeepToggle(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.#settingsService.setTerminalBeep(target.checked);
   }
 
   protected onScrollbarToggle(event: Event) {
     const target = event.target as HTMLInputElement;
-    this.#settingsService.setScrollbarEnabled(target.checked);
+    this.#settingsService.setScrollbar(target.checked);
   }
 
   protected onRestartGame() {
@@ -61,9 +60,7 @@ export class Settings {
   }
 
   protected onThemeChange(theme: string) {
-    document.documentElement.setAttribute("data-theme", theme);
-    this.currentTheme.set(theme);
-    this.#persistenceService.updateSettings({ theme });
+    this.#settingsService.setTheme(theme);
   }
 
   protected handleKeydown(event: KeyboardEvent) {

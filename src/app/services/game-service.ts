@@ -119,8 +119,7 @@ export class GameService {
       // handle auto-redirect nodes
       if (node.autoRedirectTo) {
         this.isSystemWriting.set(true);
-        const delay =
-          node.autoRedirectDelay ?? CONFIG.DEFAULT_AUTO_REDIRECT_DELAY;
+        const delay = node.autoRedirectDelay ?? CONFIG.defaultAutoRedirectDelay;
         setTimeout(() => {
           const redirectNode = this.findNode(node.autoRedirectTo!);
           if (redirectNode) {
@@ -142,8 +141,8 @@ export class GameService {
       text,
       {
         speed: this.#settingsService.typewriterSpeed(),
-        lineBreakDelay: CONFIG.NARRATION_BREAK_DELAY,
-        effectsSelector: CONFIG.DEFAULT_SCREEN_SELECTOR,
+        lineBreakDelay: CONFIG.narrationBreakDelay,
+        effectsSelector: CONFIG.defaultScreenSelector,
       },
       () => {
         this.isSystemWriting.set(false);

@@ -2,10 +2,11 @@ import { Injectable } from "@angular/core";
 import { SavedPlayerData } from "../models/game-state";
 
 export interface PersistedSettings {
-  typewriterSpeed?: number;
-  soundsEnabled?: boolean;
-  scrollbarEnabled?: boolean;
-  theme?: string;
+  typewriterSpeed: number;
+  sfxEnabled: boolean;
+  terminalBeepEnabled: boolean;
+  scrollbarEnabled: boolean;
+  theme: string;
 }
 
 @Injectable({
@@ -21,26 +22,17 @@ export class PersistenceService {
   load(key: string) {
     const result = localStorage.getItem(key);
     if (!result) return;
-    try {
-      return JSON.parse(result);
-    } catch {
-      return;
-    }
+    return JSON.parse(result);
   }
 
-  loadSettings(): PersistedSettings {
+  loadSettings(): PersistedSettings | undefined {
     const value = this.load(PersistenceService.SETTINGS_KEY);
-    if (!value || typeof value !== "object") return {};
+    if (!value || typeof value !== "object") return;
     return value as PersistedSettings;
   }
 
   saveSettings(settings: PersistedSettings) {
     this.save(PersistenceService.SETTINGS_KEY, settings);
-  }
-
-  updateSettings(patch: PersistedSettings) {
-    const current = this.loadSettings();
-    this.saveSettings({ ...current, ...patch });
   }
 
   savePlayerData(data: SavedPlayerData) {

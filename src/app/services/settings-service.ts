@@ -1,5 +1,5 @@
-import { inject, Injectable, signal } from "@angular/core";
-import { CONFIG } from "../lib/config";
+import { computed, inject, Injectable, signal } from "@angular/core";
+import { CONFIG, DEFAULT_THEME } from "../lib/config";
 import { environment } from "@environments/environment";
 
 import { PersistenceService } from "./persistence-service";
@@ -10,35 +10,74 @@ import { PersistenceService } from "./persistence-service";
 export class SettingsService {
   #persistenceService = inject(PersistenceService);
 
-  typewriterSpeed = signal<number>(CONFIG.TYPEWRITER_SPEED);
-  soundsEnabled = signal(true);
-  scrollbarEnabled = signal(false);
+  #settings = signal<{
+    typewriterSpeed: number;
+    sfxEnabled: boolean;
+    terminalBeepEnabled: boolean;
+    scrollbarEnabled: boolean;
+    theme: string;
+  }>({
+    typewriterSpeed: CONFIG.defaultTypewriterSpeed,
+    sfxEnabled: CONFIG.defaultSfxSetting,
+    terminalBeepEnabled: CONFIG.defaultTerminalBeepSetting,
+    scrollbarEnabled: CONFIG.defaultScrollbarSetting,
+    theme: DEFAULT_THEME,
+  });
+
+  readonly typewriterSpeed = computed(() => this.#settings().typewriterSpeed);
+  readonly sfxEnabled = computed(() => this.#settings().sfxEnabled);
+  readonly terminalBeepEnabled = computed(
+    () => this.#settings().terminalBeepEnabled,
+  );
+  readonly scrollbarEnabled = computed(() => this.#settings().scrollbarEnabled);
+  readonly theme = computed(() => this.#settings().theme);
+
   appVersion = environment.appVersion;
 
   constructor() {
-    const settings = this.#persistenceService.loadSettings();
+    const saved = this.#persistenceService.loadSettings();
+    if (saved) {
+      this.#settings.set(saved);
+    }
 
-    if (settings.typewriterSpeed)
-      this.typewriterSpeed.set(settings.typewriterSpeed);
-
-    if (settings.soundsEnabled) this.soundsEnabled.set(settings.soundsEnabled);
-
-    if (settings.scrollbarEnabled)
-      this.scrollbarEnabled.set(settings.scrollbarEnabled);
+    document.documentElement.setAttribute("data-theme", this.#settings().theme);
   }
 
   setTypewriterSpeed(speed: number) {
-    this.typewriterSpeed.set(speed);
-    this.#persistenceService.updateSettings({ typewriterSpeed: speed });
+    this.#settings.update((current) => ({
+      ...current,
+      typewriterSpeed: speed,
+    }));
+    this.#persistenceService.saveSettings(this.#settings());
   }
 
-  setSoundsEnabled(enabled: boolean) {
-    this.soundsEnabled.set(enabled);
-    this.#persistenceService.updateSettings({ soundsEnabled: enabled });
+  setSfx(enabled: boolean) {
+    this.#settings.update((current) => ({ ...current, sfxEnabled: enabled }));
+    this.#persistenceService.saveSettings(this.#settings());
   }
 
-  setScrollbarEnabled(enabled: boolean) {
-    this.scrollbarEnabled.set(enabled);
-    this.#persistenceService.updateSettings({ scrollbarEnabled: enabled });
+  setTerminalBeep(enabled: boolean) {
+    this.#settings.update((current) => ({
+      ...current,
+      terminalBeepEnabled: enabled,
+    }));
+    this.#persistenceService.saveSettings(this.#settings());
+  }
+
+  setScrollbar(enabled: boolean) {
+    this.#settings.update((current) => ({
+      ...current,
+      scrollbarEnabled: enabled,
+    }));
+    this.#persistenceService.saveSettings(this.#settings());
+  }
+
+  setTheme(theme: string) {
+    this.#settings.update((current) => ({
+      ...current,
+      theme,
+    }));
+    document.documentElement.setAttribute("data-theme", theme);
+    this.#persistenceService.saveSettings(this.#settings());
   }
 }

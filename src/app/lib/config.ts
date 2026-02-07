@@ -1,8 +1,11 @@
 export const CONFIG = {
-  TYPEWRITER_SPEED: 50,
-  NARRATION_BREAK_DELAY: 1000,
-  DEFAULT_SCREEN_SELECTOR: "main",
-  DEFAULT_AUTO_REDIRECT_DELAY: 1000,
+  defaultTypewriterSpeed: 50,
+  narrationBreakDelay: 1000,
+  defaultScreenSelector: "main",
+  defaultAutoRedirectDelay: 1000,
+  defaultSfxSetting: true,
+  defaultTerminalBeepSetting: true,
+  defaultScrollbarSetting: false,
 } as const;
 
 export const DEFAULT_PLAYER_DATA = {
@@ -20,3 +23,5 @@ export const THEME_OPTIONS: string[] = [
   "pastelDark",
   "pastelLight",
 ] as const;
+
+export const DEFAULT_THEME = THEME_OPTIONS[0];
