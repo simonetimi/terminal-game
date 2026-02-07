@@ -25,3 +25,11 @@ export const THEME_OPTIONS: string[] = [
 ] as const;
 
 export const DEFAULT_THEME = THEME_OPTIONS[0];
+
+export const DEFAULT_SETTINGS = {
+  typewriterSpeed: CONFIG.defaultTypewriterSpeed,
+  sfxEnabled: CONFIG.defaultSfxSetting,
+  terminalBeepEnabled: CONFIG.defaultTerminalBeepSetting,
+  scrollbarEnabled: CONFIG.defaultScrollbarSetting,
+  theme: DEFAULT_THEME,
+};

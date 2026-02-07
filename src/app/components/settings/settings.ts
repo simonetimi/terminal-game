@@ -1,6 +1,5 @@
 import { Component, inject, output, signal } from "@angular/core";
 import { SettingsService } from "../../services/settings-service";
-import { PersistenceService } from "../../services/persistence-service";
 import { TranslatePipe } from "@ngx-translate/core";
 import { UpperCasePipe } from "@angular/common";
 import { THEME_OPTIONS } from "../../lib/config";
@@ -17,7 +16,6 @@ import { FormsModule } from "@angular/forms";
 })
 export class Settings {
   #settingsService = inject(SettingsService);
-  #persistenceService = inject(PersistenceService);
   toggleSettings = output<boolean>();
 
   protected appVersion = this.#settingsService.appVersion;
@@ -56,7 +54,11 @@ export class Settings {
 
   protected onRestartGame() {
     if (!this.isRestarting()) return this.isRestarting.set(true);
-    this.#persistenceService.clearAllDataAndRefresh();
+    this.#settingsService.restartGame();
+  }
+
+  protected onResetSettings() {
+    this.#settingsService.restoreDefaults();
   }
 
   protected onThemeChange(theme: string) {

@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
-import { CONFIG, DEFAULT_THEME } from "../lib/config";
+import { DEFAULT_SETTINGS, DEFAULT_THEME } from "../lib/config";
 import { environment } from "@environments/environment";
 import { DOM_ATTRIBUTES } from "../lib/constants";
 
@@ -17,13 +17,7 @@ export class SettingsService {
     terminalBeepEnabled: boolean;
     scrollbarEnabled: boolean;
     theme: string;
-  }>({
-    typewriterSpeed: CONFIG.defaultTypewriterSpeed,
-    sfxEnabled: CONFIG.defaultSfxSetting,
-    terminalBeepEnabled: CONFIG.defaultTerminalBeepSetting,
-    scrollbarEnabled: CONFIG.defaultScrollbarSetting,
-    theme: DEFAULT_THEME,
-  });
+  }>(DEFAULT_SETTINGS);
 
   readonly typewriterSpeed = computed(() => this.#settings().typewriterSpeed);
   readonly sfxEnabled = computed(() => this.#settings().sfxEnabled);
@@ -83,5 +77,15 @@ export class SettingsService {
     }));
     document.documentElement.setAttribute(DOM_ATTRIBUTES.theme, theme);
     this.#persistenceService.saveSettings(this.#settings());
+  }
+
+  restoreDefaults() {
+    this.#settings.set(DEFAULT_SETTINGS);
+    document.documentElement.setAttribute(DOM_ATTRIBUTES.theme, DEFAULT_THEME);
+    this.#persistenceService.clearSettings();
+  }
+
+  restartGame() {
+    this.#persistenceService.clearAllDataAndRefresh();
   }
 }

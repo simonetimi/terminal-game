@@ -1,6 +1,6 @@
 <div class="fixed inset-0 bg-overlay flex items-center justify-center z-50">
   <div
-    class="bg-panel border border-(--color-accent) p-6 pb-3 max-w-md w-full mx-4 flex flex-col"
+    class="bg-panel border border-(--color-accent) p-6 pb-3 max-w-md w-full mx-4 flex flex-col max-h-[90vh] overflow-hidden"
   >
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-xl font-bold text-(--color-accent)">
@@ -15,126 +15,136 @@
       </button>
     </div>
 
-    <div class="space-y-6">
-      <div>
-        <h3 class="text-(--color-accent) mb-2">
-          {{ "settings.writingSpeed.title" | translate | uppercase }}
-        </h3>
-        <div class="flex items-center space-x-3">
-          <span class="text-(--color-link) text-sm">
-            {{ "settings.writingSpeed.slow" | translate | uppercase }}</span
-          >
-          <input
-            type="range"
-            min="10"
-            max="100"
-            step="10"
-            [value]="typewriterSpeed()"
-            (input)="onTypewriterSpeedChange($event)"
-            class="flex-1 accent-(--color-accent)"
-          />
-          <span class="text-(--color-link) text-sm">
-            {{ "settings.writingSpeed.fast" | translate | uppercase }}</span
-          >
+    <div class="settings-scroll">
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-(--color-accent) mb-2">
+            {{ "settings.writingSpeed.title" | translate | uppercase }}
+          </h3>
+          <div class="flex items-center space-x-3">
+            <span class="text-(--color-link) text-sm">
+              {{ "settings.writingSpeed.slow" | translate | uppercase }}</span
+            >
+            <input
+              type="range"
+              min="10"
+              max="100"
+              step="10"
+              [value]="typewriterSpeed()"
+              (input)="onTypewriterSpeedChange($event)"
+              class="flex-1 accent-(--color-accent)"
+            />
+            <span class="text-(--color-link) text-sm">
+              {{ "settings.writingSpeed.fast" | translate | uppercase }}</span
+            >
+          </div>
+          <p class="text-(--color-link) text-xs mt-1">
+            {{ "settings.writingSpeed.speed" | translate }}:
+            {{ typewriterSpeed() }}
+          </p>
         </div>
-        <p class="text-(--color-link) text-xs mt-1">
-          {{ "settings.writingSpeed.speed" | translate }}:
-          {{ typewriterSpeed() }}
-        </p>
-      </div>
 
-      <div class="flex flex-col gap-2">
-        <h3 class="text-(--color-accent) mb-2">
-          {{ "settings.audio.title" | translate | uppercase }}
-        </h3>
-        <label class="flex items-center space-x-2 cursor-pointer">
-          <input
-            type="checkbox"
-            [checked]="sfxEnabled()"
-            (change)="onSfxToggle($event)"
-            class="accent-(--color-accent)"
-          />
-          <span class="text-(--color-link)">
-            {{
-              sfxEnabled()
-                ? ("settings.audio.sfxEnabled" | translate)
-                : ("settings.audio.sfxDisabled" | translate)
-            }}
-          </span>
-        </label>
-        <label class="flex items-center space-x-2 cursor-pointer">
-          <input
-            type="checkbox"
-            [checked]="terminalBeepEnabled()"
-            (change)="onTerminalBeepToggle($event)"
-            class="accent-(--color-accent)"
-          />
-          <span class="text-(--color-link)">
-            {{
-              terminalBeepEnabled()
-                ? ("settings.audio.terminalBeepEnabled" | translate)
-                : ("settings.audio.terminalBeepDisabled" | translate)
-            }}
-          </span>
-        </label>
-      </div>
+        <div class="flex flex-col gap-2">
+          <h3 class="text-(--color-accent) mb-2">
+            {{ "settings.audio.title" | translate | uppercase }}
+          </h3>
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              [checked]="sfxEnabled()"
+              (change)="onSfxToggle($event)"
+              class="accent-(--color-accent)"
+            />
+            <span class="text-(--color-link)">
+              {{
+                sfxEnabled()
+                  ? ("settings.audio.sfxEnabled" | translate)
+                  : ("settings.audio.sfxDisabled" | translate)
+              }}
+            </span>
+          </label>
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              [checked]="terminalBeepEnabled()"
+              (change)="onTerminalBeepToggle($event)"
+              class="accent-(--color-accent)"
+            />
+            <span class="text-(--color-link)">
+              {{
+                terminalBeepEnabled()
+                  ? ("settings.audio.terminalBeepEnabled" | translate)
+                  : ("settings.audio.terminalBeepDisabled" | translate)
+              }}
+            </span>
+          </label>
+        </div>
 
-      <div>
-        <h3 class="text-(--color-accent) mb-2">
-          {{ "settings.theme.title" | translate | uppercase }}
-        </h3>
-        <select
-          class="custom-select w-full bg-panel border border-(--color-accent) text-(--color-accent) rounded px-2 py-2 cursor-pointer"
-          [ngModel]="theme()"
-          (ngModelChange)="onThemeChange($event)"
+        <div>
+          <h3 class="text-(--color-accent) mb-2">
+            {{ "settings.theme.title" | translate | uppercase }}
+          </h3>
+          <select
+            class="custom-select w-full bg-panel border border-(--color-accent) text-(--color-accent) rounded px-2 py-2 cursor-pointer"
+            [ngModel]="theme()"
+            (ngModelChange)="onThemeChange($event)"
+          >
+            @for (theme of themeOptions; track theme) {
+              <option [value]="theme" class="bg-panel text-(--color-accent)">
+                {{ "settings.theme.options." + theme | translate }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <h3 class="text-(--color-accent) mb-2">
+            {{ "settings.scrollbar.title" | translate | uppercase }}
+          </h3>
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              [checked]="scrollbarEnabled()"
+              (change)="onScrollbarToggle($event)"
+              class="accent-(--color-accent)"
+            />
+            <span class="text-(--color-link)">
+              {{
+                scrollbarEnabled()
+                  ? ("settings.scrollbar.enabled" | translate)
+                  : ("settings.scrollbar.disabled" | translate)
+              }}
+            </span>
+          </label>
+        </div>
+
+        <div
+          class="border-t border-(--color-accent) pt-4 flex flex-col gap-4 items-start"
         >
-          @for (theme of themeOptions; track theme) {
-            <option [value]="theme" class="bg-panel text-(--color-accent)">
-              {{ "settings.theme.options." + theme | translate }}
-            </option>
-          }
-        </select>
-      </div>
-
-      <div>
-        <h3 class="text-(--color-accent) mb-2">
-          {{ "settings.scrollbar.title" | translate | uppercase }}
-        </h3>
-        <label class="flex items-center space-x-2 cursor-pointer">
-          <input
-            type="checkbox"
-            [checked]="scrollbarEnabled()"
-            (change)="onScrollbarToggle($event)"
-            class="accent-(--color-accent)"
-          />
-          <span class="text-(--color-link)">
+          <h3 class="text-(--color-accent) mb-2">
+            {{ "settings.game.title" | translate | uppercase }}
+          </h3>
+          <button
+            (click)="onResetSettings()"
+            class="px-4 py-2 border border-(--color-accent) text-(--color-accent) hover:bg-(--color-accent) hover:text-(--color-bg) transition-colors cursor-pointer"
+          >
+            {{ "settings.game.reset" | translate | uppercase }}
+          </button>
+          <button
+            (click)="onRestartGame()"
+            [class]="
+              isRestarting()
+                ? 'px-4 py-2 border border-(--color-accent) bg-(--color-accent) text-(--color-bg) transition-colors cursor-pointer'
+                : 'px-4 py-2 border border-(--color-accent) text-(--color-accent) hover:bg-(--color-accent) hover:text-(--color-bg) transition-colors cursor-pointer'
+            "
+          >
             {{
-              scrollbarEnabled()
-                ? ("settings.scrollbar.enabled" | translate)
-                : ("settings.scrollbar.disabled" | translate)
+              isRestarting()
+                ? ("settings.game.restartConfirm" | translate | uppercase)
+                : ("settings.game.restart" | translate | uppercase)
             }}
-          </span>
-        </label>
-      </div>
-
-      <div class="border-t border-(--color-accent) pt-4">
-        <h3 class="text-(--color-accent) mb-2">
-          {{ "settings.game.title" | translate | uppercase }}
-        </h3>
-        <button
-          (click)="onRestartGame()"
-          [class]="
-            isRestarting()
-              ? 'px-4 py-2 border border-(--color-accent) bg-(--color-accent) text-(--color-bg) transition-colors cursor-pointer'
-              : 'px-4 py-2 border border-(--color-accent) text-(--color-accent) hover:bg-(--color-accent) hover:text-(--color-bg) transition-colors cursor-pointer'
-          "
-        >
-          {{
-            isRestarting()
-              ? ("settings.game.restartConfirm" | translate | uppercase)
-              : ("settings.game.restart" | translate | uppercase)
-          }}
-        </button>
+          </button>
+        </div>
       </div>
     </div>
 
