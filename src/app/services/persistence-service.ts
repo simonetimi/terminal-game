@@ -16,6 +16,16 @@ export interface PersistedSettings {
 export class PersistenceService {
   static readonly SETTINGS_KEY = STORAGE_KEYS.settings;
 
+  #encode(data: unknown) {
+    const json = JSON.stringify(data);
+    return btoa(json);
+  }
+
+  #decode(encoded: string) {
+    const json = atob(encoded);
+    return JSON.parse(json);
+  }
+
   save(key: string, data: unknown) {
     localStorage.setItem(key, JSON.stringify(data));
   }
@@ -24,6 +34,16 @@ export class PersistenceService {
     const result = localStorage.getItem(key);
     if (!result) return;
     return JSON.parse(result);
+  }
+
+  saveEncoded(key: string, data: unknown) {
+    localStorage.setItem(key, this.#encode(data));
+  }
+
+  loadEncoded(key: string) {
+    const result = localStorage.getItem(key);
+    if (!result) return;
+    return this.#decode(result);
   }
 
   loadSettings(): PersistedSettings | undefined {
@@ -37,43 +57,43 @@ export class PersistenceService {
   }
 
   savePlayerData(data: SavedPlayerData) {
-    this.save(STORAGE_KEYS.player, data);
+    this.saveEncoded(STORAGE_KEYS.player, data);
   }
 
   loadPlayerData(): SavedPlayerData {
-    return this.load(STORAGE_KEYS.player);
+    return this.loadEncoded(STORAGE_KEYS.player);
   }
 
   saveVisitedNodes(nodeIds: string[]) {
-    this.save(STORAGE_KEYS.visitedNodes, nodeIds);
+    this.saveEncoded(STORAGE_KEYS.visitedNodes, nodeIds);
   }
 
   loadVisitedNodes(): string[] {
-    return this.load(STORAGE_KEYS.visitedNodes);
+    return this.loadEncoded(STORAGE_KEYS.visitedNodes);
   }
 
   saveCurrentNodeId(nodeId: string) {
-    this.save(STORAGE_KEYS.currentNode, nodeId);
+    this.saveEncoded(STORAGE_KEYS.currentNode, nodeId);
   }
 
   loadCurrentNodeId(): string {
-    return this.load(STORAGE_KEYS.currentNode);
+    return this.loadEncoded(STORAGE_KEYS.currentNode);
   }
 
   saveFreeInputsHistory(freeInputsHistory: string[]) {
-    this.save(STORAGE_KEYS.freeInputsHistory, freeInputsHistory);
+    this.saveEncoded(STORAGE_KEYS.freeInputsHistory, freeInputsHistory);
   }
 
   loadFreeInputsHistory(): string[] {
-    return this.load(STORAGE_KEYS.freeInputsHistory);
+    return this.loadEncoded(STORAGE_KEYS.freeInputsHistory);
   }
 
   saveChoiceHistory(history: string[]) {
-    this.save(STORAGE_KEYS.choiceHistory, history);
+    this.saveEncoded(STORAGE_KEYS.choiceHistory, history);
   }
 
   loadChoiceHistory(): string[] {
-    return this.load(STORAGE_KEYS.choiceHistory) ?? [];
+    return this.loadEncoded(STORAGE_KEYS.choiceHistory) ?? [];
   }
 
   clearAllDataAndRefresh() {
