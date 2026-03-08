@@ -12,6 +12,7 @@ import { SplashScreen } from "./components/splash-screen/splash-screen";
 import { TranslateService } from "@ngx-translate/core";
 import { Title } from "@angular/platform-browser";
 import { Settings } from "./components/settings/settings";
+import { LucideIconConfig } from "lucide-angular";
 
 @Component({
   selector: "app-root",
@@ -23,11 +24,13 @@ import { Settings } from "./components/settings/settings";
 export class App implements OnInit {
   #translateService = inject(TranslateService);
   #titleService = inject(Title);
+  #lucideIconsService = inject(LucideIconConfig);
   protected hideSplashScreen = signal(false);
   protected showSettingsModal = signal(false);
 
   ngOnInit() {
     this.#titleService.setTitle(this.#translateService.instant("app.title"));
+    this.#lucideIconsService.size = 20;
   }
 
   toggleSplashScreen($event: boolean) {

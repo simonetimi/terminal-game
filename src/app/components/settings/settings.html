@@ -119,25 +119,55 @@
         </div>
 
         <div
-          class="border-t border-(--color-accent) pt-4 flex flex-col gap-4 items-start"
+          class="border-t border-(--color-accent) pt-4 flex flex-col gap-4 items-start game-buttons"
         >
           <h3 class="text-(--color-accent) mb-2">
             {{ "settings.game.title" | translate | uppercase }}
           </h3>
           <button
+            (click)="onDownloadSaveFile()"
+            class="px-4 py-2 border border-(--color-accent) text-(--color-accent) hover:bg-(--color-accent) hover:text-(--color-bg) transition-colors cursor-pointer"
+          >
+            <lucide-icon name="download" />
+            {{ "settings.game.save" | translate | uppercase }}
+          </button>
+          <label
+            class="px-4 py-2 border border-(--color-accent) text-(--color-accent) hover:bg-(--color-accent) hover:text-(--color-bg) transition-colors cursor-pointer"
+          >
+            <lucide-icon name="upload" />
+            {{ "settings.game.load" | translate | uppercase }}
+            <input
+              type="file"
+              accept="application/json,.json"
+              hidden
+              (change)="onSaveFileSelected($event)"
+            />
+          </label>
+          @if (saveFileImportFailed()) {
+            <p class="text-(--color-link) text-xs">
+              {{ "settings.game.loadError" | translate }}
+            </p>
+          }
+          <button
             (click)="onResetSettings()"
             class="px-4 py-2 border border-(--color-accent) text-(--color-accent) hover:bg-(--color-accent) hover:text-(--color-bg) transition-colors cursor-pointer"
           >
+            <lucide-icon name="settings-2" />
             {{ "settings.game.reset" | translate | uppercase }}
           </button>
           <button
-            (click)="onRestartGame()"
+            (click)="onRestartGame($event)"
             [class]="
               isRestarting()
                 ? 'px-4 py-2 border border-(--color-accent) bg-(--color-accent) text-(--color-bg) transition-colors cursor-pointer'
                 : 'px-4 py-2 border border-(--color-accent) text-(--color-accent) hover:bg-(--color-accent) hover:text-(--color-bg) transition-colors cursor-pointer'
             "
           >
+            @if (isRestarting()) {
+              <lucide-icon name="circle-alert" />
+            } @else {
+              <lucide-icon name="rotate-ccw" />
+            }
             {{
               isRestarting()
                 ? ("settings.game.restartConfirm" | translate | uppercase)

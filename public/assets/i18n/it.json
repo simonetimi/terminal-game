@@ -9,11 +9,7 @@
   },
   "commands": {
     "yes": {
-      "keys": [
-        "si",
-        "sì",
-        "s"
-      ]
+      "keys": ["si", "sì", "s"]
     }
   },
   "items": {
@@ -56,6 +52,9 @@
     },
     "game": {
       "title": "Gioco",
+      "save": "Scarica salvataggio",
+      "load": "Carica salvataggio",
+      "loadError": "File di salvataggio non valido.",
       "restart": "Ricomincia il gioco",
       "restartConfirm": "Sei sicuro di voler ricominciare?",
       "reset": "Ripristina impostazioni"
