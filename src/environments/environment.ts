@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  appVersion: "0.0.0-alpha.7",
+  appVersion: "0.0.0-alpha.8",
   language: "it",
 };
