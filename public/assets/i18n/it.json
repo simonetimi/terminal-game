@@ -39,8 +39,8 @@
     },
     "audio": {
       "title": "Audio",
-      "sfxEnabled": "Suoni della storia abilitati",
-      "sfxDisabled": "Suoni della storia disabilitati",
+      "sfxEnabled": "Suoni storia abilitati",
+      "sfxDisabled": "Suoni storia disabilitati",
       "terminalBeepEnabled": "Suoni terminale abilitati",
       "terminalBeepDisabled": "Suoni terminale disabilitati"
     },
@@ -56,8 +56,8 @@
     },
     "game": {
       "title": "Gioco",
-      "restart": "Riavvia il gioco",
-      "restartConfirm": "Sei sicuro di voler riavviare?",
+      "restart": "Ricomincia il gioco",
+      "restartConfirm": "Sei sicuro di voler ricominciare?",
       "reset": "Ripristina impostazioni"
     },
     "close": "Chiudi"
