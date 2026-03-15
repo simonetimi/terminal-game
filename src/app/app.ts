@@ -12,7 +12,7 @@ import { SplashScreen } from "./components/splash-screen/splash-screen";
 import { TranslateService } from "@ngx-translate/core";
 import { Title } from "@angular/platform-browser";
 import { Settings } from "./components/settings/settings";
-import { PersistenceService } from "./services/persistence-service";
+import { LucideIconConfig } from "lucide-angular";
 
 @Component({
   selector: "app-root",
@@ -23,15 +23,14 @@ import { PersistenceService } from "./services/persistence-service";
 })
 export class App implements OnInit {
   #translateService = inject(TranslateService);
-  #persistenceService = inject(PersistenceService);
   #titleService = inject(Title);
+  #lucideIconsService = inject(LucideIconConfig);
   protected hideSplashScreen = signal(false);
   protected showSettingsModal = signal(false);
 
   ngOnInit() {
     this.#titleService.setTitle(this.#translateService.instant("app.title"));
-    const theme = this.#persistenceService.loadTheme();
-    if (theme) document.documentElement.setAttribute("data-theme", theme);
+    this.#lucideIconsService.size = 20;
   }
 
   toggleSplashScreen($event: boolean) {

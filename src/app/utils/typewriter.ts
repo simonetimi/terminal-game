@@ -1,7 +1,9 @@
 import { WritableSignal } from "@angular/core";
+import { ListItem } from "../models/game.model";
+import { TEXT_DELIMITERS, VFX_EVENTS } from "../lib/constants";
 
 export function typewriter(
-  targetSignal: WritableSignal<string[]>,
+  targetSignal: WritableSignal<ListItem[]>,
   text: string,
   options: {
     speed?: number;
@@ -24,14 +26,14 @@ export function typewriter(
   const delay = maxDelay - Math.round((speed / 100) * (maxDelay - minDelay));
 
   // split text by double backslashes
-  const lines = text.split("\\");
+  const lines = text.split(TEXT_DELIMITERS.storyLineBreak);
   let currentLineIndex = 0;
   let currentCharIndex = 0;
   let finished = false;
   let isPaused = false;
   let currentTimeout: number | null = null;
 
-  targetSignal.update((items) => [...items, ""]);
+  targetSignal.update((items) => [...items, { text: "" }]);
   const firstIndex = targetSignal().length - 1;
 
   // event helpers
@@ -75,8 +77,8 @@ export function typewriter(
     }
   };
 
-  eventTarget.addEventListener("glitch-starting", glitchStartListener);
-  eventTarget.addEventListener("glitch-ended", glitchEndListener);
+  eventTarget.addEventListener(VFX_EVENTS.glitchStarting, glitchStartListener);
+  eventTarget.addEventListener(VFX_EVENTS.glitchEnded, glitchEndListener);
 
   const updateText = () => {
     // build the complete text up to current position
@@ -99,7 +101,7 @@ export function typewriter(
 
     targetSignal.update((items) => {
       const arr = [...items];
-      arr[firstIndex] = completeText;
+      arr[firstIndex].text = completeText;
       return arr;
     });
   };
@@ -150,10 +152,16 @@ export function typewriter(
 
   const cleanupListeners = () => {
     if (glitchStartListener) {
-      eventTarget.removeEventListener("glitch-starting", glitchStartListener);
+      eventTarget.removeEventListener(
+        VFX_EVENTS.glitchStarting,
+        glitchStartListener,
+      );
     }
     if (glitchEndListener) {
-      eventTarget.removeEventListener("glitch-ended", glitchEndListener);
+      eventTarget.removeEventListener(
+        VFX_EVENTS.glitchEnded,
+        glitchEndListener,
+      );
     }
   };
 

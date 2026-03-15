@@ -10,6 +10,8 @@ import { typewriter } from "../../utils/typewriter";
 import { FormsModule } from "@angular/forms";
 import { SettingsService } from "../../services/settings-service";
 import { GameService } from "../../services/game-service";
+import { ListItem } from "../../models/game.model";
+import { KEYBOARD_KEYS } from "../../lib/constants";
 
 @Component({
   selector: "app-splash-screen",
@@ -25,7 +27,7 @@ export class SplashScreen implements AfterViewInit {
   #settingsService = inject(SettingsService);
   #gameService = inject(GameService);
 
-  protected displayMessages = signal<string[]>([]);
+  protected displayMessages = signal<ListItem[]>([]);
   protected showButton = signal(false);
 
   #textLoaded = signal(false);
@@ -61,7 +63,10 @@ export class SplashScreen implements AfterViewInit {
   }
 
   protected handleKeydown(event: KeyboardEvent) {
-    if (event.key === "Enter" || event.key === " ") {
+    if (
+      event.key === KEYBOARD_KEYS.enter ||
+      event.key === KEYBOARD_KEYS.space
+    ) {
       this.onSubmit();
     }
   }

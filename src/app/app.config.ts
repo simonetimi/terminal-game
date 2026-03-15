@@ -12,6 +12,24 @@ import { provideTranslateService } from "@ngx-translate/core";
 import { provideTranslateHttpLoader } from "@ngx-translate/http-loader";
 import { provideHttpClient } from "@angular/common/http";
 import { initializeTranslations } from "./translate.config";
+import { ASSET_PATHS } from "./lib/constants";
+import {
+  CircleAlert,
+  Download,
+  LUCIDE_ICONS,
+  LucideIconProvider,
+  RotateCcw,
+  Settings2,
+  Upload,
+} from "lucide-angular";
+
+const lucideIcons = {
+  Download,
+  Upload,
+  Settings2,
+  RotateCcw,
+  CircleAlert,
+};
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,10 +39,15 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     provideTranslateService({
       loader: provideTranslateHttpLoader({
-        prefix: "assets/i18n/",
-        suffix: ".json",
+        prefix: ASSET_PATHS.i18nPrefix,
+        suffix: ASSET_PATHS.i18nSuffix,
       }),
     }),
     provideAppInitializer(initializeTranslations),
+    {
+      provide: LUCIDE_ICONS,
+      multi: true,
+      useValue: new LucideIconProvider(lucideIcons),
+    },
   ],
 };

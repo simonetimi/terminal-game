@@ -11,7 +11,11 @@
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ESNext",
-    "module": "preserve"
+    "module": "preserve",
+    "baseUrl": "src",
+    "paths": {
+      "@environments/*": ["environments/*"]
+    },
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

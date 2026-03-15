@@ -1,10 +1,28 @@
-<div class="h-full overflow-hidden">
-  <ul
+<div class="h-full overflow-hidden flex flex-col justify-end">
+  <cdk-virtual-scroll-viewport
     #scrollContainer
-    class="list-none h-full overflow-y-auto flex flex-col justify-end"
+    class="h-full w-full overflow-y-auto"
+    autosize
+    minBufferPx="600"
+    maxBufferPx="1200"
   >
-    @for (item of displayItems(); track $index) {
-      <li [innerHTML]="item"></li>
-    }
-  </ul>
+    <ul class="list-none flex flex-col">
+      <li
+        *cdkVirtualFor="
+          let item of displayItems();
+          let i = index;
+          trackBy: trackByIndex
+        "
+        [innerHTML]="item.text"
+        [attr.data-choice-num]="item.choiceNumber"
+        (click)="handleChoiceClick($event)"
+        (keydown)="handleChoiceKeydown($event)"
+        [attr.tabindex]="
+          item.choiceNumber !== null && item.choiceNumber !== undefined
+            ? 0
+            : null
+        "
+      ></li>
+    </ul>
+  </cdk-virtual-scroll-viewport>
 </div>

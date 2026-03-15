@@ -4,10 +4,10 @@
   @if (showSettingsModal()) {
     <app-settings (toggleSettings)="toggleSettingsModal($event)" />
   } @else if (hideSplashScreen()) {
-    <app-player-status class="h-12 flex items-center flex-shrink-0 mb-1" />
+    <app-player-status class="h-12 flex items-center shrink-0 mb-1" />
     <app-display-area class="flex-1 min-h-0 mb-2 overflow-hidden" />
     <app-input-area
-      class="flex items-center flex-shrink-0 min-h-[3rem]"
+      class="flex items-center shrink-0 min-h-12"
       (toggleSettings)="toggleSettingsModal($event)"
     />
   } @else {

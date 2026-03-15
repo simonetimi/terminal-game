@@ -5,7 +5,7 @@
   <ul class="flex flex-col list-none text-center">
     @for (message of displayMessages(); track $index) {
       <li>
-        {{ message }}
+        {{ message.text }}
       </li>
     }
   </ul>

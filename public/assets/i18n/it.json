@@ -9,11 +9,7 @@
   },
   "commands": {
     "yes": {
-      "keys": [
-        "si",
-        "sì",
-        "s"
-      ]
+      "keys": ["si", "sì", "s"]
     }
   },
   "items": {
@@ -32,10 +28,17 @@
       "fast": "Veloce",
       "speed": "Velocità"
     },
+    "scrollbar": {
+      "title": "Scorrimento verticale",
+      "enabled": "Indicatore abilitato",
+      "disabled": "Indicatore disabilitato"
+    },
     "audio": {
       "title": "Audio",
-      "enabled": "Suoni abilitati",
-      "disabled": "Suoni disabilitati"
+      "sfxEnabled": "Suoni storia abilitati",
+      "sfxDisabled": "Suoni storia disabilitati",
+      "terminalBeepEnabled": "Suoni terminale abilitati",
+      "terminalBeepDisabled": "Suoni terminale disabilitati"
     },
     "theme": {
       "title": "Temi",
@@ -49,8 +52,12 @@
     },
     "game": {
       "title": "Gioco",
-      "restart": "Riavvia",
-      "restartConfirm": "Sei sicuro di voler riavviare?"
+      "save": "Scarica salvataggio",
+      "load": "Carica salvataggio",
+      "loadError": "File di salvataggio non valido.",
+      "restart": "Ricomincia il gioco",
+      "restartConfirm": "Sei sicuro di voler ricominciare?",
+      "reset": "Ripristina impostazioni"
     },
     "close": "Chiudi"
   },

@@ -2,24 +2,31 @@ import { Injectable, isDevMode } from "@angular/core";
 import gsap from "gsap";
 import { CONFIG } from "../lib/config";
 import { VfxOptions } from "../models/vfx.model";
+import { Vfx } from "../models/game-state";
+import {
+  DATASET_KEYS,
+  MEDIA_QUERIES,
+  VFX_CLASSES,
+  VFX_EVENTS,
+} from "../lib/constants";
 
 @Injectable({ providedIn: "root" })
 export class VfxService {
-  #permanentEffects = new Set<string>();
+  #permanentEffects = new Set<Vfx>();
   #currentTimeline: gsap.core.Timeline | null = null;
 
   play(effectName: string, options: VfxOptions = {}) {
     const effects: Record<string, () => void> = {
       shake: () =>
-        this.#shake(options.selector || CONFIG.DEFAULT_SCREEN_SELECTOR),
+        this.#shake(options.selector || CONFIG.defaultScreenSelector),
       dark: () =>
         this.#dark(
-          options.selector || CONFIG.DEFAULT_SCREEN_SELECTOR,
+          options.selector || CONFIG.defaultScreenSelector,
           options.duration || 2,
         ),
       glitch: () =>
         this.#glitch(
-          options.selector || CONFIG.DEFAULT_SCREEN_SELECTOR,
+          options.selector || CONFIG.defaultScreenSelector,
           options.duration || 1,
         ),
     };
@@ -103,13 +110,15 @@ export class VfxService {
   }
 
   #createGrainOverlay(parentElement: HTMLElement) {
-    const existingGrain = parentElement.querySelector(".vfx-grain-overlay");
+    const existingGrain = parentElement.querySelector(
+      `.${VFX_CLASSES.grainOverlay}`,
+    );
     if (existingGrain) {
       existingGrain.remove();
     }
 
     const grain = document.createElement("div");
-    grain.className = "vfx-grain-overlay";
+    grain.className = VFX_CLASSES.grainOverlay;
 
     Object.assign(grain.style, {
       position: "absolute",
@@ -163,9 +172,9 @@ export class VfxService {
     const element = document.querySelector(selector) as HTMLElement | null;
     if (!element) return;
 
-    element.dataset["glitching"] = "true";
+    element.dataset[DATASET_KEYS.glitching] = "true";
     element.dispatchEvent(
-      new CustomEvent("glitch-starting", {
+      new CustomEvent(VFX_EVENTS.glitchStarting, {
         detail: { duration: duration * 1000 },
         bubbles: true,
         composed: true,
@@ -179,7 +188,7 @@ export class VfxService {
     }
 
     const overlay = document.createElement("div");
-    overlay.className = "vfx-glitch-overlay";
+    overlay.className = VFX_CLASSES.glitchOverlay;
     Object.assign(overlay.style, {
       position: "absolute",
       inset: "0",
@@ -204,7 +213,7 @@ export class VfxService {
     overlay.style.setProperty("--vfx-shake-rot", "0deg");
 
     const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
+      MEDIA_QUERIES.prefersReducedMotion,
     ).matches;
     const prevTransform = element.style.transform;
     let jitterTimer: number | null = null;
@@ -276,15 +285,18 @@ export class VfxService {
       if (prevPos === "static") {
         element.style.position = "";
       }
-      delete element.dataset["glitching"];
+      delete element.dataset[DATASET_KEYS.glitching];
       element.dispatchEvent(
-        new CustomEvent("glitch-ended", { bubbles: true, composed: true }),
+        new CustomEvent(VFX_EVENTS.glitchEnded, {
+          bubbles: true,
+          composed: true,
+        }),
       );
     }, duration * 1000);
   }
 
   removeEffects(
-    selector: string = CONFIG.DEFAULT_SCREEN_SELECTOR,
+    selector: string = CONFIG.defaultScreenSelector,
     duration = 1.5,
   ) {
     this.#permanentEffects.clear();
@@ -298,7 +310,7 @@ export class VfxService {
     if (!element) return;
 
     // remove grain overlay
-    const grain = element.querySelector(".vfx-grain-overlay");
+    const grain = element.querySelector(`.${VFX_CLASSES.grainOverlay}`);
     if (grain) {
       gsap.to(grain, {
         opacity: 0,

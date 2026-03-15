@@ -2,9 +2,6 @@
   spellcheck="false"
   class="flex gap-1 items-center w-full max-w-full text-sm"
   (ngSubmit)="onSubmit()"
-  (click)="captureFocus()"
-  (keyup)="captureFocus()"
-  (touchstart)="captureFocus()"
 >
   <p class="input-prompt font-mono text-base shrink-0 pr-1 text-ui">
     {{ playerState().name }}&#64;terminal ~ %
@@ -15,6 +12,7 @@
     class="terminal-input bg-transparent border-none outline-none text-ui font-mono text-base caret-(--color-cursor) flex-1 min-w-0"
     autocomplete="off"
     [formControl]="inputCommand"
+    (keydown)="handleKeydown($event)"
   />
   <section class="flex gap-3 items-center">
     <button
@@ -22,6 +20,7 @@
       type="button"
       class="text-accent hover:text-(--color-link) transition-colors cursor-pointer"
       title="Settings"
+      tabindex="0"
     >
       <app-svg-icon
         iconUrl="/assets/icons/cog.svg"

@@ -1,0 +1,20 @@
+:host .settings-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+
+  /* adjust scrollbar */
+  margin-left: -1.5rem;
+  margin-right: -1.25rem;
+  padding-left: 1.5rem;
+  padding-right: 1.25rem;
+}
+
+.game-buttons {
+  button,
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
