@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { provideHttpClient } from "@angular/common/http";
+import { provideTranslateService } from "@ngx-translate/core";
 
 import { SplashScreen } from "./splash-screen";
 
@@ -9,6 +11,7 @@ describe("SplashScreen", () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [SplashScreen],
+      providers: [provideHttpClient(), provideTranslateService()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SplashScreen);

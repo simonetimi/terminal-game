@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { provideHttpClient } from "@angular/common/http";
+import { provideTranslateService } from "@ngx-translate/core";
 
 import { InputArea } from "./input-area";
 
@@ -9,6 +11,7 @@ describe("InputArea", () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [InputArea],
+      providers: [provideHttpClient(), provideTranslateService()],
     }).compileComponents();
 
     fixture = TestBed.createComponent(InputArea);
