@@ -61,5 +61,5 @@ export const MEDIA_QUERIES = {
 } as const;
 
 export const TEXT_DELIMITERS = {
-  storyLineBreak: "\\",
+  narrationBreak: "\\",
 } as const;

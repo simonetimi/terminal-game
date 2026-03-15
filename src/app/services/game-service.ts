@@ -19,7 +19,7 @@ import { SettingsService } from "./settings-service";
 import Fuse from "fuse.js";
 import { httpResource } from "@angular/common/http";
 import { ListItem } from "../models/game.model";
-import { ASSET_PATHS, KEYBOARD_KEYS } from "../lib/constants";
+import { ASSET_PATHS, KEYBOARD_KEYS, TEXT_DELIMITERS } from "../lib/constants";
 
 @Injectable({
   providedIn: "root",
@@ -78,6 +78,23 @@ export class GameService {
     const savedVisitedNodes = this.#persistenceService.loadVisitedNodes();
 
     this.nodes = data.nodes;
+
+    // check for valid data
+    const isSavedStateValid =
+      !!savedNodeId &&
+      Array.isArray(savedVisitedNodes) &&
+      savedVisitedNodes.length > 0 &&
+      this.nodes.some((node) => node.id === savedNodeId) &&
+      savedVisitedNodes.every((id) =>
+        this.nodes.some((node) => node.id === id),
+      );
+
+    if (!!savedNodeId || !!savedVisitedNodes) {
+      if (!isSavedStateValid) {
+        this.#persistenceService.clearAllDataAndRefresh();
+        return;
+      }
+    }
 
     if (savedNodeId && savedVisitedNodes) {
       // restore visited nodes
@@ -547,7 +564,7 @@ export class GameService {
         const text = this.chooseTextToDisplay(
           node,
           tempVisitedNodes,
-        ).replaceAll("\\", "");
+        ).replaceAll(TEXT_DELIMITERS.narrationBreak, "");
         display.push({ text });
         continue;
       }
@@ -562,7 +579,7 @@ export class GameService {
 
       // render node text with current reconstructed state
       const text = this.chooseTextToDisplay(node, tempVisitedNodes).replaceAll(
-        "\\",
+        TEXT_DELIMITERS.narrationBreak,
         "",
       );
       display.push({ text });

@@ -25,8 +25,8 @@ export function typewriter(
   const maxDelay = 80;
   const delay = maxDelay - Math.round((speed / 100) * (maxDelay - minDelay));
 
-  // split text by double backslashes
-  const lines = text.split(TEXT_DELIMITERS.storyLineBreak);
+  // split narration chunks by delimiter marker
+  const lines = text.split(TEXT_DELIMITERS.narrationBreak);
   let currentLineIndex = 0;
   let currentCharIndex = 0;
   let finished = false;
@@ -35,6 +35,11 @@ export function typewriter(
 
   targetSignal.update((items) => [...items, { text: "" }]);
   const firstIndex = targetSignal().length - 1;
+
+  const getParts = (line: string) => {
+    if (wordMode) return line.split(" ");
+    return line.match(/<[^>]+>|./g) ?? [];
+  };
 
   // event helpers
   const eventTarget: Document = document;
@@ -92,7 +97,7 @@ export function typewriter(
     // add current line up to current character
     if (currentLineIndex < lines.length) {
       const currentLine = lines[currentLineIndex];
-      const parts = wordMode ? currentLine.split(" ") : currentLine.split("");
+      const parts = getParts(currentLine);
       const currentPart = parts
         .slice(0, Math.min(currentCharIndex + 1, parts.length))
         .join(wordMode ? " " : "");
@@ -117,7 +122,7 @@ export function typewriter(
     }
 
     const currentLine = lines[currentLineIndex];
-    const parts = wordMode ? currentLine.split(" ") : currentLine.split("");
+    const parts = getParts(currentLine);
 
     updateText();
     currentCharIndex++;

@@ -12,6 +12,8 @@ import { SettingsService } from "../../services/settings-service";
 import { GameService } from "../../services/game-service";
 import { ListItem } from "../../models/game.model";
 import { KEYBOARD_KEYS } from "../../lib/constants";
+import { environment } from "@environments/environment";
+import { PersistenceService } from "../../services/persistence-service";
 
 @Component({
   selector: "app-splash-screen",
@@ -26,9 +28,12 @@ export class SplashScreen implements AfterViewInit {
   #translateService = inject(TranslateService);
   #settingsService = inject(SettingsService);
   #gameService = inject(GameService);
+  #persistenceService = inject(PersistenceService);
 
   protected displayMessages = signal<ListItem[]>([]);
   protected showButton = signal(false);
+
+  protected isDev = !environment.production;
 
   #textLoaded = signal(false);
 
@@ -60,6 +65,11 @@ export class SplashScreen implements AfterViewInit {
 
   protected onSubmit() {
     if (this.#textLoaded()) this.hideSplashScreen.emit(true);
+  }
+
+  protected devReset(event: MouseEvent) {
+    event.preventDefault();
+    this.#persistenceService.clearAllDataAndRefresh();
   }
 
   protected handleKeydown(event: KeyboardEvent) {
