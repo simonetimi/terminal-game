@@ -1,23 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { SvgIcon } from './svg-icon';
+import { SvgIcon } from "./svg-icon";
 
-describe('SvgIcon', () => {
+describe("SvgIcon", () => {
   let component: SvgIcon;
   let fixture: ComponentFixture<SvgIcon>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SvgIcon]
-    })
-    .compileComponents();
+      imports: [SvgIcon],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(SvgIcon);
+    fixture.componentRef.setInput("iconUrl", "/assets/icons/test.svg");
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });
